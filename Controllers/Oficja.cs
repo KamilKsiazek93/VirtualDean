@@ -11,5 +11,6 @@ namespace VirtualDean.Controllers
     [ApiController]
     public class Oficja : ControllerBase
     {
+
     }
 }
