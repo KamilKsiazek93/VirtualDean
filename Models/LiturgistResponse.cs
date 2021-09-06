@@ -9,8 +9,8 @@ namespace VirtualDean.Models
     {
         public string Name { get; set; }
         public string Surname { get; set; }
-        public List<KitchenOffices> KitchenOffices { get; set; }
-        public List<Obstacles> Obstacles { get; set; }
-        public List<Offices> Offices { get; set; }
+        public List<string> KitchenOffices { get; set; }
+        public List<string> Obstacles { get; set; }
+        public List<string> Offices { get; set; }
     }
 }
