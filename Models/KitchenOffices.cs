@@ -7,7 +7,7 @@ namespace VirtualDean.Models
 {
     public class KitchenOffices
     {
-        public string SaturdayOffices { get; set; }
-        public string SundayOffices { get; set; }
+        public string SaturdayOffice { get; set; }
+        public string SundayOffice { get; set; }
     }
 }
