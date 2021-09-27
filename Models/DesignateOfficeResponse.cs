@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace VirtualDean.Models
 {
-    public class DeignateOfficeResponse
+    public class DesignateOfficeResponse
     {
         public string Name { get; set; }
         public string Surname { get; set; }
