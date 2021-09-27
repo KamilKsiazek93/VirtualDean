@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 
 namespace VirtualDean.Enties
 {
-    public enum CantorOffice
+    public enum CantorGregOffice
     {
-        S,
-        PS
+        K1,
+        K2,
+        R1,
+        R2
     }
 }
