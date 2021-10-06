@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 
 namespace VirtualDean.Models
 {
-    public class CantorResponse
+    public class CantorResponse : BaseModel
     {
-        public string Name { get; set; }
-        public string Surname { get; set; }
         public Boolean LastWeekSinging { get; set; }
     }
 }

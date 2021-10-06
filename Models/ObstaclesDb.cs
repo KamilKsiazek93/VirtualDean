@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace VirtualDean.Models
 {
-    public class KitchenOffices : BaseModel
+    public class ObstaclesDb : BaseModel
     {
-        public string SaturdayOffice { get; set; }
-        public string SundayOffice { get; set; }
+        public List<string> Obstacles { get; set; }
     }
 }
