@@ -12,12 +12,13 @@ namespace VirtualDean.Controllers
     [ApiController]
     public class Oficja : ControllerBase
     {
-        [HttpGet("singing")]
-        public IEnumerable<CantorResponse> GetSingingBrother()
+        [HttpGet("brothers")]
+        public IEnumerable<Brothers> GetBrothers()
         {
-            List<CantorResponse> singing = new List<CantorResponse>();
-            return singing;
+            List<Brothers> brothers = new List<Brothers>();
+            return brothers;
         }
+
 
         [HttpPost("kitchen-offices")]
         public void AddKitchenOffices(IEnumerable<KitchenOffices> offices)
