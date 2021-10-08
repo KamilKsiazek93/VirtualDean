@@ -19,6 +19,11 @@ namespace VirtualDean.Controllers
             return brothers;
         }
 
+        [HttpGet("brothers")]
+        public void AddBrothers(Brothers brother)
+        {
+            //
+        }
 
         [HttpPost("kitchen-offices")]
         public void AddKitchenOffices(IEnumerable<KitchenOffices> offices)

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace VirtualDean.Models
 {
-    public class Brothers : BaseModel
+    public class Brother : BaseModel
     {
         public Boolean isSinging { get; set; }
         public Boolean isLector { get; set; }
