@@ -10,4 +10,5 @@ namespace VirtualDean.Data
     {
         void AddBrother(Brother brother);
         IEnumerable<Brother> GetBrothers();
+    }
 }
