@@ -28,10 +28,7 @@ namespace VirtualDean
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
-<<<<<<< HEAD
-=======
 
->>>>>>> feature_setup-db
             EnsureDatabase.For.SqlDatabase(connectionString);
 
             var upgrader = DeployChanges.To
