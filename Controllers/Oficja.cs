@@ -13,12 +13,17 @@ namespace VirtualDean.Controllers
     public class Oficja : ControllerBase
     {
         [HttpGet("brothers")]
-        public IEnumerable<Brothers> GetBrothers()
+        public IEnumerable<Brother> GetBrothers()
         {
-            List<Brothers> brothers = new List<Brothers>();
+            List<Brother> brothers = new List<Brother>();
             return brothers;
         }
 
+        [HttpGet("brothers")]
+        public void AddBrothers(Brother brother)
+        {
+            //
+        }
 
         [HttpPost("kitchen-offices")]
         public void AddKitchenOffices(IEnumerable<KitchenOffices> offices)
