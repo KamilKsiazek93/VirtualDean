@@ -20,7 +20,7 @@ namespace VirtualDean.Controllers
             return brothers;
         }
 
-        [HttpGet("brothers")]
+        [HttpPost("brothers")]
         public void AddBrothers(Brother brother)
         {
             //
