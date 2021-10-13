@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VirtualDean.Data;
 
 namespace VirtualDean
 {
@@ -49,6 +50,8 @@ namespace VirtualDean
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "VirtualDean", Version = "v1" });
             });
+
+            services.AddScoped<IBrothers, Brothers>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

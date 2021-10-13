@@ -13,17 +13,23 @@ namespace VirtualDean.Controllers
     [ApiController]
     public class Oficja : ControllerBase
     {
+        private readonly IBrothers _brothers;
+        public Oficja(IBrothers brothers)
+        {
+            _brothers = brothers;
+        }
         [HttpGet("brothers")]
-        public IEnumerable<Brother> GetBrothers()
+        public async Task<IEnumerable<Brother>> GetBrothers()
         {
             List<Brother> brothers = new List<Brother>();
             return brothers;
         }
 
         [HttpPost("brothers")]
-        public void AddBrothers(Brother brother)
+        public async Task<ActionResult<Brother>> AddBrothers(Brother brother)
         {
-            //
+            var savedBrother = await _brothers.AddBrother(brother);
+            return CreatedAtAction(nameof(GetBrothers), new { savedBrother });
         }
 
         [HttpPost("kitchen-offices")]
