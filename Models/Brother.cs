@@ -7,6 +7,7 @@ namespace VirtualDean.Models
 {
     public class Brother : BaseModel
     {
+        public DateTime precedency { get; set; }
         public Boolean isSinging { get; set; }
         public Boolean isLector { get; set; }
         public Boolean isAcolit { get; set; }

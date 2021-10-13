@@ -8,7 +8,8 @@ namespace VirtualDean.Data
 {
     public interface IBrothers
     {
-        void AddBrother(Brother brother);
-        IEnumerable<Brother> GetBrothers();
+        Task<Brother> AddBrother(Brother brother);
+        Task<IEnumerable<Brother>> GetBrothers();
+        Task<Brother> GetBrother(int brotherId);
     }
 }
