@@ -21,8 +21,13 @@ namespace VirtualDean.Controllers
         [HttpGet("brothers")]
         public async Task<IEnumerable<Brother>> GetBrothers()
         {
-            List<Brother> brothers = new List<Brother>();
-            return brothers;
+            return await _brothers.GetBrothers();
+        }
+
+        [HttpGet("brothers/{id}")]
+        public async Task<Brother> GetBrothers(int id)
+        {
+            return await _brothers.GetBrother(id);
         }
 
         [HttpPost("brothers")]

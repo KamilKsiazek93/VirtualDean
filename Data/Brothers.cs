@@ -42,9 +42,13 @@ namespace VirtualDean.Data
             return await connection.QueryFirstOrDefaultAsync<Brother>(sql, new { brotherId = brotherId });
         }
 
-        public Task<IEnumerable<Brother>> GetBrothers()
+        public async Task<IEnumerable<Brother>> GetBrothers()
         {
-            throw new NotImplementedException();
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            var sql = "SELECT * FROM brothers";
+
+            return (await connection.QueryAsync<Brother>(sql)).ToList();
         }
     }
 }
