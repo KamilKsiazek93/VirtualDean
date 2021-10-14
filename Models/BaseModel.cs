@@ -7,7 +7,7 @@ namespace VirtualDean.Models
 {
     public class BaseModel
     {
-        public int IdBrother { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
     }

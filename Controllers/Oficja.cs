@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VirtualDean.Data;
 using VirtualDean.Models;
 
 namespace VirtualDean.Controllers
@@ -12,17 +13,28 @@ namespace VirtualDean.Controllers
     [ApiController]
     public class Oficja : ControllerBase
     {
-        [HttpGet("brothers")]
-        public IEnumerable<Brother> GetBrothers()
+        private readonly IBrothers _brothers;
+        public Oficja(IBrothers brothers)
         {
-            List<Brother> brothers = new List<Brother>();
-            return brothers;
+            _brothers = brothers;
+        }
+        [HttpGet("brothers")]
+        public async Task<IEnumerable<Brother>> GetBrothers()
+        {
+            return await _brothers.GetBrothers();
         }
 
-        [HttpGet("brothers")]
-        public void AddBrothers(Brother brother)
+        [HttpGet("brothers/{id}")]
+        public async Task<Brother> GetBrothers(int id)
         {
-            //
+            return await _brothers.GetBrother(id);
+        }
+
+        [HttpPost("brothers")]
+        public async Task<ActionResult<Brother>> AddBrothers(Brother brother)
+        {
+            var savedBrother = await _brothers.AddBrother(brother);
+            return CreatedAtAction(nameof(GetBrothers), new { savedBrother });
         }
 
         [HttpPost("kitchen-offices")]
