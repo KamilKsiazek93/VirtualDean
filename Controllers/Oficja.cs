@@ -25,6 +25,12 @@ namespace VirtualDean.Controllers
             return brothers;
         }
 
+        [HttpGet("brothers/{id}")]
+        public async Task<Brother> GetBrothers(int id)
+        {
+            return await _brothers.GetBrother(id);
+        }
+
         [HttpPost("brothers")]
         public async Task<ActionResult<Brother>> AddBrothers(Brother brother)
         {
