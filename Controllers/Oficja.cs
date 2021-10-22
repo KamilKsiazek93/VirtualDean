@@ -40,10 +40,9 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("kitchen-offices")]
-        public async Task<ActionResult<KitchenOffices>> AddKitchenOffices()
+        public async Task AddKitchenOffices(IEnumerable<KitchenOffices> offices)
         {
-            var savedOffices = await _kitchen.AddKitchenOffices();
-            return CreatedAtAction(nameof(GetKitchenOffices), new { savedOffices });
+            await _kitchen.AddKitchenOffices(offices);
         }
 
         [HttpGet("kitchen-offices")]
