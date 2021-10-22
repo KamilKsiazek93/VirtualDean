@@ -52,6 +52,12 @@ CREATE TABLE [kitchenOffice] (
 )
 GO
 
+CREATE TABLE [weeksNumber] (
+  [id] int IDENTITY(1,1),
+  [weekNumber] int
+)
+GO
+
 ALTER TABLE [brothers] ADD FOREIGN KEY ([id]) REFERENCES [obstacles] ([userId])
 GO
 

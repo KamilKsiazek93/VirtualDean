@@ -14,9 +14,11 @@ namespace VirtualDean.Controllers
     public class Oficja : ControllerBase
     {
         private readonly IBrothers _brothers;
-        public Oficja(IBrothers brothers)
+        private readonly IKitchen _kitchen;
+        public Oficja(IBrothers brothers, IKitchen kitchen)
         {
             _brothers = brothers;
+            _kitchen = kitchen;
         }
         [HttpGet("brothers")]
         public async Task<IEnumerable<Brother>> GetBrothers()
@@ -38,23 +40,21 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("kitchen-offices")]
-        public void AddKitchenOffices(IEnumerable<KitchenOffices> offices)
+        public async Task AddKitchenOffices(IEnumerable<KitchenOffices> offices)
         {
-            //
+            await _kitchen.AddKitchenOffices(offices);
         }
 
         [HttpGet("kitchen-offices")]
-        public IEnumerable<KitchenOffices> GetKitchenOffices()
+        public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices()
         {
-            List<KitchenOffices> kitchen = new List<KitchenOffices>();
-            return kitchen;
+            return await _kitchen.GetKitchenOffices();
         }
 
         [HttpGet("kitchen-offices/{weekId}")]
-        public IEnumerable<KitchenOffices> GetKitchenOffices(int weekId)
+        public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices(int weekId)
         {
-            List<KitchenOffices> kitchen = new List<KitchenOffices>();
-            return kitchen;
+            return await _kitchen.GetKitchenOffices(weekId);
         }
 
         [HttpPost("tray-hour")]
