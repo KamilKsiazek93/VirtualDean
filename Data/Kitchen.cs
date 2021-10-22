@@ -39,9 +39,19 @@ namespace VirtualDean.Data
             return await connection.QueryFirstAsync<int>(sql);
         }
 
-        public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices()
+        public async Task<IEnumerable<AllKitchenOffices>> GetKitchenOffices()
         {
-            throw new NotImplementedException();
+            using var connection = new SqlConnection(_connectionString);
+            var sql = "SELECT userId brotherId, weekOfOffices WeekOfOffices, saturdayOffices SaturdayOffice, sundayOffices SundayOffice FROM kitchenOffice";
+            return (await connection.QueryAsync<AllKitchenOffices>(sql)).ToList();
+        }
+
+        public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices(int weekId)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            var sql = "SELECT userId brotherId, saturdayOffices SaturdayOffice, sundayOffices SundayOffice FROM kitchenOffice" +
+                " WHERE weekOfOffices = @weekId";
+            return (await connection.QueryAsync<KitchenOffices>(sql, new { weekId = weekId })).ToList();
         }
     }
 }
