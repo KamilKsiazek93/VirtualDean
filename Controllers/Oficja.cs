@@ -46,7 +46,7 @@ namespace VirtualDean.Controllers
         }
 
         [HttpGet("kitchen-offices")]
-        public async Task<IEnumerable<AllKitchenOffices>> GetKitchenOffices()
+        public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices()
         {
             return await _kitchen.GetKitchenOffices();
         }

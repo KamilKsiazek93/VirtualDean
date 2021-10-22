@@ -19,7 +19,6 @@ namespace VirtualDean.Data
         public async Task AddKitchenOffices(IEnumerable<KitchenOffices> kitchenOffices)
         {
             int weekNumber = await GetWeekNumber();
-            //int weekNumber = 1;
             foreach (KitchenOffices office in kitchenOffices)
             {
                 using var connection = new SqlConnection(_connectionString);
@@ -39,11 +38,11 @@ namespace VirtualDean.Data
             return await connection.QueryFirstAsync<int>(sql);
         }
 
-        public async Task<IEnumerable<AllKitchenOffices>> GetKitchenOffices()
+        public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices()
         {
             using var connection = new SqlConnection(_connectionString);
             var sql = "SELECT userId brotherId, weekOfOffices WeekOfOffices, saturdayOffices SaturdayOffice, sundayOffices SundayOffice FROM kitchenOffice";
-            return (await connection.QueryAsync<AllKitchenOffices>(sql)).ToList();
+            return (await connection.QueryAsync<KitchenOffices>(sql)).ToList();
         }
 
         public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices(int weekId)
