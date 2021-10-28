@@ -15,10 +15,12 @@ namespace VirtualDean.Controllers
     {
         private readonly IBrothers _brothers;
         private readonly IKitchen _kitchen;
-        public Oficja(IBrothers brothers, IKitchen kitchen)
+        private readonly ITrayHour _trayHour;
+        public Oficja(IBrothers brothers, IKitchen kitchen, ITrayHour trayHour)
         {
             _brothers = brothers;
             _kitchen = kitchen;
+            _trayHour = trayHour;
         }
         [HttpGet("brothers")]
         public async Task<IEnumerable<Brother>> GetBrothers()
@@ -58,10 +60,21 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("tray-hour")]
-        public IEnumerable<TrayOfficeAdded> AddTrayOffice(IEnumerable<TrayOfficeAdded> listOfTray)
+        public async Task AddTrayOffice(IEnumerable<TrayOfficeAdded> listOfTray)
         {
-            List<TrayOfficeAdded> offices = new List<TrayOfficeAdded>();
-            return offices;
+            await _trayHour.AddTrayHour(listOfTray);
+        }
+
+        [HttpGet("tray-hour")]
+        public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHour()
+        {
+            return await _trayHour.GetTrayHours();
+        }
+
+        [HttpGet("tray-hour/{weekId}")]
+        public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHour(int weekId)
+        {
+            return await _trayHour.GetTrayHours(weekId);
         }
 
         [HttpPost("communion-hour")]
