@@ -9,6 +9,6 @@ namespace VirtualDean.Models
     public class CommunionOfficeAdded
     {
         public int IdBrother { get; set; }
-        public List<CommunionHour> CommunionHourOffices { get; set; }
+        public List<String> CommunionHourOffices { get; set; }
     }
 }
