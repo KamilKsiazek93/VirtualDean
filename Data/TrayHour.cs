@@ -39,7 +39,7 @@ namespace VirtualDean.Data
             List<String> trays = new List<String>();
 
             using var connection = new SqlConnection(_connectionString);
-            var sqlId = "SELECT userId IdBrother FROM trayHourOffice";
+            var sqlId = "SELECT DISTINCT userId IdBrother FROM trayHourOffice";
             var sqlTray = "SELECT trayHour from trayHourOffice WHERE userId = @userId";
             await connection.OpenAsync();
             var ids = await connection.QueryAsync<int>(sqlId);
@@ -60,7 +60,7 @@ namespace VirtualDean.Data
             List<String> trays = new List<String>();
 
             using var connection = new SqlConnection(_connectionString);
-            var sqlId = "SELECT userId IdBrother FROM trayHourOffice";
+            var sqlId = "SELECT DISTINCT userId IdBrother FROM trayHourOffice";
             var sqlTray = "SELECT trayHour from trayHourOffice WHERE userId = @userId AND weekOfOffice = @weekId";
             await connection.OpenAsync();
             var ids = await connection.QueryAsync<int>(sqlId);
