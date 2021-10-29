@@ -10,5 +10,6 @@ namespace VirtualDean.Models
     {
         public int IdBrother { get; set; }
         public List<String> CommunionHourOffices { get; set; }
+        public int? weekId { get; set; }
     }
 }
