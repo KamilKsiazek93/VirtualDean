@@ -9,6 +9,7 @@ namespace VirtualDean.Models
     public class TrayOfficeAdded
     {
         public int IdBrother { get; set; }
-        public List<TrayHour> TrayHourOffices { get; set; }
+        public List<String> TrayHourOffices { get; set; }
+        public int? weekId { get; set; }
     }
 }

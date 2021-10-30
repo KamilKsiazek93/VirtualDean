@@ -11,17 +11,20 @@ namespace VirtualDean.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class Oficja : ControllerBase
+    public class Offices : ControllerBase
     {
         private readonly IBrothers _brothers;
         private readonly IKitchen _kitchen;
         private readonly ITrayHour _trayHour;
-        public Oficja(IBrothers brothers, IKitchen kitchen, ITrayHour trayHour)
+        private readonly ICommunionHour _communionHour;
+        public Offices(IBrothers brothers, IKitchen kitchen, ITrayHour trayHour, ICommunionHour communionHour)
         {
             _brothers = brothers;
             _kitchen = kitchen;
             _trayHour = trayHour;
+            _communionHour = communionHour;
         }
+
         [HttpGet("brothers")]
         public async Task<IEnumerable<Brother>> GetBrothers()
         {
@@ -78,10 +81,21 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("communion-hour")]
-        public IEnumerable<CommunionOfficeAdded> AddCommunionOffice(IEnumerable<CommunionOfficeAdded> listOfCommunion)
+        public async Task AddCommunionOffice(IEnumerable<CommunionOfficeAdded> listOfCommunion)
         {
-            List<CommunionOfficeAdded> offices = new List<CommunionOfficeAdded>();
-            return offices;
+            await _communionHour.AddCommunionHour(listOfCommunion);
+        }
+
+        [HttpGet("communion-hour")]
+        public async Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHour()
+        {
+            return await _communionHour.GetCommunionHours();
+        }
+
+        [HttpGet("communion-hour/{weekId}")]
+        public async Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHour(int weekId)
+        {
+            return await _communionHour.GetCommunionHours(weekId);
         }
 
         [HttpPost("obstacles")]
