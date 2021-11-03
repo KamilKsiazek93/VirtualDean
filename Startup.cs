@@ -55,6 +55,7 @@ namespace VirtualDean
             services.AddScoped<IKitchen, Kitchen>();
             services.AddScoped<ITrayHour, TrayHour>();
             services.AddScoped<ICommunionHour, CommunionHour>();
+            services.AddScoped<IObstacle, Obstacles>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
