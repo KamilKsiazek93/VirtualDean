@@ -103,7 +103,7 @@ namespace VirtualDean.Controllers
         [HttpPost("obstacles")]
         public async Task AddObstacles(IEnumerable<ObstaclesAdded> obstacles)
         {
-            _obstacle.AddObstacle(obstacles);
+            await _obstacle.AddObstacle(obstacles);
         }
 
         [HttpGet("obstacles/{weekId}")]
