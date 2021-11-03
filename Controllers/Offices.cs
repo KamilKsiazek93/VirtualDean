@@ -17,12 +17,14 @@ namespace VirtualDean.Controllers
         private readonly IKitchen _kitchen;
         private readonly ITrayHour _trayHour;
         private readonly ICommunionHour _communionHour;
-        public Offices(IBrothers brothers, IKitchen kitchen, ITrayHour trayHour, ICommunionHour communionHour)
+        private readonly IObstacle _obstacle;
+        public Offices(IBrothers brothers, IKitchen kitchen, ITrayHour trayHour, ICommunionHour communionHour, IObstacle obstacle)
         {
             _brothers = brothers;
             _kitchen = kitchen;
             _trayHour = trayHour;
             _communionHour = communionHour;
+            _obstacle = obstacle;
         }
 
         [HttpGet("brothers")]
@@ -99,23 +101,15 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("obstacles")]
-        public void AddObstacles(IEnumerable<ObstaclesAdded> obstacles)
+        public async Task AddObstacles(IEnumerable<ObstaclesAdded> obstacles)
         {
-            //
-        }
-
-        [HttpGet("obstacles")]
-        public IEnumerable<ObstaclesDb> GetObstacles()
-        {
-            List<ObstaclesDb> obstacles = new List<ObstaclesDb>();
-            return obstacles;
+            _obstacle.AddObstacle(obstacles);
         }
 
         [HttpGet("obstacles/{weekId}")]
-        public IEnumerable<ObstaclesDb> GetObstaclesInWeek(int weekId)
+        public async Task<IEnumerable<ObstaclesAdded>> GetObstaclesInWeek(int weekId)
         {
-            List<ObstaclesDb> obstacles = new List<ObstaclesDb>();
-            return obstacles;
+            return await _obstacle.GetObstacles(weekId);
         }
     }
 }
