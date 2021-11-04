@@ -16,6 +16,18 @@ namespace VirtualDean.Data
         {
             _connectionString = configuration["ConnectionStrings:DefaultConnection"];
         }
+
+        public async Task AddConstObstacle(ConstObstacleAdded obstacles)
+        {
+            var sql = "INSERT INTO obstacleConst (userId, obstacleName) VALUES (@userId, @obstacleName)";
+            var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            foreach(var obstacle in obstacles.Obstacles)
+            {
+                await connection.ExecuteAsync(sql, new { userId = obstacles.IdBrother , obstacleName = obstacle});
+            }
+        }
+
         public async Task AddObstacle(IEnumerable<ObstaclesAdded> obstacles)
         {
             int weekNumber = await GetWeekNumber();
@@ -42,6 +54,14 @@ namespace VirtualDean.Data
                     }
                 }
             }
+        }
+
+        public async Task<IEnumerable<string>> GetConstObstacle(int brotherId)
+        {
+            var sql = "SELECT obstacleName from obstacleConst WHERE userId = @brotherId";
+            var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            return (await connection.QueryAsync<string>(sql, new { brotherId = brotherId })).ToList(); 
         }
 
         public async Task<IEnumerable<ObstaclesAdded>> GetObstacles(int weekId)
