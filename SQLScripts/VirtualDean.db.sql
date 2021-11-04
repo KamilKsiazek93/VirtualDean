@@ -14,7 +14,7 @@ CREATE TABLE [obstacles] (
   [id] int PRIMARY KEY IDENTITY(1, 1),
   [userId] int,
   [weekOfOffices] int,
-  [dateOfObstacles] datetime,
+  [wholeWeek] bit,
   [obstacle] nvarchar(255)
 )
 GO
@@ -53,8 +53,22 @@ CREATE TABLE [kitchenOffice] (
 GO
 
 CREATE TABLE [weeksNumber] (
-  [id] int IDENTITY(1,1),
+  [id] int IDENTITY(1, 1),
   [weekNumber] int
+)
+GO
+
+CREATE TABLE [obstacleConst] (
+  [id] int PRIMARY KEY IDENTITY(1, 1),
+  [userId] int,
+  [obstacleName] nvarchar(255)
+)
+GO
+
+CREATE TABLE [obstacleBetweenOffices] (
+  [id] int PRIMARY KEY IDENTITY(1, 1),
+  [officeName] nvarchar(255),
+  [officeConnected] nvarchar(255)
 )
 GO
 
@@ -71,4 +85,22 @@ ALTER TABLE [brothers] ADD FOREIGN KEY ([id]) REFERENCES [offices] ([userId])
 GO
 
 ALTER TABLE [brothers] ADD FOREIGN KEY ([id]) REFERENCES [kitchenOffice] ([userId])
+GO
+
+ALTER TABLE [weeksNumber] ADD FOREIGN KEY ([weekNumber]) REFERENCES [trayHourOffice] ([weekOfOffice])
+GO
+
+ALTER TABLE [weeksNumber] ADD FOREIGN KEY ([weekNumber]) REFERENCES [communionHourOffice] ([weekOfOffices])
+GO
+
+ALTER TABLE [weeksNumber] ADD FOREIGN KEY ([weekNumber]) REFERENCES [offices] ([weekOfOffices])
+GO
+
+ALTER TABLE [weeksNumber] ADD FOREIGN KEY ([weekNumber]) REFERENCES [obstacles] ([weekOfOffices])
+GO
+
+ALTER TABLE [weeksNumber] ADD FOREIGN KEY ([weekNumber]) REFERENCES [kitchenOffice] ([weekOfOffices])
+GO
+
+ALTER TABLE [brothers] ADD FOREIGN KEY ([id]) REFERENCES [obstacleConst] ([userId])
 GO
