@@ -46,7 +46,33 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<ObstaclesAdded>> GetObstacles(int weekId)
         {
-            throw new NotImplementedException();
+            List<ObstaclesAdded> obstacles = new List<ObstaclesAdded>();
+            List<String> obstacle = new List<String>();
+
+            using var connection = new SqlConnection(_connectionString);
+            var sqlId = "SELECT DISTINCT userId IdBrother FROM obstacles";
+            var sqlObstacles = "SELECT obstacle from obstacles WHERE userId = @userId AND weekOfOffices = @weekId AND obstacle IS NOT NULL";
+            var sqlWholeWeek = "SELECT wholeWeek from obstacles WHERE userId = @userId AND weekOfOffices = @weekId";
+
+            await connection.OpenAsync();
+            var ids = await connection.QueryAsync<int>(sqlId);
+            foreach (var id in ids)
+            {
+                obstacle = (await connection.QueryAsync<String>(sqlObstacles, new { userId = id, weekId = weekId })).ToList();
+                if (obstacle.Any())
+                {
+                    obstacles.Add(new ObstaclesAdded() { IdBrother = id, Obstacles = obstacle, weekId = weekId });
+                }
+                else
+                {
+                    var wholeWeek = await connection.QueryFirstOrDefaultAsync<Boolean>(sqlWholeWeek, new { userId = id, weekId = weekId });
+                    if(wholeWeek)
+                    {
+                        obstacles.Add(new ObstaclesAdded() { IdBrother = id, WholeWeek = wholeWeek, weekId = weekId });
+                    }
+                }
+            }
+            return obstacles;
         }
 
         private async Task<int> GetWeekNumber()
