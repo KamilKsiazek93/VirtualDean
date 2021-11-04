@@ -111,5 +111,17 @@ namespace VirtualDean.Controllers
         {
             return await _obstacle.GetObstacles(weekId);
         }
+
+        [HttpPost("obstacle-const")]
+        public async Task AddConstObstacle(ConstObstacleAdded obstacles)
+        {
+            await _obstacle.AddConstObstacle(obstacles);
+        }
+
+        [HttpGet("obstacle-const/{brotherId}")]
+        public async Task<IEnumerable<string>> GetConstObstacle(int brotherId)
+        {
+            return await _obstacle.GetConstObstacle(brotherId);
+        }
     }
 }
