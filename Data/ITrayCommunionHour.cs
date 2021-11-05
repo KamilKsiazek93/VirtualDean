@@ -6,10 +6,14 @@ using VirtualDean.Models;
 
 namespace VirtualDean.Data
 {
-    public interface ITrayHour
+    public interface ITrayCommunionHour
     {
         Task AddTrayHour(IEnumerable<TrayOfficeAdded> offices);
         Task<IEnumerable<TrayOfficeAdded>> GetTrayHours();
         Task<IEnumerable<TrayOfficeAdded>> GetTrayHours(int weekId);
+
+        Task AddCommunionHour(IEnumerable<CommunionOfficeAdded> offices);
+        Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHours();
+        Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHours(int weekId);
     }
 }

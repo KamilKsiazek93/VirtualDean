@@ -12,9 +12,11 @@ namespace VirtualDean.Data
     public class Obstacles : IObstacle
     {
         private readonly string _connectionString;
-        public Obstacles(IConfiguration configuration)
+        private readonly IWeek _week;
+        public Obstacles(IConfiguration configuration, IWeek week)
         {
             _connectionString = configuration["ConnectionStrings:DefaultConnection"];
+            _week = week;
         }
 
         public async Task AddConstObstacle(ConstObstacleAdded obstacles)
@@ -30,7 +32,7 @@ namespace VirtualDean.Data
 
         public async Task AddObstacle(IEnumerable<ObstaclesAdded> obstacles)
         {
-            int weekNumber = await GetWeekNumber();
+            int weekNumber = await _week.GetLastWeek();
             foreach(ObstaclesAdded obstacle in obstacles)
             {
                 var brotherId = obstacle.IdBrother;
@@ -93,14 +95,6 @@ namespace VirtualDean.Data
                 }
             }
             return obstacles;
-        }
-
-        private async Task<int> GetWeekNumber()
-        {
-            using var connection = new SqlConnection(_connectionString);
-            var sql = "SELECT TOP 1 weekNumber FROM weeksNumber ORDER BY weekNumber DESC";
-            await connection.OpenAsync();
-            return await connection.QueryFirstAsync<int>(sql);
         }
     }
 }
