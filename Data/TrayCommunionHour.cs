@@ -19,21 +19,36 @@ namespace VirtualDean.Data
             _week = week;
         }
 
+        public async Task AddSingleCommunionHour(int brotherId, int weekNumber, string hour)
+        {
+            var sql = "INSERT INTO communionHourOffice (userId, weekOfOffices, communionHour)" +
+                "VALUES (@brotherId, @weekOfOffice, @communionHour)";
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            await connection.ExecuteAsync(sql, new { brotherId = brotherId, weekOfOffice = weekNumber, communionHour = hour });
+
+        }
+
         public async Task AddCommunionHour(IEnumerable<CommunionOfficeAdded> offices)
         {
             int weekNumber = await _week.GetLastWeek();
             foreach (CommunionOfficeAdded office in offices)
             {
                 var brotherId = office.IdBrother;
-                var sql = "INSERT INTO communionHourOffice (userId, weekOfOffices, communionHour)" +
-                    "VALUES (@brotherId, @weekOfOffice, @communionHour)";
                 foreach (var hour in office.CommunionHourOffices)
                 {
-                    using var connection = new SqlConnection(_connectionString);
-                    await connection.OpenAsync();
-                    await connection.ExecuteAsync(sql, new { brotherId = brotherId, weekOfOffice = weekNumber, communionHour = hour.ToString() });
+                    await AddSingleCommunionHour(brotherId, weekNumber, hour);
                 }
             }
+        }
+
+        public async Task AddSingleTrayHour(int brotherId, int weekNumber, string hour)
+        {
+            var sql = "INSERT INTO trayHourOffice (userId, weekOfOffice, trayHour)" +
+                "VALUES (@brotherId, @weekOfOffice, @trayHour)";
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            await connection.ExecuteAsync(sql, new { brotherId = brotherId, weekOfOffice = weekNumber, trayHour = hour });
         }
 
         public async Task AddTrayHour(IEnumerable<TrayOfficeAdded> offices)
@@ -42,13 +57,9 @@ namespace VirtualDean.Data
             foreach (TrayOfficeAdded office in offices)
             {
                 var brotherId = office.IdBrother;
-                var sql = "INSERT INTO trayHourOffice (userId, weekOfOffice, trayHour)" +
-                    "VALUES (@brotherId, @weekOfOffice, @trayHour)";
                 foreach(var hour in office.TrayHourOffices)
                 {
-                    using var connection = new SqlConnection(_connectionString);
-                    await connection.OpenAsync();
-                    await connection.ExecuteAsync(sql, new { brotherId = brotherId, weekOfOffice = weekNumber, trayHour = hour.ToString()});
+                    await AddSingleTrayHour(brotherId, weekNumber, hour);
                 }
             }
         }
