@@ -14,16 +14,14 @@ namespace VirtualDean.Controllers
     public class Offices : ControllerBase
     {
         private readonly IBrothers _brothers;
-        private readonly IKitchen _kitchen;
-        private readonly ITrayHour _trayHour;
-        private readonly ICommunionHour _communionHour;
+        private readonly IOfficesManager _officesManager;
+        private readonly ITrayCommunionHour _trayCommunionHour;
         private readonly IObstacle _obstacle;
-        public Offices(IBrothers brothers, IKitchen kitchen, ITrayHour trayHour, ICommunionHour communionHour, IObstacle obstacle)
+        public Offices(IBrothers brothers, IOfficesManager officesManager, ITrayCommunionHour trayCommunionHour, IObstacle obstacle)
         {
             _brothers = brothers;
-            _kitchen = kitchen;
-            _trayHour = trayHour;
-            _communionHour = communionHour;
+            _officesManager = officesManager;
+            _trayCommunionHour = trayCommunionHour;
             _obstacle = obstacle;
         }
 
@@ -49,55 +47,55 @@ namespace VirtualDean.Controllers
         [HttpPost("kitchen-offices")]
         public async Task AddKitchenOffices(IEnumerable<KitchenOffices> offices)
         {
-            await _kitchen.AddKitchenOffices(offices);
+            await _officesManager.AddKitchenOffices(offices);
         }
 
         [HttpGet("kitchen-offices")]
         public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices()
         {
-            return await _kitchen.GetKitchenOffices();
+            return await _officesManager.GetKitchenOffices();
         }
 
         [HttpGet("kitchen-offices/{weekId}")]
         public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices(int weekId)
         {
-            return await _kitchen.GetKitchenOffices(weekId);
+            return await _officesManager.GetKitchenOffices(weekId);
         }
 
         [HttpPost("tray-hour")]
         public async Task AddTrayOffice(IEnumerable<TrayOfficeAdded> listOfTray)
         {
-            await _trayHour.AddTrayHour(listOfTray);
+            await _trayCommunionHour.AddTrayHour(listOfTray);
         }
 
         [HttpGet("tray-hour")]
         public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHour()
         {
-            return await _trayHour.GetTrayHours();
+            return await _trayCommunionHour.GetTrayHours();
         }
 
         [HttpGet("tray-hour/{weekId}")]
         public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHour(int weekId)
         {
-            return await _trayHour.GetTrayHours(weekId);
+            return await _trayCommunionHour.GetTrayHours(weekId);
         }
 
         [HttpPost("communion-hour")]
         public async Task AddCommunionOffice(IEnumerable<CommunionOfficeAdded> listOfCommunion)
         {
-            await _communionHour.AddCommunionHour(listOfCommunion);
+            await _trayCommunionHour.AddCommunionHour(listOfCommunion);
         }
 
         [HttpGet("communion-hour")]
         public async Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHour()
         {
-            return await _communionHour.GetCommunionHours();
+            return await _trayCommunionHour.GetCommunionHours();
         }
 
         [HttpGet("communion-hour/{weekId}")]
         public async Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHour(int weekId)
         {
-            return await _communionHour.GetCommunionHours(weekId);
+            return await _trayCommunionHour.GetCommunionHours(weekId);
         }
 
         [HttpPost("obstacles")]

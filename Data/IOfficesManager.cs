@@ -6,7 +6,7 @@ using VirtualDean.Models;
 
 namespace VirtualDean.Data
 {
-    public interface IKitchen
+    public interface IOfficesManager
     {
         Task<IEnumerable<KitchenOffices>> GetKitchenOffices();
         Task<IEnumerable<KitchenOffices>> GetKitchenOffices(int weekId);

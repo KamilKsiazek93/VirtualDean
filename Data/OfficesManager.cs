@@ -9,16 +9,18 @@ using VirtualDean.Models;
 
 namespace VirtualDean.Data
 {
-    public class Kitchen : IKitchen
+    public class OfficesManager : IOfficesManager
     {
         private readonly string _connectionString;
-        public Kitchen(IConfiguration configuration)
+        private readonly IWeek _week;
+        public OfficesManager(IConfiguration configuration, IWeek week)
         {
             _connectionString = configuration["ConnectionStrings:DefaultConnection"];
+            _week = week;
         }
         public async Task AddKitchenOffices(IEnumerable<KitchenOffices> kitchenOffices)
         {
-            int weekNumber = await GetWeekNumber();
+            int weekNumber = await _week.GetLastWeek();
             foreach (KitchenOffices office in kitchenOffices)
             {
                 using var connection = new SqlConnection(_connectionString);
@@ -28,14 +30,6 @@ namespace VirtualDean.Data
                 await connection.ExecuteAsync(sql, new {userId = office.BrotherId, weekOfOffices = weekNumber, 
                     saturdayOffices = office.SaturdayOffice, sundayOffices = office.SundayOffice });
             }
-        }
-
-        private async Task<int> GetWeekNumber()
-        {
-            using var connection = new SqlConnection(_connectionString);
-            var sql = "SELECT TOP 1 weekNumber FROM weeksNumber ORDER BY weekNumber DESC";
-            await connection.OpenAsync();
-            return await connection.QueryFirstAsync<int>(sql);
         }
 
         public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices()
