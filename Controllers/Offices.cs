@@ -31,6 +31,12 @@ namespace VirtualDean.Controllers
             return await _brothers.GetBrothers();
         }
 
+        [HttpGet("brothers-base")]
+        public async Task<IEnumerable<BaseModel>> GetBaseBrothersModel()
+        {
+            return await _brothers.GetBaseBrothersModel();
+        }
+
         [HttpGet("brothers/{id}")]
         public async Task<Brother> GetBrothers(int id)
         {

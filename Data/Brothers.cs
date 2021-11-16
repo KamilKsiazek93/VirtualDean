@@ -33,6 +33,15 @@ namespace VirtualDean.Data
             return await GetBrother(brotherId);
         }
 
+        public async Task<IEnumerable<BaseModel>> GetBaseBrothersModel()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            var sql = "SELECT id, name, surname FROM brothers";
+
+            return await connection.QueryAsync<BaseModel>(sql);
+        }
+
         public async Task<Brother> GetBrother(int brotherId)
         {
             using var connection = new SqlConnection(_connectionString);
