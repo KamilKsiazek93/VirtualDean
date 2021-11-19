@@ -10,6 +10,6 @@ namespace VirtualDean.Data
     {
         Task<IEnumerable<KitchenOffices>> GetKitchenOffices();
         Task<IEnumerable<KitchenOffices>> GetKitchenOffices(int weekId);
-        Task AddKitchenOffices(IEnumerable<KitchenOffices> kitchenOffices);
+        Task AddKitchenOffices(IEnumerable<KitchenOfficeAdded> kitchenOffices);
     }
 }
