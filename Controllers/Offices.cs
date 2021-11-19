@@ -31,6 +31,12 @@ namespace VirtualDean.Controllers
             return await _brothers.GetBrothers();
         }
 
+        [HttpGet("brothers-base")]
+        public async Task<IEnumerable<BaseModel>> GetBaseBrothersModel()
+        {
+            return await _brothers.GetBaseBrothersModel();
+        }
+
         [HttpGet("brothers/{id}")]
         public async Task<Brother> GetBrothers(int id)
         {
@@ -45,9 +51,10 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("kitchen-offices")]
-        public async Task AddKitchenOffices(IEnumerable<KitchenOffices> offices)
+        public async Task<ActionResult<KitchenOfficeAdded>> AddKitchenOffices(IEnumerable<KitchenOfficeAdded> offices)
         {
             await _officesManager.AddKitchenOffices(offices);
+            return CreatedAtAction(nameof(GetKitchenOffices), offices);
         }
 
         [HttpGet("kitchen-offices")]

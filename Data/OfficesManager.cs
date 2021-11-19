@@ -18,17 +18,38 @@ namespace VirtualDean.Data
             _connectionString = configuration["ConnectionStrings:DefaultConnection"];
             _week = week;
         }
-        public async Task AddKitchenOffices(IEnumerable<KitchenOffices> kitchenOffices)
+
+        public async Task AddSingleSaturdayKitchenOffice(int brotherId, int weekNumber, string officeName)
+        {
+            var sql = "INSERT INTO kitchenOffice (userId, weekOfOffices, saturdayOffices)" +
+                "VALUES (@brotherId, @weekOfOffices, @saturdayOffices)";
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            await connection.ExecuteAsync(sql, new { brotherId , weekOfOffices = weekNumber , saturdayOffices = officeName });
+        }
+
+        public async Task AddSingleSundayKitchenOffice(int brotherId, int weekNumber, string officeName)
+        {
+            var sql = "INSERT INTO kitchenOffice (userId, weekOfOffices, sundayOffices)" +
+                "VALUES (@brotherId, @weekOfOffices, @sundayOffices)";
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            await connection.ExecuteAsync(sql, new { brotherId = brotherId, weekOfOffices = weekNumber, sundayOffices = officeName });
+        }
+
+        public async Task AddKitchenOffices(IEnumerable<KitchenOfficeAdded> kitchenOffices)
         {
             int weekNumber = await _week.GetLastWeek();
-            foreach (KitchenOffices office in kitchenOffices)
+            foreach (KitchenOfficeAdded office in kitchenOffices)
             {
-                using var connection = new SqlConnection(_connectionString);
-                await connection.OpenAsync();
-                var sql = "INSERT INTO kitchenOffice (userId, weekOfOffices, saturdayOffices, sundayOffices)" +
-                "VaLUES (@userId, @weekOfOffices, @saturdayOffices, @sundayOffices)";
-                await connection.ExecuteAsync(sql, new {userId = office.BrotherId, weekOfOffices = weekNumber, 
-                    saturdayOffices = office.SaturdayOffice, sundayOffices = office.SundayOffice });
+                if(office.Day.ToUpper().Equals("SATURDAY"))
+                {
+                    await AddSingleSaturdayKitchenOffice(office.BrotherId, weekNumber, office.OfficeName);
+                }
+                else if(office.Day.ToUpper().Equals("SUNDAY"))
+                {
+                    await AddSingleSundayKitchenOffice(office.BrotherId, weekNumber, office.OfficeName);
+                }
             }
         }
 

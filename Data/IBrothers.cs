@@ -11,5 +11,6 @@ namespace VirtualDean.Data
         Task<Brother> AddBrother(Brother brother);
         Task<IEnumerable<Brother>> GetBrothers();
         Task<Brother> GetBrother(int brotherId);
+        Task<IEnumerable<BaseModel>> GetBaseBrothersModel();
     }
 }
