@@ -6,6 +6,7 @@ using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using VirtualDean.Models;
+using VirtualDean.Enties;
 
 namespace VirtualDean.Data
 {
@@ -66,6 +67,24 @@ namespace VirtualDean.Data
             var sql = "SELECT userId brotherId, saturdayOffices SaturdayOffice, sundayOffices SundayOffice FROM kitchenOffice" +
                 " WHERE weekOfOffices = @weekId";
             return (await connection.QueryAsync<KitchenOffices>(sql, new { weekId = weekId })).ToList();
+        }
+
+        public async Task AddBrothersForSchola(IEnumerable<CantorOfficeAdded> schola)
+        {
+            int weekNumber = await _week.GetLastWeek();
+            foreach(var brother in schola)
+            {
+                await AddSingleScholaOffice(brother.IdBrother, brother.OfficeName, weekNumber);
+            }
+        }
+
+        private async Task AddSingleScholaOffice(int idBrother, string officeName, int weekNumber)
+        {
+            var sql = "INSERT INTO offices (userId, weekOfOffices, officeName)" +
+                "VALUES (@idBrother, @weekNumber, @officeName)";
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            await connection.ExecuteAsync(sql, new { idBrother, weekNumber, officeName });
         }
     }
 }
