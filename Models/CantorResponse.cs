@@ -7,6 +7,6 @@ namespace VirtualDean.Models
 {
     public class CantorResponse : BaseModel
     {
-        public Boolean LastWeekSinging { get; set; }
+        public Boolean IsSinging { get; set; }
     }
 }

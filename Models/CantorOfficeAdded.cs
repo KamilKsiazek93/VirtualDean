@@ -9,6 +9,6 @@ namespace VirtualDean.Models
     public class CantorOfficeAdded
     {
         public int IdBrother { get; set; }
-        public CantorOffice OfficeName { get; set; }
+        public string OfficeName { get; set; }
     }
 }

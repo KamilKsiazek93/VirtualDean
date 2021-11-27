@@ -59,5 +59,14 @@ namespace VirtualDean.Data
 
             return (await connection.QueryAsync<Brother>(sql)).ToList();
         }
+
+        public async Task<IEnumerable<CantorResponse>> GetSingingBrothers()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            var sql = "SELECT id, name, surname, isSinging FROM brothers WHERE isSinging = @isSinging";
+
+            return (await connection.QueryAsync<CantorResponse>(sql, new { isSinging = true })).ToList();
+        }
     }
 }

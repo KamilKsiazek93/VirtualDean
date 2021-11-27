@@ -50,6 +50,19 @@ namespace VirtualDean.Controllers
             return CreatedAtAction(nameof(GetBrothers), new { savedBrother });
         }
 
+        [HttpGet("brothers-singing")]
+        public async Task<IEnumerable<BaseModel>> GetSingingBrothers()
+        {
+            return await _brothers.GetSingingBrothers();
+        }
+
+        [HttpPost("office-singing")]
+        public async Task<ActionResult<CantorOfficeAdded>> AddScholaOffices(IEnumerable<CantorOfficeAdded> offices)
+        {
+            await _officesManager.AddBrothersForSchola(offices);
+            return CreatedAtAction(nameof(GetSingingBrothers), offices);
+        }
+
         [HttpPost("kitchen-offices")]
         public async Task<ActionResult<KitchenOfficeAdded>> AddKitchenOffices(IEnumerable<KitchenOfficeAdded> offices)
         {
