@@ -50,6 +50,12 @@ namespace VirtualDean.Controllers
             return CreatedAtAction(nameof(GetBrothers), new { savedBrother });
         }
 
+        [HttpGet("brothers-tray")]
+        public async Task<IEnumerable<BaseModel>> GetBrothersForTray()
+        {
+            return await _brothers.GetBrothersForTray();
+        }
+
         [HttpGet("brothers-singing")]
         public async Task<IEnumerable<BaseModel>> GetSingingBrothers()
         {

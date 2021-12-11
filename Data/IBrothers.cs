@@ -13,5 +13,6 @@ namespace VirtualDean.Data
         Task<Brother> GetBrother(int brotherId);
         Task<IEnumerable<BaseModel>> GetBaseBrothersModel();
         Task<IEnumerable<CantorResponse>> GetSingingBrothers();
+        Task<IEnumerable<BaseModel>> GetBrothersForTray();
     }
 }

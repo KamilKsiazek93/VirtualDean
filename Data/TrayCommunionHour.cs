@@ -106,17 +106,24 @@ namespace VirtualDean.Data
             return communionOffice;
         }
 
+        private async Task<IEnumerable<int>> GetUniqueBrotherIdFromTrayHourOffice()
+        {
+            var sqlId = "SELECT DISTINCT userId IdBrother FROM trayHourOffice";
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            return await connection.QueryAsync<int>(sqlId);
+        }
+
         public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHours()
         {
             List<TrayOfficeAdded> trayOffices = new List<TrayOfficeAdded>();
             List<String> trays = new List<String>();
 
             using var connection = new SqlConnection(_connectionString);
-            var sqlId = "SELECT DISTINCT userId IdBrother FROM trayHourOffice";
             var sqlTray = "SELECT trayHour from trayHourOffice WHERE userId = @userId";
             await connection.OpenAsync();
-            var ids = await connection.QueryAsync<int>(sqlId);
-            foreach(var id in ids)
+            var ids = await GetUniqueBrotherIdFromTrayHourOffice();
+            foreach (var id in ids)
             {
                 trays = (await connection.QueryAsync<String>(sqlTray, new { userId = id })).ToList();
                 if(trays.Any())
@@ -131,20 +138,19 @@ namespace VirtualDean.Data
         {
             List<TrayOfficeAdded> trayOffices = new List<TrayOfficeAdded>();
             List<String> trays = new List<String>();
-
+           
             using var connection = new SqlConnection(_connectionString);
-            var sqlId = "SELECT DISTINCT userId IdBrother FROM trayHourOffice";
-            var sqlTray = "SELECT trayHour from trayHourOffice WHERE userId = @userId AND weekOfOffice = @weekId";
             await connection.OpenAsync();
-            var ids = await connection.QueryAsync<int>(sqlId);
-            foreach (var id in ids)
+            var sql = "SELECT userId IdBrother, trayHour OfficeName from trayHourOffice WHERE weekOfOffice = @weekId";
+            var result = (await connection.QueryAsync<SingleOfficeWithID>(sql, new { weekId })).ToList();
+
+            var ids = result.Select(item => item.IdBrother).Distinct();
+            foreach(var id in ids)
             {
-                trays = (await connection.QueryAsync<String>(sqlTray, new { userId = id, weekId = weekId })).ToList();
-                if(trays.Any())
-                {
-                    trayOffices.Add(new TrayOfficeAdded() { IdBrother = id, TrayHourOffices = trays, weekId = weekId });
-                }
+                trays = result.Where(item => item.IdBrother == id).Select(tray => tray.OfficeName).ToList();
+                trayOffices.Add(new TrayOfficeAdded { IdBrother = id, TrayHourOffices = trays, weekId = weekId });
             }
+
             return trayOffices;
         }
     }
