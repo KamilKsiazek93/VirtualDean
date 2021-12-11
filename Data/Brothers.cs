@@ -60,6 +60,15 @@ namespace VirtualDean.Data
             return (await connection.QueryAsync<Brother>(sql)).ToList();
         }
 
+        public async Task<IEnumerable<BaseModel>> GetBrothersForTray()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            var sql = "SELECT id, name, surname FROM brothers WHERE isAcolit = @isAcolit AND isDiacon = @isDiacon";
+
+            return (await connection.QueryAsync<BaseModel>(sql, new { isAcolit = false, isDiacon = false })).ToList();
+        }
+
         public async Task<IEnumerable<CantorResponse>> GetSingingBrothers()
         {
             using var connection = new SqlConnection(_connectionString);
