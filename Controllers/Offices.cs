@@ -46,8 +46,12 @@ namespace VirtualDean.Controllers
         [HttpPost("brothers")]
         public async Task<ActionResult<Brother>> AddBrothers(Brother brother)
         {
-            var savedBrother = await _brothers.AddBrother(brother);
-            return CreatedAtAction(nameof(GetBrothers), new { savedBrother });
+            if(!await _brothers.IsBrotherInDb(brother))
+            {
+                 await _brothers.SaveBrother(brother);
+                return Ok(new { status = 201, isSucces = true, message = "User added" });
+            }
+            return Ok(new { status = 401, isSuucces = false, message = "User already exist" }) ;
         }
 
         [HttpGet("brothers-tray")]
