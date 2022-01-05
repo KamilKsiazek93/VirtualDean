@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VirtualDean.Data;
+using Microsoft.EntityFrameworkCore;
+using VirtualDean.Models.DatabaseContext;
 
 namespace VirtualDean
 {
@@ -44,6 +46,8 @@ namespace VirtualDean
             {
                 upgrader.PerformUpgrade();
             }
+
+            services.AddDbContext<BrotherDbContext>(options => options.UseSqlServer(connectionString));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

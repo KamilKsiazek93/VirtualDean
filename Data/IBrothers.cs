@@ -8,11 +8,12 @@ namespace VirtualDean.Data
 {
     public interface IBrothers
     {
-        Task<Brother> AddBrother(Brother brother);
         Task<IEnumerable<Brother>> GetBrothers();
         Task<Brother> GetBrother(int brotherId);
         Task<IEnumerable<BaseModel>> GetBaseBrothersModel();
         Task<IEnumerable<CantorResponse>> GetSingingBrothers();
         Task<IEnumerable<BaseModel>> GetBrothersForTray();
+        Task<Boolean> IsBrotherInDb(Brother brother);
+        Task SaveBrother(Brother brother);
     }
 }

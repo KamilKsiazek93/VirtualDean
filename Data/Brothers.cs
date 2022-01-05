@@ -6,76 +6,64 @@ using System.Linq;
 using System.Threading.Tasks;
 using VirtualDean.Models;
 using Dapper;
+using VirtualDean.Models.DatabaseContext;
+using Microsoft.EntityFrameworkCore;
 
 namespace VirtualDean.Data
 {
     public class Brothers : IBrothers
     {
-        private readonly string _connectionString;
-        public Brothers(IConfiguration configuration)
+        private readonly BrotherDbContext _brotherContext;
+        public Brothers(BrotherDbContext brotherContext)
         {
-            _connectionString = configuration["ConnectionStrings:DefaultConnection"];
-        }
-
-        public async Task<Brother> AddBrother(Brother brother)
-        {
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            DateTime today = DateTime.Today;
-
-            var sql = @"INSERT INTO dbo.brothers (name, surname, precedency, isSinging, isLector, isAcolit, isDiacon)
-                OUTPUT INSERTED.[id]
-                VALUES (@Name, @Surname, @Precedency, @isSinging, @isLector, @isAcolit, @isDiacon)";
-
-            var brotherId = connection.QuerySingle<int>(sql, new { Name = brother.Name, Surname = brother.Surname, Precedency = today,
-            IsSinging = brother.isSinging, IsLector = brother.isLector, IsAcolit = brother.isAcolit, IsDiacon = brother.isDiacon});
-
-            return await GetBrother(brotherId);
+            _brotherContext = brotherContext;
         }
 
         public async Task<IEnumerable<BaseModel>> GetBaseBrothersModel()
         {
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            var sql = "SELECT id, name, surname FROM brothers";
-
-            return await connection.QueryAsync<BaseModel>(sql);
+            return await _brotherContext.Brothers.Select(bro => new BaseModel() 
+            { Id = bro.Id, Name = bro.Name, Surname = bro.Surname }).ToListAsync();
         }
 
         public async Task<Brother> GetBrother(int brotherId)
         {
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            var sql = "SELECT * FROM brothers WHERE id = @brotherId";
-
-            return await connection.QueryFirstOrDefaultAsync<Brother>(sql, new { brotherId = brotherId });
+            return await _brotherContext.Brothers.FindAsync(brotherId);
         }
 
         public async Task<IEnumerable<Brother>> GetBrothers()
         {
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            var sql = "SELECT * FROM brothers";
-
-            return (await connection.QueryAsync<Brother>(sql)).ToList();
+            return await _brotherContext.Brothers.ToListAsync();
         }
 
         public async Task<IEnumerable<BaseModel>> GetBrothersForTray()
         {
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            var sql = "SELECT id, name, surname FROM brothers WHERE isAcolit = @isAcolit AND isDiacon = @isDiacon";
-
-            return (await connection.QueryAsync<BaseModel>(sql, new { isAcolit = false, isDiacon = false })).ToList();
+            return await _brotherContext.Brothers.Where(bro => !bro.isAcolit && !bro.isDiacon).ToListAsync();
         }
 
         public async Task<IEnumerable<CantorResponse>> GetSingingBrothers()
         {
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            var sql = "SELECT id, name, surname, isSinging FROM brothers WHERE isSinging = @isSinging";
+            return await _brotherContext.Brothers.
+                Where(bro => bro.isSinging).
+                Select(bro => new CantorResponse()
+            { Id = bro.Id, Name = bro.Name, Surname = bro.Surname, IsSinging = bro.isSinging}).ToListAsync();
+        }
 
-            return (await connection.QueryAsync<CantorResponse>(sql, new { isSinging = true })).ToList();
+        public async Task<Boolean> IsBrotherInDb(Brother brother)
+        {
+            return await _brotherContext.Brothers.AnyAsync(bro => bro.Name == brother.Name && bro.Surname == brother.Surname);
+        }
+
+        public async Task SaveBrother(Brother brother)
+        {
+            try
+            {
+                await _brotherContext.Brothers.AddAsync(brother);
+                await _brotherContext.SaveChangesAsync();
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }
