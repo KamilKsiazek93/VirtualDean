@@ -49,9 +49,9 @@ namespace VirtualDean.Controllers
             if(!await _brothers.IsBrotherInDb(brother))
             {
                  await _brothers.SaveBrother(brother);
-                return Ok(new { status = 201, isSucces = true, message = "User added" });
+                return Ok(new { status = 201, isSucces = true, message = "Dodano nowego brata" });
             }
-            return Ok(new { status = 401, isSuucces = false, message = "User already exist" }) ;
+            return Ok(new { status = 401, isSuucces = false, message = "W bazie istnieje już brat o takim imieniu i nazwisku" }) ;
         }
 
         [HttpGet("brothers-tray")]
