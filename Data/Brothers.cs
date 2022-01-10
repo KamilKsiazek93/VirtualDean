@@ -19,6 +19,18 @@ namespace VirtualDean.Data
             _brotherContext = brotherContext;
         }
 
+        public async Task DeleteBrother(Brother brother)
+        {
+             _brotherContext.Remove(brother);
+            await _brotherContext.SaveChangesAsync();
+        }
+
+        public async Task EditBrother(Brother brother)
+        {
+            _brotherContext.Entry(brother).State = EntityState.Modified;
+            await _brotherContext.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<BaseModel>> GetBaseBrothersModel()
         {
             return await _brotherContext.Brothers.Select(bro => new BaseModel() 

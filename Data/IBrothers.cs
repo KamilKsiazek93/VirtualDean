@@ -15,5 +15,7 @@ namespace VirtualDean.Data
         Task<IEnumerable<BaseModel>> GetBrothersForTray();
         Task<Boolean> IsBrotherInDb(Brother brother);
         Task SaveBrother(Brother brother);
+        Task DeleteBrother(Brother brother);
+        Task EditBrother(Brother brother);
     }
 }

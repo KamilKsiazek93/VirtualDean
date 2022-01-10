@@ -43,6 +43,32 @@ namespace VirtualDean.Controllers
             return await _brothers.GetBrother(id);
         }
 
+        [HttpDelete("brothers/{id}")]
+        public async Task<ActionResult> DeleteBrother(int id)
+        {
+            var brother = await _brothers.GetBrother(id);
+            if(brother == null)
+            {
+                return NotFound(new { message = "Nie ma takiego brata w bazie danych" });
+            }
+            await _brothers.DeleteBrother(brother);
+            return Ok(new { message = "Brat został usunięty" });
+        }
+
+        [HttpPut("brothers/{id}")]
+        public async Task<IActionResult> EditBrother(Brother brother)
+        {
+            try
+            {
+                await _brothers.EditBrother(brother);
+            }
+            catch(Exception ex)
+            {
+                NotFound( new { message = "Operacja się nie powiodła ", ex});
+            }
+            return Ok(new { message = "Zaktualizowano dane"});
+        }
+
         [HttpPost("brothers")]
         public async Task<ActionResult<Brother>> AddBrothers(Brother brother)
         {
