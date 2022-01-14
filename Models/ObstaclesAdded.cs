@@ -7,9 +7,9 @@ namespace VirtualDean.Models
 {
     public class ObstaclesAdded
     {
-        public int IdBrother { get; set; }
-        public Boolean WholeWeek { get; set; }
-        public int? weekId { get; set; }
-        public List<string> Obstacles { get; set; }
+        public int Id { get; set; }
+        public int BrotherId { get; set; }
+        public int WeekOfOffices { get; set; }
+        public string Obstacle { get; set; }
     }
 }

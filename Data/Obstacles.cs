@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using VirtualDean.Models;
 using Dapper;
+using VirtualDean.Models.DatabaseContext;
+using Microsoft.EntityFrameworkCore;
 
 namespace VirtualDean.Data
 {
@@ -13,10 +15,12 @@ namespace VirtualDean.Data
     {
         private readonly string _connectionString;
         private readonly IWeek _week;
-        public Obstacles(IConfiguration configuration, IWeek week)
+        private readonly ObstaclesDbContext _obstaclesDbContext;
+        public Obstacles(IConfiguration configuration, IWeek week, ObstaclesDbContext obstaclesDbContext)
         {
             _connectionString = configuration["ConnectionStrings:DefaultConnection"];
             _week = week;
+            _obstaclesDbContext = obstaclesDbContext;
         }
 
         public async Task AddConstObstacle(ConstObstacleAdded obstacles)
@@ -33,28 +37,19 @@ namespace VirtualDean.Data
         public async Task AddObstacle(IEnumerable<ObstaclesAdded> obstacles)
         {
             int weekNumber = await _week.GetLastWeek();
-            foreach(ObstaclesAdded obstacle in obstacles)
+            foreach(var obstacle in obstacles)
             {
-                var brotherId = obstacle.IdBrother;
-                if(obstacle.WholeWeek)
-                {
-                    var sqlWhole = "INSERT INTO obstacles (userId, weekOfOffices, wholeWeek)" +
-                    "VALUES (@brotherId, @weekOfOffice, @wholeWeek)";
-                    using var connection = new SqlConnection(_connectionString);
-                    await connection.OpenAsync();
-                    await connection.ExecuteAsync(sqlWhole, new { brotherId = brotherId, weekOfOffice = weekNumber, wholeWeek = obstacle.WholeWeek });
-                }
-                else
-                {
-                    var sql = "INSERT INTO obstacles (userId, weekOfOffices, obstacle)" +
-                    "VALUES (@brotherId, @weekOfOffice, @obstacle)";
-                    foreach (var singleObstacle in obstacle.Obstacles)
-                    {
-                        using var connection = new SqlConnection(_connectionString);
-                        await connection.OpenAsync();
-                        await connection.ExecuteAsync(sql, new { brotherId = brotherId, @weekOfOffice = weekNumber, obstacle = singleObstacle });
-                    }
-                }
+                obstacle.WeekOfOffices = weekNumber;
+            }
+
+            try
+            {
+                await _obstaclesDbContext.AddRangeAsync(obstacles);
+                await _obstaclesDbContext.SaveChangesAsync();
+            }
+            catch
+            {
+                throw;
             }
         }
 
@@ -63,38 +58,20 @@ namespace VirtualDean.Data
             var sql = "SELECT obstacleName from obstacleConst WHERE userId = @brotherId";
             var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
-            return (await connection.QueryAsync<string>(sql, new { brotherId = brotherId })).ToList(); 
+            return (await connection.QueryAsync<string>(sql, new { brotherId = brotherId })).ToList();
         }
 
-        public async Task<IEnumerable<ObstaclesAdded>> GetObstacles(int weekId)
+        public async Task<IEnumerable<ObstaclesList>> GetObstacles(int weekId)
         {
-            List<ObstaclesAdded> obstacles = new List<ObstaclesAdded>();
-            List<String> obstacle = new List<String>();
-
-            using var connection = new SqlConnection(_connectionString);
-            var sqlId = "SELECT DISTINCT userId IdBrother FROM obstacles";
-            var sqlObstacles = "SELECT obstacle from obstacles WHERE userId = @userId AND weekOfOffices = @weekId AND obstacle IS NOT NULL";
-            var sqlWholeWeek = "SELECT wholeWeek from obstacles WHERE userId = @userId AND weekOfOffices = @weekId";
-
-            await connection.OpenAsync();
-            var ids = await connection.QueryAsync<int>(sqlId);
-            foreach (var id in ids)
+            List<ObstaclesList> obstaclesFromDB = new List<ObstaclesList>();
+            var obstacles =  await _obstaclesDbContext.Obstacles.Where(o => o.WeekOfOffices == weekId).ToListAsync();
+            var ids = obstacles.Select(o => o.BrotherId).Distinct();
+            foreach(var id in ids)
             {
-                obstacle = (await connection.QueryAsync<String>(sqlObstacles, new { userId = id, weekId = weekId })).ToList();
-                if (obstacle.Any())
-                {
-                    obstacles.Add(new ObstaclesAdded() { IdBrother = id, Obstacles = obstacle, weekId = weekId });
-                }
-                else
-                {
-                    var wholeWeek = await connection.QueryFirstOrDefaultAsync<Boolean>(sqlWholeWeek, new { userId = id, weekId = weekId });
-                    if(wholeWeek)
-                    {
-                        obstacles.Add(new ObstaclesAdded() { IdBrother = id, WholeWeek = wholeWeek, weekId = weekId });
-                    }
-                }
+                obstaclesFromDB.Add(new ObstaclesList { BrotherId = id, Obstacles = obstacles.Where(o => o.BrotherId == id).Select(o => o.Obstacle).ToList() });
             }
-            return obstacles;
+
+            return obstaclesFromDB;
         }
     }
 }

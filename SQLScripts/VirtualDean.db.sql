@@ -1,106 +1,108 @@
 CREATE TABLE [brothers] (
-  [id] int PRIMARY KEY IDENTITY(1, 1),
-  [name] nvarchar(255),
-  [surname] nvarchar(255),
-  [precedency] datetime,
-  [isSinging] bit,
-  [isLector] bit,
-  [isAcolit] bit,
-  [isDiacon] bit
+  [Id] int PRIMARY KEY IDENTITY(1, 1),
+  [Name] nvarchar(255),
+  [Password] nvarchar(255),
+  [Surname] nvarchar(255),
+  [Precedency] datetime,
+  [IsSinging] bit,
+  [IsLector] bit,
+  [IsAcolit] bit,
+  [IsDiacon] bit
 )
 GO
 
 CREATE TABLE [obstacles] (
-  [id] int PRIMARY KEY IDENTITY(1, 1),
-  [userId] int,
-  [weekOfOffices] int,
-  [wholeWeek] bit,
-  [obstacle] nvarchar(255)
+  [Id] int PRIMARY KEY IDENTITY(1, 1),
+  [BrotherId] int,
+  [WeekOfOffices] int,
+  [Obstacle] nvarchar(255)
 )
 GO
 
 CREATE TABLE [trayHourOffice] (
-  [id] int PRIMARY KEY IDENTITY(1, 1),
-  [userId] int,
-  [weekOfOffice] int,
-  [trayHour] nvarchar(255) NOT NULL CHECK ([trayHour] IN ('T8', 'T9', 'T10', 'T12', 'T13', 'T15', 'T17', 'T19', 'T20', 'T21'))
+  [Id] int PRIMARY KEY IDENTITY(1, 1),
+  [BrotherId] int,
+  [WeekOfOffices] int,
+  [TrayHour] nvarchar(255)
 )
 GO
 
 CREATE TABLE [communionHourOffice] (
-  [id] int PRIMARY KEY IDENTITY(1, 1),
-  [userId] int,
-  [weekOfOffices] int,
-  [communionHour] nvarchar(255) NOT NULL CHECK ([communionHour] IN ('K8', 'K9', 'K10', 'K12', 'K13', 'K15', 'K17', 'K19', 'K20', 'K21'))
+  [Id] int PRIMARY KEY IDENTITY(1, 1),
+  [BrotherId] int,
+  [WeekOfOffices] int,
+  [CommunionHour] nvarchar(255)
 )
 GO
 
 CREATE TABLE [offices] (
-  [id] int PRIMARY KEY IDENTITY(1, 1),
-  [userId] int,
-  [weekOfOffices] int,
-  [officeName] nvarchar(255)
+  [Id] int PRIMARY KEY IDENTITY(1, 1),
+  [BrotherId] int,
+  [WeekOfOffices] int,
+  [CantorOffice] nvarchar(255),
+  [LiturgistOffice] nvarchar(255),
+  [DeanOffice] nvarchar(255)
 )
 GO
 
 CREATE TABLE [kitchenOffice] (
-  [id] int PRIMARY KEY IDENTITY(1, 1),
-  [userId] int,
-  [weekOfOffices] int,
-  [saturdayOffices] nvarchar(255),
-  [sundayOffices] nvarchar(255)
+  [Id] int PRIMARY KEY IDENTITY(1, 1),
+  [BrotherId] int,
+  [WeekOfOffices] int,
+  [SaturdayOffices] nvarchar(255),
+  [SundayOffices] nvarchar(255)
 )
 GO
 
 CREATE TABLE [weeksNumber] (
-  [id] int IDENTITY(1, 1),
-  [weekNumber] int
+  [Id] int IDENTITY(1, 1),
+  [WeekNumber] int PRIMARY KEY
 )
 GO
 
 CREATE TABLE [obstacleConst] (
-  [id] int PRIMARY KEY IDENTITY(1, 1),
-  [userId] int,
-  [obstacleName] nvarchar(255)
+  [Id] int PRIMARY KEY IDENTITY(1, 1),
+  [BrotherId] int,
+  [ObstacleName] nvarchar(255)
 )
 GO
 
 CREATE TABLE [obstacleBetweenOffices] (
-  [id] int PRIMARY KEY IDENTITY(1, 1),
-  [officeName] nvarchar(255),
-  [officeConnected] nvarchar(255)
+  [Id] int PRIMARY KEY IDENTITY(1, 1),
+  [OfficeName] nvarchar(255),
+  [OfficeConnected] nvarchar(255)
 )
 GO
 
-ALTER TABLE [brothers] ADD FOREIGN KEY ([id]) REFERENCES [obstacles] ([userId])
+ALTER TABLE [obstacles] ADD FOREIGN KEY ([BrotherId]) REFERENCES [brothers] ([Id])
 GO
 
-ALTER TABLE [brothers] ADD FOREIGN KEY ([id]) REFERENCES [communionHourOffice] ([userId])
+ALTER TABLE [obstacles] ADD FOREIGN KEY ([WeekOfOffices]) REFERENCES [weeksNumber] ([WeekNumber])
 GO
 
-ALTER TABLE [brothers] ADD FOREIGN KEY ([id]) REFERENCES [trayHourOffice] ([userId])
+ALTER TABLE [trayHourOffice] ADD FOREIGN KEY ([BrotherId]) REFERENCES [brothers] ([Id])
 GO
 
-ALTER TABLE [brothers] ADD FOREIGN KEY ([id]) REFERENCES [offices] ([userId])
+ALTER TABLE [trayHourOffice] ADD FOREIGN KEY ([WeekOfOffices]) REFERENCES [weeksNumber] ([WeekNumber])
 GO
 
-ALTER TABLE [brothers] ADD FOREIGN KEY ([id]) REFERENCES [kitchenOffice] ([userId])
+ALTER TABLE [communionHourOffice] ADD FOREIGN KEY ([BrotherId]) REFERENCES [brothers] ([Id])
 GO
 
-ALTER TABLE [weeksNumber] ADD FOREIGN KEY ([weekNumber]) REFERENCES [trayHourOffice] ([weekOfOffice])
+ALTER TABLE [communionHourOffice] ADD FOREIGN KEY ([WeekOfOffices]) REFERENCES [weeksNumber] ([WeekNumber])
 GO
 
-ALTER TABLE [weeksNumber] ADD FOREIGN KEY ([weekNumber]) REFERENCES [communionHourOffice] ([weekOfOffices])
+ALTER TABLE [offices] ADD FOREIGN KEY ([BrotherId]) REFERENCES [brothers] ([Id])
 GO
 
-ALTER TABLE [weeksNumber] ADD FOREIGN KEY ([weekNumber]) REFERENCES [offices] ([weekOfOffices])
+ALTER TABLE [offices] ADD FOREIGN KEY ([WeekOfOffices]) REFERENCES [weeksNumber] ([WeekNumber])
 GO
 
-ALTER TABLE [weeksNumber] ADD FOREIGN KEY ([weekNumber]) REFERENCES [obstacles] ([weekOfOffices])
+ALTER TABLE [kitchenOffice] ADD FOREIGN KEY ([BrotherId]) REFERENCES [brothers] ([Id])
 GO
 
-ALTER TABLE [weeksNumber] ADD FOREIGN KEY ([weekNumber]) REFERENCES [kitchenOffice] ([weekOfOffices])
+ALTER TABLE [kitchenOffice] ADD FOREIGN KEY ([WeekOfOffices]) REFERENCES [weeksNumber] ([WeekNumber])
 GO
 
-ALTER TABLE [brothers] ADD FOREIGN KEY ([id]) REFERENCES [obstacleConst] ([userId])
+ALTER TABLE [obstacleConst] ADD FOREIGN KEY ([BrotherId]) REFERENCES [brothers] ([Id])
 GO
