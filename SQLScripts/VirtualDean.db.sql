@@ -12,7 +12,7 @@ CREATE TABLE [brothers] (
 GO
 
 CREATE TABLE [obstacles] (
-  [Id] int IDENTITY(1, 1),
+  [Id] int PRIMARY KEY IDENTITY(1, 1),
   [BrotherId] int,
   [WeekOfOffices] int,
   [Obstacle] nvarchar(255)
