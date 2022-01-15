@@ -161,7 +161,7 @@ namespace VirtualDean.Controllers
         }
 
         [HttpGet("obstacles/{weekId}")]
-        public async Task<IEnumerable<ObstaclesAdded>> GetObstaclesInWeek(int weekId)
+        public async Task<IEnumerable<ObstaclesList>> GetObstaclesInWeek(int weekId)
         {
             return await _obstacle.GetObstacles(weekId);
         }

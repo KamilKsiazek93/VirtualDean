@@ -9,7 +9,7 @@ namespace VirtualDean.Data
     public interface IObstacle
     {
         Task AddObstacle(IEnumerable<ObstaclesAdded> obstacles);
-        Task<IEnumerable<ObstaclesAdded>> GetObstacles(int weekId);
+        Task<IEnumerable<ObstaclesList>> GetObstacles(int weekId);
         Task AddConstObstacle(ConstObstacleAdded obstacle);
         Task<IEnumerable<string>> GetConstObstacle(int brotherId);
     }
