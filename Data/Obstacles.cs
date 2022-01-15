@@ -16,21 +16,25 @@ namespace VirtualDean.Data
         private readonly string _connectionString;
         private readonly IWeek _week;
         private readonly ObstaclesDbContext _obstaclesDbContext;
-        public Obstacles(IConfiguration configuration, IWeek week, ObstaclesDbContext obstaclesDbContext)
+        private readonly ObstacleConstDbContext _obstacleConstDbContext;
+        public Obstacles(IConfiguration configuration, IWeek week, ObstaclesDbContext obstaclesDbContext, ObstacleConstDbContext obstacleConstDbContext)
         {
             _connectionString = configuration["ConnectionStrings:DefaultConnection"];
             _week = week;
             _obstaclesDbContext = obstaclesDbContext;
+            _obstacleConstDbContext = obstacleConstDbContext;
         }
 
         public async Task AddConstObstacle(ConstObstacleAdded obstacles)
         {
-            var sql = "INSERT INTO obstacleConst (userId, obstacleName) VALUES (@userId, @obstacleName)";
-            var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            foreach(var obstacle in obstacles.Obstacles)
+            try
             {
-                await connection.ExecuteAsync(sql, new { userId = obstacles.IdBrother , obstacleName = obstacle});
+                await _obstacleConstDbContext.AddAsync(obstacles);
+                await _obstacleConstDbContext.SaveChangesAsync();
+            }
+            catch
+            {
+                throw;
             }
         }
 
@@ -55,10 +59,7 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<string>> GetConstObstacle(int brotherId)
         {
-            var sql = "SELECT obstacleName from obstacleConst WHERE userId = @brotherId";
-            var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            return (await connection.QueryAsync<string>(sql, new { brotherId = brotherId })).ToList();
+            return await _obstacleConstDbContext.ObstacleConst.Where(obstacle => obstacle.BrotherId == brotherId).Select(obstacle => obstacle.ObstacleName).ToListAsync();
         }
 
         public async Task<IEnumerable<ObstaclesList>> GetObstacles(int weekId)
