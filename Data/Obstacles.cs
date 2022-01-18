@@ -13,13 +13,11 @@ namespace VirtualDean.Data
 {
     public class Obstacles : IObstacle
     {
-        private readonly string _connectionString;
         private readonly IWeek _week;
         private readonly ObstaclesDbContext _obstaclesDbContext;
         private readonly ObstacleConstDbContext _obstacleConstDbContext;
-        public Obstacles(IConfiguration configuration, IWeek week, ObstaclesDbContext obstaclesDbContext, ObstacleConstDbContext obstacleConstDbContext)
+        public Obstacles(IWeek week, ObstaclesDbContext obstaclesDbContext, ObstacleConstDbContext obstacleConstDbContext)
         {
-            _connectionString = configuration["ConnectionStrings:DefaultConnection"];
             _week = week;
             _obstaclesDbContext = obstaclesDbContext;
             _obstacleConstDbContext = obstacleConstDbContext;
@@ -57,9 +55,25 @@ namespace VirtualDean.Data
             }
         }
 
-        public async Task<IEnumerable<string>> GetConstObstacle(int brotherId)
+        public async Task DeleteConstObstacle(ConstObstacleAdded obstacle)
+        {
+            _obstacleConstDbContext.Remove(obstacle);
+            await _obstacleConstDbContext.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<ConstObstacleAdded>> GetAllConstObstacles()
+        {
+            return await _obstacleConstDbContext.ObstacleConst.ToListAsync();
+        }
+
+        public async Task<IEnumerable<string>> GetConstObstacleForBrother(int brotherId)
         {
             return await _obstacleConstDbContext.ObstacleConst.Where(obstacle => obstacle.BrotherId == brotherId).Select(obstacle => obstacle.ObstacleName).ToListAsync();
+        }
+
+        public async Task<ConstObstacleAdded> GetConstObstacle(int id)
+        {
+            return await _obstacleConstDbContext.ObstacleConst.FindAsync(id);
         }
 
         public async Task<IEnumerable<ObstaclesList>> GetObstacles(int weekId)
@@ -73,6 +87,24 @@ namespace VirtualDean.Data
             }
 
             return obstaclesFromDB;
+        }
+
+        public async Task<IEnumerable<ConstObstacleWithBrotherData>> GetObstacleWithBrotherData(IEnumerable<BaseModel> brothers)
+        {
+            var constObstacle = await GetAllConstObstacles();
+            List<ConstObstacleWithBrotherData> obstacleWithBrothersData = new List<ConstObstacleWithBrotherData>();
+            foreach(var obstacle in constObstacle)
+            {
+                var brotherData = brothers.Where(bro => bro.Id == obstacle.BrotherId).Select(bro => new { Name = bro.Name, Surname = bro.Surname, BrotherId = bro.Id}).First();
+                obstacleWithBrothersData.Add(new ConstObstacleWithBrotherData { Id = obstacle.Id, BrotherId = brotherData.BrotherId, Name = brotherData.Name, Surname = brotherData.Surname, ObstacleName = obstacle.ObstacleName });
+            }
+            return obstacleWithBrothersData;
+        }
+
+        public async Task EditConstObstacle(ConstObstacleAdded obstacle)
+        {
+            _obstacleConstDbContext.Entry(obstacle).State = EntityState.Modified;
+            await _obstacleConstDbContext.SaveChangesAsync();
         }
     }
 }

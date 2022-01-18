@@ -167,15 +167,62 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("obstacle-const")]
-        public async Task AddConstObstacle(ConstObstacleAdded obstacles)
+        public async Task<ActionResult> AddConstObstacle(ConstObstacleAdded obstacles)
         {
-            await _obstacle.AddConstObstacle(obstacles);
+            try
+            {
+                await _obstacle.AddConstObstacle(obstacles);
+                return Ok(new { message = "Dodano przeszkodę"});
+            }
+            catch
+            {
+                return NotFound(new { message = "Nie udało się dodać przeszkody" });
+            }
         }
 
         [HttpGet("obstacle-const/{brotherId}")]
         public async Task<IEnumerable<string>> GetConstObstacle(int brotherId)
         {
-            return await _obstacle.GetConstObstacle(brotherId);
+            return await _obstacle.GetConstObstacleForBrother(brotherId);
+        }
+
+        [HttpGet("obstacle-const")]
+        public async Task<IEnumerable<ConstObstacleAdded>> GetAllObstaclesConst()
+        {
+            return await _obstacle.GetAllConstObstacles();
+        }
+
+        [HttpGet("obstacle-const/brothers-data")]
+        public async Task<IEnumerable<ConstObstacleWithBrotherData>> GetObstacleWithBrotherData()
+        {
+            var baseBrothers = await _brothers.GetBaseBrothersModel();
+            return await _obstacle.GetObstacleWithBrotherData(baseBrothers);
+        }
+
+        [HttpDelete("obstacle-const/{id}")]
+        public async Task<ActionResult> DeleteConstObstacle(int id)
+        {
+            var obstacle = await _obstacle.GetConstObstacle(id);
+            if (obstacle == null)
+            {
+                return NotFound(new { message = "Nie ma takiej przeszkody" });
+            }
+            await _obstacle.DeleteConstObstacle(obstacle);
+            return Ok(new { message = "Przeszkoda została usunięta" });
+        }
+
+        [HttpPut("obstacle-const/{id}")]
+        public async Task<IActionResult> EditOBstacleConst(ConstObstacleAdded obstacle)
+        {
+            try
+            {
+                await _obstacle.EditConstObstacle(obstacle);
+            }
+            catch (Exception ex)
+            {
+                NotFound(new { message = "Operacja się nie powiodła ", ex });
+            }
+            return Ok(new { message = "Zaktualizowano dane" });
         }
     }
 }
