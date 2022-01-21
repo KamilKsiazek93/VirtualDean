@@ -17,5 +17,6 @@ namespace VirtualDean.Data
         Task SaveBrother(Brother brother);
         Task DeleteBrother(Brother brother);
         Task EditBrother(Brother brother);
+        Task<BaseModel> FindLoginBrother(LoginModel loginData);
     }
 }

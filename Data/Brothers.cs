@@ -14,9 +14,11 @@ namespace VirtualDean.Data
     public class Brothers : IBrothers
     {
         private readonly BrotherDbContext _brotherContext;
-        public Brothers(BrotherDbContext brotherContext)
+        private readonly IAuth _auth;
+        public Brothers(BrotherDbContext brotherContext, IAuth auth)
         {
             _brotherContext = brotherContext;
+            _auth = auth;
         }
 
         public async Task DeleteBrother(Brother brother)
@@ -29,6 +31,18 @@ namespace VirtualDean.Data
         {
             _brotherContext.Entry(brother).State = EntityState.Modified;
             await _brotherContext.SaveChangesAsync();
+        }
+
+        public async Task<BaseModel> FindLoginBrother(LoginModel loginData)
+        {
+            var hashedPassword = _auth.GetHashedPassword(loginData.Password);
+            var brother = await _brotherContext.Brothers.Where(b => b.Email == loginData.Email 
+            && b.PasswordHash == hashedPassword).FirstOrDefaultAsync();
+            if(brother != null)
+            {
+                return new BaseModel { Id = brother.Id, Name = brother.Name, Surname = brother.Surname, StatusBrother = brother.StatusBrother };
+            }
+            return null;
         }
 
         public async Task<IEnumerable<BaseModel>> GetBaseBrothersModel()
@@ -69,6 +83,8 @@ namespace VirtualDean.Data
         {
             try
             {
+                brother.StatusBrother = "BRAT";
+                brother.PasswordHash = _auth.GetHashedPassword(brother.Name + "123");
                 await _brotherContext.Brothers.AddAsync(brother);
                 await _brotherContext.SaveChangesAsync();
             }

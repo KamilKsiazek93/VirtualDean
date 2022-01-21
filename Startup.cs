@@ -62,6 +62,7 @@ namespace VirtualDean
             services.AddScoped<ITrayCommunionHour, TrayCommunionHour>();
             services.AddScoped<IObstacle, Obstacles>();
             services.AddScoped<IWeek, Week>();
+            services.AddScoped<IAuth, Auth>();
 
             services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
                   builder
