@@ -31,6 +31,17 @@ namespace VirtualDean.Controllers
             return await _brothers.GetBrothers();
         }
 
+        [HttpGet("brother-login")]
+        public async Task<BaseModel> LoginAction([FromQuery]LoginModel loginData)
+        {
+            var findingBrother =  await _brothers.FindLoginBrother(loginData);
+            if(findingBrother != null)
+            {
+                return findingBrother;
+            }
+            return new BaseModel { };
+        }
+
         [HttpGet("brothers-base")]
         public async Task<IEnumerable<BaseModel>> GetBaseBrothersModel()
         {

@@ -12,5 +12,7 @@ namespace VirtualDean.Models
         public Boolean isLector { get; set; }
         public Boolean isAcolit { get; set; }
         public Boolean isDiacon { get; set; }
+        public string PasswordHash { get; set; }
+        public string Email { get; set; }
     }
 }
