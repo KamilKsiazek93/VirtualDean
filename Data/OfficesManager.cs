@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
@@ -7,16 +8,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using VirtualDean.Models;
 using VirtualDean.Enties;
+using VirtualDean.Models.DatabaseContext;
 
 namespace VirtualDean.Data
 {
     public class OfficesManager : IOfficesManager
     {
         private readonly string _connectionString;
+        private readonly OfficeNameDbContext _officeNameContext;
         private readonly IWeek _week;
-        public OfficesManager(IConfiguration configuration, IWeek week)
+        public OfficesManager(IConfiguration configuration, IWeek week, OfficeNameDbContext officeNameDbContext)
         {
             _connectionString = configuration["ConnectionStrings:DefaultConnection"];
+            _officeNameContext = officeNameDbContext;
             _week = week;
         }
 
@@ -85,6 +89,11 @@ namespace VirtualDean.Data
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
             await connection.ExecuteAsync(sql, new { idBrother, weekNumber, officeName });
+        }
+
+        public async Task<IEnumerable<string>> GetOfficesName()
+        {
+            return await _officeNameContext.OfficeNames.Select(i => i.OfficeName).ToListAsync();
         }
     }
 }

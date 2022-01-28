@@ -11,6 +11,6 @@ namespace VirtualDean.Models
         public string Surname { get; set; }
         public List<KitchenOffices> KitchenOffices { get; set; }
         public List<string> Obstacles { get; set; }
-        public List<Offices> Offices { get; set; }
+        public List<Office> Offices { get; set; }
     }
 }

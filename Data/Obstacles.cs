@@ -39,20 +39,27 @@ namespace VirtualDean.Data
         public async Task AddObstacle(IEnumerable<ObstaclesAdded> obstacles)
         {
             int weekNumber = await _week.GetLastWeek();
-            foreach(var obstacle in obstacles)
-            {
-                obstacle.WeekOfOffices = weekNumber;
-            }
-
             try
             {
-                await _obstaclesDbContext.AddRangeAsync(obstacles);
+                foreach (var obstacle in obstacles)
+                {
+                    obstacle.WeekOfOffices = weekNumber;
+                    if (!await isOBstacleInDb(obstacle))
+                    {
+                        await _obstaclesDbContext.AddAsync(obstacle);
+                    }
+                }
                 await _obstaclesDbContext.SaveChangesAsync();
             }
             catch
             {
                 throw;
             }
+        }
+
+        private async Task<Boolean> isOBstacleInDb(ObstaclesAdded obstacle)
+        {
+            return await _obstaclesDbContext.Obstacles.AnyAsync(item => item.Obstacle == obstacle.Obstacle && item.WeekOfOffices == obstacle.WeekOfOffices);
         }
 
         public async Task DeleteConstObstacle(ConstObstacleAdded obstacle)
