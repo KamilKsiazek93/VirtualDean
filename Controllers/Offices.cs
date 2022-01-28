@@ -110,6 +110,13 @@ namespace VirtualDean.Controllers
             return CreatedAtAction(nameof(GetSingingBrothers), offices);
         }
 
+        [HttpGet("office-last/{brotherId}")]
+        public async Task<Office> GetLastOfficeForBrother(int brotherId)
+        {
+            var office = new Office();
+            return office;
+        }
+
         [HttpPost("kitchen-offices")]
         public async Task<ActionResult<KitchenOfficeAdded>> AddKitchenOffices(IEnumerable<KitchenOfficeAdded> offices)
         {
@@ -166,9 +173,17 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("obstacles")]
-        public async Task AddObstacles(IEnumerable<ObstaclesAdded> obstacles)
+        public async Task<ActionResult> AddObstacles(IEnumerable<ObstaclesAdded> obstacles)
         {
-            await _obstacle.AddObstacle(obstacles);
+            try
+            {
+                await _obstacle.AddObstacle(obstacles);
+                return Ok(new { message = "Pomyślnie dodano przeszkody" });
+            }
+            catch
+            {
+                return NotFound(new { message = "Nie udało się dodać przeszkód" });
+            }
         }
 
         [HttpGet("obstacles/{weekId}")]
@@ -234,6 +249,12 @@ namespace VirtualDean.Controllers
                 NotFound(new { message = "Operacja się nie powiodła ", ex });
             }
             return Ok(new { message = "Zaktualizowano dane" });
+        }
+
+        [HttpGet("offices-name")]
+        public async Task<IEnumerable<string>> GetOfficesName()
+        {
+            return await _officesManager.GetOfficesName();
         }
     }
 }
