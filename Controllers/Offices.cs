@@ -104,10 +104,17 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("office-singing")]
-        public async Task<ActionResult<CantorOfficeAdded>> AddScholaOffices(IEnumerable<CantorOfficeAdded> offices)
+        public async Task<ActionResult> AddScholaOffices(IEnumerable<Office> offices)
         {
-            await _officesManager.AddBrothersForSchola(offices);
-            return CreatedAtAction(nameof(GetSingingBrothers), offices);
+            try
+            {
+                await _officesManager.AddBrothersForSchola(offices);
+                return Ok(new { message = "Dodano oficja" });
+            }
+            catch
+            {
+                return NotFound(new { message = "Nie udało się dodać oficjów" });
+            }
         }
 
         [HttpGet("office-last/{brotherId}")]

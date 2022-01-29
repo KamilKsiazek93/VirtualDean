@@ -16,12 +16,14 @@ namespace VirtualDean.Data
     {
         private readonly string _connectionString;
         private readonly OfficeNameDbContext _officeNameContext;
+        private readonly OfficeDbContext _officeDbContext;
         private readonly IWeek _week;
-        public OfficesManager(IConfiguration configuration, IWeek week, OfficeNameDbContext officeNameDbContext)
+        public OfficesManager(IConfiguration configuration, IWeek week, OfficeNameDbContext officeNameDbContext, OfficeDbContext officeDbContext)
         {
             _connectionString = configuration["ConnectionStrings:DefaultConnection"];
             _officeNameContext = officeNameDbContext;
             _week = week;
+            _officeDbContext = officeDbContext;
         }
 
         public async Task AddSingleSaturdayKitchenOffice(int brotherId, int weekNumber, string officeName)
@@ -73,22 +75,16 @@ namespace VirtualDean.Data
             return (await connection.QueryAsync<KitchenOffices>(sql, new { weekId = weekId })).ToList();
         }
 
-        public async Task AddBrothersForSchola(IEnumerable<CantorOfficeAdded> schola)
+        public async Task AddBrothersForSchola(IEnumerable<Office> offices)
         {
             int weekNumber = await _week.GetLastWeek();
-            foreach(var brother in schola)
+            foreach(var office in offices)
             {
-                await AddSingleScholaOffice(brother.IdBrother, brother.OfficeName, weekNumber);
+                office.WeekOfOffices = weekNumber;
+                
+                await _officeDbContext.AddAsync(office);
             }
-        }
-
-        private async Task AddSingleScholaOffice(int idBrother, string officeName, int weekNumber)
-        {
-            var sql = "INSERT INTO offices (userId, weekOfOffices, officeName)" +
-                "VALUES (@idBrother, @weekNumber, @officeName)";
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            await connection.ExecuteAsync(sql, new { idBrother, weekNumber, officeName });
+            await _officeDbContext.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<string>> GetOfficesName()

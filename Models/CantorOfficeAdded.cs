@@ -8,7 +8,7 @@ namespace VirtualDean.Models
 {
     public class CantorOfficeAdded
     {
-        public int IdBrother { get; set; }
+        public int BrotherId { get; set; }
         public string OfficeName { get; set; }
     }
 }

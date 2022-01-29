@@ -12,7 +12,6 @@ namespace VirtualDean.Models
         public int BrotherId { get; set; }
         public int WeekOfOffices { get; set; }
         public string CantorOffice { get; set; }
-        public string Gregorian { get; set; }
         public string LiturgistOffice { get; set; }
         public string DeanOffice { get; set; }
         public string Tray { get; set; }
