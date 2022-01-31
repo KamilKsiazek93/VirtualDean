@@ -17,5 +17,10 @@ namespace VirtualDean.Data
         Task<ConstObstacleAdded> GetConstObstacle(int id);
         Task DeleteConstObstacle(ConstObstacleAdded obstacle);
         Task EditConstObstacle(ConstObstacleAdded obstacle);
+        Task<IEnumerable<ObstacleBetweenOffice>> GetObstacleBetweenOffices();
+        Task AddObstacleBetweenOffices(ObstacleBetweenOffice obstacle);
+        Task EditObstacleBetweenOffices(ObstacleBetweenOffice obstacle);
+        Task DeleteObstacleBetweenOffices(ObstacleBetweenOffice obstacle);
+        Task<ObstacleBetweenOffice> GetObstacleBetweenOffice(int id);
     }
 }

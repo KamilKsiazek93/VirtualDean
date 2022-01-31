@@ -263,5 +263,51 @@ namespace VirtualDean.Controllers
         {
             return await _officesManager.GetOfficesName();
         }
+
+        [HttpGet("obstacle-between-office")]
+        public async Task<IEnumerable<ObstacleBetweenOffice>> GetObstacleBetweenOffices()
+        {
+            return await _obstacle.GetObstacleBetweenOffices();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddObstacleBetweenOffice(ObstacleBetweenOffice obstacle)
+        {
+            try
+            {
+                await _obstacle.AddObstacleBetweenOffices(obstacle);
+                return Ok(new { message = "Dodano przeszkodę" });
+            }
+            catch
+            {
+                return NotFound(new { message = "Nie udało się dodać przeszkody" });
+            }
+        }
+
+        [HttpPut("obstacle-between-office/{id}")]
+        public async Task<ActionResult> EditObstacleBetweenOffice(ObstacleBetweenOffice obstacle)
+        {
+            try
+            {
+                await _obstacle.EditObstacleBetweenOffices(obstacle);
+            }
+            catch
+            {
+                NotFound(new { message = "Operacja się nie powiodła " });
+            }
+            return Ok(new { message = "Zaktualizowano dane" });
+        }
+
+        [HttpDelete("obstacle-between-office/{id}")]
+        public async Task<ActionResult> DeleteObstacleBetweenOffice(int id)
+        {
+            var obstacle = await _obstacle.GetObstacleBetweenOffice(id);
+            if (obstacle == null)
+            {
+                return NotFound(new { message = "Nie ma takiej przeszkody" });
+            }
+            await _obstacle.DeleteObstacleBetweenOffices(obstacle);
+            return Ok(new { message = "Przeszkoda została usunięta" });
+        }
     }
 }

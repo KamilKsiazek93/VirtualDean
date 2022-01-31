@@ -16,11 +16,14 @@ namespace VirtualDean.Data
         private readonly IWeek _week;
         private readonly ObstaclesDbContext _obstaclesDbContext;
         private readonly ObstacleConstDbContext _obstacleConstDbContext;
-        public Obstacles(IWeek week, ObstaclesDbContext obstaclesDbContext, ObstacleConstDbContext obstacleConstDbContext)
+        private readonly ObstacleBetweenOfficesDbContext _obstacleBetweenOfficeDbContext;
+        public Obstacles(IWeek week, ObstaclesDbContext obstaclesDbContext, ObstacleConstDbContext obstacleConstDbContext,
+            ObstacleBetweenOfficesDbContext obstacleBetweenOfficesDbContext)
         {
             _week = week;
             _obstaclesDbContext = obstaclesDbContext;
             _obstacleConstDbContext = obstacleConstDbContext;
+            _obstacleBetweenOfficeDbContext = obstacleBetweenOfficesDbContext;
         }
 
         public async Task AddConstObstacle(ConstObstacleAdded obstacles)
@@ -44,7 +47,7 @@ namespace VirtualDean.Data
                 foreach (var obstacle in obstacles)
                 {
                     obstacle.WeekOfOffices = weekNumber;
-                    if (!await isOBstacleInDb(obstacle))
+                    if (!await IsOBstacleInDb(obstacle))
                     {
                         await _obstaclesDbContext.AddAsync(obstacle);
                     }
@@ -57,7 +60,7 @@ namespace VirtualDean.Data
             }
         }
 
-        private async Task<Boolean> isOBstacleInDb(ObstaclesAdded obstacle)
+        private async Task<Boolean> IsOBstacleInDb(ObstaclesAdded obstacle)
         {
             return await _obstaclesDbContext.Obstacles.AnyAsync(item => item.Obstacle == obstacle.Obstacle && item.WeekOfOffices == obstacle.WeekOfOffices);
         }
@@ -112,6 +115,34 @@ namespace VirtualDean.Data
         {
             _obstacleConstDbContext.Entry(obstacle).State = EntityState.Modified;
             await _obstacleConstDbContext.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<ObstacleBetweenOffice>> GetObstacleBetweenOffices()
+        {
+            return await _obstacleBetweenOfficeDbContext.ObstacleBetweenOffices.ToListAsync();
+        }
+
+        public async Task AddObstacleBetweenOffices(ObstacleBetweenOffice obstacle)
+        {
+            await _obstacleBetweenOfficeDbContext.AddAsync(obstacle);
+            await _obstacleBetweenOfficeDbContext.SaveChangesAsync();
+        }
+
+        public async Task EditObstacleBetweenOffices(ObstacleBetweenOffice obstacle)
+        {
+            _obstacleBetweenOfficeDbContext.Entry(obstacle).State = EntityState.Modified;
+            await _obstacleBetweenOfficeDbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteObstacleBetweenOffices(ObstacleBetweenOffice obstacle)
+        {
+            _obstacleBetweenOfficeDbContext.Remove(obstacle);
+            await _obstacleBetweenOfficeDbContext.SaveChangesAsync();
+        }
+
+        public async Task<ObstacleBetweenOffice> GetObstacleBetweenOffice(int id)
+        {
+            return await _obstacleBetweenOfficeDbContext.ObstacleBetweenOffices.FindAsync(id);
         }
     }
 }
