@@ -270,7 +270,7 @@ namespace VirtualDean.Controllers
             return await _obstacle.GetObstacleBetweenOffices();
         }
 
-        [HttpPost]
+        [HttpPost("obstacle-between-office")]
         public async Task<ActionResult> AddObstacleBetweenOffice(ObstacleBetweenOffice obstacle)
         {
             try
