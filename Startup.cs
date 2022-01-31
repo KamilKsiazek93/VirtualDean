@@ -52,6 +52,7 @@ namespace VirtualDean
             services.AddDbContext<ObstacleConstDbContext>(options => options.UseSqlServer(connectionString));
             services.AddDbContext<OfficeNameDbContext>(options => options.UseSqlServer(connectionString));
             services.AddDbContext<OfficeDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddDbContext<ObstacleBetweenOfficesDbContext>(options => options.UseSqlServer(connectionString);
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
