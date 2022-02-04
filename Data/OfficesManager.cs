@@ -17,13 +17,16 @@ namespace VirtualDean.Data
         private readonly string _connectionString;
         private readonly OfficeNameDbContext _officeNameContext;
         private readonly OfficeDbContext _officeDbContext;
+        private readonly KitchenOfficeDbContext _kitchenContext;
         private readonly IWeek _week;
-        public OfficesManager(IConfiguration configuration, IWeek week, OfficeNameDbContext officeNameDbContext, OfficeDbContext officeDbContext)
+        public OfficesManager(IConfiguration configuration, IWeek week, OfficeNameDbContext officeNameDbContext,
+            OfficeDbContext officeDbContext, KitchenOfficeDbContext kitchenContext)
         {
             _connectionString = configuration["ConnectionStrings:DefaultConnection"];
             _officeNameContext = officeNameDbContext;
             _week = week;
             _officeDbContext = officeDbContext;
+            _kitchenContext = kitchenContext;
         }
 
         public async Task AddSingleSaturdayKitchenOffice(int brotherId, int weekNumber, string officeName)
@@ -44,20 +47,16 @@ namespace VirtualDean.Data
             await connection.ExecuteAsync(sql, new { brotherId = brotherId, weekOfOffices = weekNumber, sundayOffices = officeName });
         }
 
-        public async Task AddKitchenOffices(IEnumerable<KitchenOfficeAdded> kitchenOffices)
+        public async Task AddKitchenOffices(IEnumerable<KitchenOffices> kitchenOffices)
         {
-            int weekNumber = await _week.GetLastWeek();
-            foreach (KitchenOfficeAdded office in kitchenOffices)
+            int weekOfOffice = await _week.GetLastWeek();
+            foreach(var office in kitchenOffices)
             {
-                if(office.Day.ToUpper().Equals("SATURDAY"))
-                {
-                    await AddSingleSaturdayKitchenOffice(office.BrotherId, weekNumber, office.OfficeName);
-                }
-                else if(office.Day.ToUpper().Equals("SUNDAY"))
-                {
-                    await AddSingleSundayKitchenOffice(office.BrotherId, weekNumber, office.OfficeName);
-                }
+                office.WeekOfOffices = weekOfOffice;
             }
+
+            await _kitchenContext.AddRangeAsync(kitchenOffices);
+            await _kitchenContext.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices()
