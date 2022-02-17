@@ -47,7 +47,7 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<BaseModel>> GetBaseBrothersModel()
         {
-            return await _brotherContext.Brothers.Select(bro => new BaseModel() 
+            return await _brotherContext.Brothers.Where(bro => bro.StatusBrother == "BRAT").Select(bro => new BaseModel() 
             { Id = bro.Id, Name = bro.Name, Surname = bro.Surname }).ToListAsync();
         }
 
