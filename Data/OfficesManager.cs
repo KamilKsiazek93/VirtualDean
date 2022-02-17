@@ -61,17 +61,12 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices()
         {
-            using var connection = new SqlConnection(_connectionString);
-            var sql = "SELECT userId brotherId, weekOfOffices WeekOfOffices, saturdayOffices SaturdayOffice, sundayOffices SundayOffice FROM kitchenOffice";
-            return (await connection.QueryAsync<KitchenOffices>(sql)).ToList();
+            return await _kitchenContext.KitchenOffice.ToListAsync();
         }
 
         public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices(int weekId)
         {
-            using var connection = new SqlConnection(_connectionString);
-            var sql = "SELECT userId brotherId, saturdayOffices SaturdayOffice, sundayOffices SundayOffice FROM kitchenOffice" +
-                " WHERE weekOfOffices = @weekId";
-            return (await connection.QueryAsync<KitchenOffices>(sql, new { weekId = weekId })).ToList();
+            return await _kitchenContext.KitchenOffice.Where(office => office.WeekOfOffices == weekId).ToListAsync();
         }
 
         public async Task AddBrothersForSchola(IEnumerable<Office> offices)
