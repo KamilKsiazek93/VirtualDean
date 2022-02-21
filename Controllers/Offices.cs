@@ -120,8 +120,13 @@ namespace VirtualDean.Controllers
         [HttpGet("office-last/{brotherId}")]
         public async Task<Office> GetLastOfficeForBrother(int brotherId)
         {
-            var office = new Office();
-            return office;
+            return await _officesManager.GetLastOfficeForBrother(brotherId);
+        }
+
+        [HttpGet("office-last")]
+        public async Task<IEnumerable<Office>> GetLastOffice()
+        {
+            return await _officesManager.GetLastOffice();
         }
 
         [HttpPost("kitchen-offices")]

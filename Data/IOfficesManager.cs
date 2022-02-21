@@ -13,5 +13,7 @@ namespace VirtualDean.Data
         Task AddKitchenOffices(IEnumerable<KitchenOffices> kitchenOffices);
         Task AddBrothersForSchola(IEnumerable<Office> schola);
         Task<IEnumerable<string>> GetOfficesName();
+        Task<IEnumerable<Office>> GetLastOffice();
+        Task<Office> GetLastOfficeForBrother(int brotherId);
     }
 }
