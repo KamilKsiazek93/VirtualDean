@@ -98,6 +98,11 @@ namespace VirtualDean.Data
 
             return obstaclesFromDB;
         }
+        public async Task<IEnumerable<ObstaclesList>> GetLastObstacleAdded()
+        {
+            int weekNumber = await _week.GetLastWeek();
+            return await GetObstacles(weekNumber);
+        }
 
         public async Task<IEnumerable<ConstObstacleWithBrotherData>> GetObstacleWithBrotherData(IEnumerable<BaseModel> brothers)
         {

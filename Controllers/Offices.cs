@@ -193,6 +193,12 @@ namespace VirtualDean.Controllers
             }
         }
 
+        [HttpGet("obstacle-last")]
+        public async Task<IEnumerable<ObstaclesList>> GetLastObstacleAdded()
+        {
+            return await _obstacle.GetLastObstacleAdded();
+        }
+
         [HttpGet("obstacles/{weekId}")]
         public async Task<IEnumerable<ObstaclesList>> GetObstaclesInWeek(int weekId)
         {
@@ -218,6 +224,7 @@ namespace VirtualDean.Controllers
         {
             return await _obstacle.GetConstObstacleForBrother(brotherId);
         }
+
 
         [HttpGet("obstacle-const")]
         public async Task<IEnumerable<ConstObstacleAdded>> GetAllObstaclesConst()
