@@ -149,9 +149,18 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("tray-hour")]
-        public async Task AddTrayOffice(IEnumerable<TrayOfficeAdded> listOfTray)
+        public async Task<ActionResult> AddTrayOffice(IEnumerable<TrayOfficeAdded> listOfTray)
         {
-            await _trayCommunionHour.AddTrayHour(listOfTray);
+            try
+            {
+                await _trayCommunionHour.AddTrayHour(listOfTray);
+                return Ok(new { message = "Zapisano tace w bazie danych" });
+            }
+            catch
+            {
+                return NotFound(new { message = "Nie udało się zapisać oficjów" });
+            }
+            
         }
 
         [HttpGet("tray-hour")]
