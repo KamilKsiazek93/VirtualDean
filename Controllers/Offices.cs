@@ -120,8 +120,13 @@ namespace VirtualDean.Controllers
         [HttpGet("office-last/{brotherId}")]
         public async Task<Office> GetLastOfficeForBrother(int brotherId)
         {
-            var office = new Office();
-            return office;
+            return await _officesManager.GetLastOfficeForBrother(brotherId);
+        }
+
+        [HttpGet("office-last")]
+        public async Task<IEnumerable<Office>> GetLastOffice()
+        {
+            return await _officesManager.GetLastOffice();
         }
 
         [HttpPost("kitchen-offices")]
@@ -144,9 +149,18 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("tray-hour")]
-        public async Task AddTrayOffice(IEnumerable<TrayOfficeAdded> listOfTray)
+        public async Task<ActionResult> AddTrayOffice(IEnumerable<TrayOfficeAdded> listOfTray)
         {
-            await _trayCommunionHour.AddTrayHour(listOfTray);
+            try
+            {
+                await _trayCommunionHour.AddTrayHour(listOfTray);
+                return Ok(new { message = "Zapisano tace w bazie danych" });
+            }
+            catch
+            {
+                return NotFound(new { message = "Nie udało się zapisać oficjów" });
+            }
+            
         }
 
         [HttpGet("tray-hour")]
@@ -193,6 +207,12 @@ namespace VirtualDean.Controllers
             }
         }
 
+        [HttpGet("obstacle-last")]
+        public async Task<IEnumerable<ObstaclesList>> GetLastObstacleAdded()
+        {
+            return await _obstacle.GetLastObstacleAdded();
+        }
+
         [HttpGet("obstacles/{weekId}")]
         public async Task<IEnumerable<ObstaclesList>> GetObstaclesInWeek(int weekId)
         {
@@ -218,6 +238,7 @@ namespace VirtualDean.Controllers
         {
             return await _obstacle.GetConstObstacleForBrother(brotherId);
         }
+
 
         [HttpGet("obstacle-const")]
         public async Task<IEnumerable<ConstObstacleAdded>> GetAllObstaclesConst()

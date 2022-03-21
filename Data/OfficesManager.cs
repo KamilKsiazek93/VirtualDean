@@ -85,5 +85,17 @@ namespace VirtualDean.Data
         {
             return await _officeNameContext.OfficeNames.Select(i => i.OfficeName).ToListAsync();
         }
+
+        public async Task<IEnumerable<Office>> GetLastOffice()
+        {
+            int weekOfOffice = await _week.GetLastWeek();
+            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekOfOffice).ToListAsync();
+        }
+
+        public async Task<Office> GetLastOfficeForBrother(int brotherId)
+        {
+            int weekOfOffice = await _week.GetLastWeek();
+            return await _officeDbContext.Offices.Where(item => item.BrotherId == brotherId && item.WeekOfOffices == weekOfOffice).FirstOrDefaultAsync();
+        }
     }
 }

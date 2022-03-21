@@ -10,6 +10,7 @@ namespace VirtualDean.Data
     {
         Task AddObstacle(IEnumerable<ObstaclesAdded> obstacles);
         Task<IEnumerable<ObstaclesList>> GetObstacles(int weekId);
+        Task<IEnumerable<ObstaclesList>> GetLastObstacleAdded();
         Task AddConstObstacle(ConstObstacleAdded obstacle);
         Task<IEnumerable<string>> GetConstObstacleForBrother(int brotherId);
         Task<IEnumerable<ConstObstacleAdded>> GetAllConstObstacles();
