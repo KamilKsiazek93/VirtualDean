@@ -97,6 +97,12 @@ namespace VirtualDean.Controllers
             return await _brothers.GetBrothersForTray();
         }
 
+        [HttpGet("brothers-liturgistOffice")]
+        public async Task<IEnumerable<BaseModel>> GetBrothersForLiturgistOffice()
+        {
+            return await _brothers.GetBrotherForLiturgistOffice();
+        }
+
         [HttpGet("brothers-singing")]
         public async Task<IEnumerable<BaseModel>> GetSingingBrothers()
         {
