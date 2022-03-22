@@ -123,6 +123,20 @@ namespace VirtualDean.Controllers
             }
         }
 
+        [HttpPost("office-liturgist")]
+        public async Task<ActionResult> AddLiturgistOffice(IEnumerable<Office> offices)
+        {
+            try
+            {
+                await _officesManager.AddLiturgistOffice(offices);
+                return Ok(new { message = "Dodano oficja" });
+            }
+            catch
+            {
+                return NotFound(new { message = "Nie udało się dodać oficjów" });
+            }
+        }
+
         [HttpGet("office-last/{brotherId}")]
         public async Task<Office> GetLastOfficeForBrother(int brotherId)
         {
