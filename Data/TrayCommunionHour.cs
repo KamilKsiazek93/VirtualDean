@@ -102,5 +102,21 @@ namespace VirtualDean.Data
         {
             return await _trayContext.TrayHourOffice.Where(tray => tray.WeekOfOffices == weekId).ToListAsync();
         }
+
+        public async Task<IEnumerable<LastTrayOfficeList>> GetLastTrayHour()
+        {
+            int weekNumber = await _week.GetLastWeek();
+            var ids = await _trayContext.TrayHourOffice.Where(tray => tray.WeekOfOffices == weekNumber)
+                .Select(tray => tray.BrotherId).Distinct().ToListAsync();
+            var lastTrays = new List<LastTrayOfficeList>();
+            
+            foreach(var id in ids)
+            {
+                var trays = await _trayContext.TrayHourOffice.Where(item => item.WeekOfOffices == weekNumber && item.BrotherId == id)
+                    .Select(tray => tray.TrayHour).ToListAsync();
+                lastTrays.Add(new LastTrayOfficeList { IdBrother = id, BrothersTrays = trays });
+            }
+            return lastTrays;
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace VirtualDean.Data
         Task AddTrayHour(IEnumerable<TrayOfficeAdded> offices);
         Task<IEnumerable<TrayOfficeAdded>> GetTrayHours();
         Task<IEnumerable<TrayOfficeAdded>> GetTrayHours(int weekId);
+        Task<IEnumerable<LastTrayOfficeList>> GetLastTrayHour();
 
         Task AddCommunionHour(IEnumerable<CommunionOfficeAdded> offices);
         Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHours();

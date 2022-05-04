@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VirtualDean.Data;
 using VirtualDean.Models;
+using VirtualDean.Enties;
 
 namespace VirtualDean.Controllers
 {
@@ -60,10 +61,10 @@ namespace VirtualDean.Controllers
             var brother = await _brothers.GetBrother(id);
             if(brother == null)
             {
-                return NotFound(new { message = "Nie ma takiego brata w bazie danych" });
+                return NotFound(new { message = ActionResultMessage.BrotherNotFound });
             }
             await _brothers.DeleteBrother(brother);
-            return Ok(new { message = "Brat został usunięty" });
+            return Ok(new { message = ActionResultMessage.BrotherDeleted });
         }
 
         [HttpPut("brothers/{id}")]
@@ -75,9 +76,9 @@ namespace VirtualDean.Controllers
             }
             catch(Exception ex)
             {
-                NotFound( new { message = "Operacja się nie powiodła ", ex});
+                NotFound( new { message = ActionResultMessage.OperationFailed, ex});
             }
-            return Ok(new { message = "Zaktualizowano dane"});
+            return Ok(new { message = ActionResultMessage.DataUpdated });
         }
 
         [HttpPost("brothers")]
@@ -88,13 +89,19 @@ namespace VirtualDean.Controllers
                  await _brothers.SaveBrother(brother);
                 return Ok(new { status = 201, isSucces = true, message = "Dodano nowego brata" });
             }
-            return Ok(new { status = 401, isSuucces = false, message = "W bazie istnieje już brat o takim imieniu i nazwisku" }) ;
+            return Ok(new { status = 401, isSuucces = false, message = ActionResultMessage.BrotherAlreadyExist }) ;
         }
 
         [HttpGet("brothers-tray")]
         public async Task<IEnumerable<BaseModel>> GetBrothersForTray()
         {
             return await _brothers.GetBrothersForTray();
+        }
+
+        [HttpGet("brothers-liturgistOffice")]
+        public async Task<IEnumerable<BaseBrotherForLiturgistOffice>> GetBrothersForLiturgistOffice()
+        {
+            return await _brothers.GetBrotherForLiturgistOffice();
         }
 
         [HttpGet("brothers-singing")]
@@ -109,11 +116,25 @@ namespace VirtualDean.Controllers
             try
             {
                 await _officesManager.AddBrothersForSchola(offices);
-                return Ok(new { message = "Dodano oficja" });
+                return Ok(new { message = ActionResultMessage.OfficeAdded });
             }
             catch
             {
-                return NotFound(new { message = "Nie udało się dodać oficjów" });
+                return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
+            }
+        }
+
+        [HttpPost("office-liturgist")]
+        public async Task<ActionResult> AddLiturgistOffice(IEnumerable<Office> offices)
+        {
+            try
+            {
+                await _officesManager.AddLiturgistOffice(offices);
+                return Ok(new { message = ActionResultMessage.OfficeAdded });
+            }
+            catch
+            {
+                return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
             }
         }
 
@@ -154,11 +175,11 @@ namespace VirtualDean.Controllers
             try
             {
                 await _trayCommunionHour.AddTrayHour(listOfTray);
-                return Ok(new { message = "Zapisano tace w bazie danych" });
+                return Ok(new { message = ActionResultMessage.OfficeAdded });
             }
             catch
             {
-                return NotFound(new { message = "Nie udało się zapisać oficjów" });
+                return NotFound(new { message = ActionResultMessage.OperationFailed });
             }
             
         }
@@ -173,6 +194,12 @@ namespace VirtualDean.Controllers
         public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHour(int weekId)
         {
             return await _trayCommunionHour.GetTrayHours(weekId);
+        }
+
+        [HttpGet("tray-hour-last")]
+        public async Task<IEnumerable<LastTrayOfficeList>> GetLastTray()
+        {
+            return await _trayCommunionHour.GetLastTrayHour();
         }
 
         [HttpPost("communion-hour")]
@@ -199,11 +226,11 @@ namespace VirtualDean.Controllers
             try
             {
                 await _obstacle.AddObstacle(obstacles);
-                return Ok(new { message = "Pomyślnie dodano przeszkody" });
+                return Ok(new { message = ActionResultMessage.OfficeAdded });
             }
             catch
             {
-                return NotFound(new { message = "Nie udało się dodać przeszkód" });
+                return NotFound(new { message = ActionResultMessage.OperationFailed });
             }
         }
 
@@ -225,11 +252,11 @@ namespace VirtualDean.Controllers
             try
             {
                 await _obstacle.AddConstObstacle(obstacles);
-                return Ok(new { message = "Dodano przeszkodę"});
+                return Ok(new { message = ActionResultMessage.ObstacleAdded });
             }
             catch
             {
-                return NotFound(new { message = "Nie udało się dodać przeszkody" });
+                return NotFound(new { message = ActionResultMessage.OperationFailed });
             }
         }
 
@@ -259,10 +286,10 @@ namespace VirtualDean.Controllers
             var obstacle = await _obstacle.GetConstObstacle(id);
             if (obstacle == null)
             {
-                return NotFound(new { message = "Nie ma takiej przeszkody" });
+                return NotFound(new { message = ActionResultMessage.ObstacleNotFound });
             }
             await _obstacle.DeleteConstObstacle(obstacle);
-            return Ok(new { message = "Przeszkoda została usunięta" });
+            return Ok(new { message = ActionResultMessage.ObstacleDeleted });
         }
 
         [HttpPut("obstacle-const/{id}")]
@@ -274,9 +301,9 @@ namespace VirtualDean.Controllers
             }
             catch (Exception ex)
             {
-                NotFound(new { message = "Operacja się nie powiodła ", ex });
+                NotFound(new { message = ActionResultMessage.OperationFailed, ex });
             }
-            return Ok(new { message = "Zaktualizowano dane" });
+            return Ok(new { message = ActionResultMessage.DataUpdated });
         }
 
         [HttpGet("offices-name")]
@@ -297,11 +324,11 @@ namespace VirtualDean.Controllers
             try
             {
                 await _obstacle.AddObstacleBetweenOffices(obstacle);
-                return Ok(new { message = "Dodano przeszkodę" });
+                return Ok(new { message = ActionResultMessage.ObstacleAdded });
             }
             catch
             {
-                return NotFound(new { message = "Nie udało się dodać przeszkody" });
+                return NotFound(new { message = ActionResultMessage.ObstacleNotAdded });
             }
         }
 
@@ -314,9 +341,9 @@ namespace VirtualDean.Controllers
             }
             catch
             {
-                NotFound(new { message = "Operacja się nie powiodła " });
+                NotFound(new { message = ActionResultMessage.OperationFailed });
             }
-            return Ok(new { message = "Zaktualizowano dane" });
+            return Ok(new { message = ActionResultMessage.DataUpdated });
         }
 
         [HttpDelete("obstacle-between-office/{id}")]
@@ -325,10 +352,10 @@ namespace VirtualDean.Controllers
             var obstacle = await _obstacle.GetObstacleBetweenOffice(id);
             if (obstacle == null)
             {
-                return NotFound(new { message = "Nie ma takiej przeszkody" });
+                return NotFound(new { message = ActionResultMessage.ObstacleNotFound });
             }
             await _obstacle.DeleteObstacleBetweenOffices(obstacle);
-            return Ok(new { message = "Przeszkoda została usunięta" });
+            return Ok(new { message = ActionResultMessage.ObstacleDeleted });
         }
     }
 }

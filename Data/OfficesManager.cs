@@ -14,37 +14,17 @@ namespace VirtualDean.Data
 {
     public class OfficesManager : IOfficesManager
     {
-        private readonly string _connectionString;
         private readonly OfficeNameDbContext _officeNameContext;
         private readonly OfficeDbContext _officeDbContext;
         private readonly KitchenOfficeDbContext _kitchenContext;
         private readonly IWeek _week;
-        public OfficesManager(IConfiguration configuration, IWeek week, OfficeNameDbContext officeNameDbContext,
+        public OfficesManager(IWeek week, OfficeNameDbContext officeNameDbContext,
             OfficeDbContext officeDbContext, KitchenOfficeDbContext kitchenContext)
         {
-            _connectionString = configuration["ConnectionStrings:DefaultConnection"];
             _officeNameContext = officeNameDbContext;
             _week = week;
             _officeDbContext = officeDbContext;
             _kitchenContext = kitchenContext;
-        }
-
-        public async Task AddSingleSaturdayKitchenOffice(int brotherId, int weekNumber, string officeName)
-        {
-            var sql = "INSERT INTO kitchenOffice (userId, weekOfOffices, saturdayOffices)" +
-                "VALUES (@brotherId, @weekOfOffices, @saturdayOffices)";
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            await connection.ExecuteAsync(sql, new { brotherId , weekOfOffices = weekNumber , saturdayOffices = officeName });
-        }
-
-        public async Task AddSingleSundayKitchenOffice(int brotherId, int weekNumber, string officeName)
-        {
-            var sql = "INSERT INTO kitchenOffice (userId, weekOfOffices, sundayOffices)" +
-                "VALUES (@brotherId, @weekOfOffices, @sundayOffices)";
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            await connection.ExecuteAsync(sql, new { brotherId = brotherId, weekOfOffices = weekNumber, sundayOffices = officeName });
         }
 
         public async Task AddKitchenOffices(IEnumerable<KitchenOffices> kitchenOffices)
@@ -96,6 +76,18 @@ namespace VirtualDean.Data
         {
             int weekOfOffice = await _week.GetLastWeek();
             return await _officeDbContext.Offices.Where(item => item.BrotherId == brotherId && item.WeekOfOffices == weekOfOffice).FirstOrDefaultAsync();
+        }
+
+        public async Task AddLiturgistOffice(IEnumerable<Office> offices)
+        {
+            int weekNumber = await _week.GetLastWeek();
+            foreach (var office in offices)
+            {
+                office.WeekOfOffices = weekNumber;
+
+                await _officeDbContext.AddAsync(office);
+            }
+            await _officeDbContext.SaveChangesAsync();
         }
     }
 }

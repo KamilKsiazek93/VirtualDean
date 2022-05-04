@@ -56,6 +56,14 @@ namespace VirtualDean.Data
             return await _brotherContext.Brothers.FindAsync(brotherId);
         }
 
+        public async Task<IEnumerable<BaseBrotherForLiturgistOffice>> GetBrotherForLiturgistOffice()
+        {
+            return await _brotherContext.Brothers.Where(bro => !bro.isDiacon).
+                Select(bro => new BaseBrotherForLiturgistOffice { Id = bro.Id, Name = bro.Name, Surname = bro.Surname,
+                StatusBrother = bro.StatusBrother, IsAcolit = bro.isAcolit })
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Brother>> GetBrothers()
         {
             return await _brotherContext.Brothers.ToListAsync();
