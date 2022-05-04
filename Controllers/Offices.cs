@@ -99,7 +99,7 @@ namespace VirtualDean.Controllers
         }
 
         [HttpGet("brothers-liturgistOffice")]
-        public async Task<IEnumerable<BaseModel>> GetBrothersForLiturgistOffice()
+        public async Task<IEnumerable<BaseBrotherForLiturgistOffice>> GetBrothersForLiturgistOffice()
         {
             return await _brothers.GetBrotherForLiturgistOffice();
         }
@@ -194,6 +194,12 @@ namespace VirtualDean.Controllers
         public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHour(int weekId)
         {
             return await _trayCommunionHour.GetTrayHours(weekId);
+        }
+
+        [HttpGet("tray-hour-last")]
+        public async Task<IEnumerable<LastTrayOfficeList>> GetLastTray()
+        {
+            return await _trayCommunionHour.GetLastTrayHour();
         }
 
         [HttpPost("communion-hour")]
