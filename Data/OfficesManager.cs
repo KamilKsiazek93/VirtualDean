@@ -89,5 +89,17 @@ namespace VirtualDean.Data
             }
             await _officeDbContext.SaveChangesAsync();
         }
+
+        public async Task AddDeanOffice(IEnumerable<Office> offices)
+        {
+            int weekNumber = await _week.GetLastWeek();
+            foreach (var office in offices)
+            {
+                office.WeekOfOffices = weekNumber;
+
+                await _officeDbContext.AddAsync(office);
+            }
+            await _officeDbContext.SaveChangesAsync();
+        }
     }
 }

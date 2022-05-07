@@ -18,12 +18,14 @@ namespace VirtualDean.Controllers
         private readonly IOfficesManager _officesManager;
         private readonly ITrayCommunionHour _trayCommunionHour;
         private readonly IObstacle _obstacle;
-        public Offices(IBrothers brothers, IOfficesManager officesManager, ITrayCommunionHour trayCommunionHour, IObstacle obstacle)
+        private readonly IWeek _week;
+        public Offices(IBrothers brothers, IOfficesManager officesManager, ITrayCommunionHour trayCommunionHour, IObstacle obstacle, IWeek week)
         {
             _brothers = brothers;
             _officesManager = officesManager;
             _trayCommunionHour = trayCommunionHour;
             _obstacle = obstacle;
+            _week = week;
         }
 
         [HttpGet("brothers")]
@@ -124,12 +126,32 @@ namespace VirtualDean.Controllers
             }
         }
 
+        [HttpGet("week-number")]
+        public async Task<int> GetActualWeekNumber()
+        {
+            return await _week.GetLastWeek();
+        }
+
         [HttpPost("office-liturgist")]
         public async Task<ActionResult> AddLiturgistOffice(IEnumerable<Office> offices)
         {
             try
             {
                 await _officesManager.AddLiturgistOffice(offices);
+                return Ok(new { message = ActionResultMessage.OfficeAdded });
+            }
+            catch
+            {
+                return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
+            }
+        }
+
+        [HttpPost("office-dean")]
+        public async Task<ActionResult> AddDeanOffice(IEnumerable<Office> offices)
+        {
+            try
+            {
+                await _officesManager.AddDeanOffice(offices);
                 return Ok(new { message = ActionResultMessage.OfficeAdded });
             }
             catch
