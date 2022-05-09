@@ -13,19 +13,26 @@ namespace VirtualDean.Data
 {
     public class TrayCommunionHour : ITrayCommunionHour
     {
-        private readonly string _connectionString;
+        private readonly CommunionHourDbContext _communionContext;
         private readonly TrayHourDbContext _trayContext;
         private readonly IWeek _week;
-        public TrayCommunionHour(IConfiguration configuration, TrayHourDbContext trayHourDbContext, IWeek week)
+        public TrayCommunionHour(CommunionHourDbContext communionContext, TrayHourDbContext trayHourDbContext, IWeek week)
         {
-            _connectionString = configuration["ConnectionStrings:DefaultConnection"];
+            _communionContext = communionContext;
             _trayContext = trayHourDbContext;
             _week = week;
         }
 
         public async Task AddCommunionHour(IEnumerable<CommunionOfficeAdded> offices)
         {
-            
+            int weekNumber = await _week.GetLastWeek();
+            foreach (var office in offices)
+            {
+                office.WeekOfOffices = weekNumber;
+            }
+
+            await _communionContext.AddRangeAsync(offices);
+            await _communionContext.SaveChangesAsync();
         }
 
         public async Task AddTrayHour(IEnumerable<TrayOfficeAdded> offices)
@@ -42,12 +49,12 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHours()
         {
-            
+            return await _communionContext.CommunionHourOffice.ToListAsync();
         }
 
         public async Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHours(int weekId)
         {
-            
+            return await _communionContext.CommunionHourOffice.Where(communion => communion.WeekOfOffices == weekId).ToListAsync();
         }
         public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHours()
         {
