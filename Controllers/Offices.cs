@@ -203,7 +203,6 @@ namespace VirtualDean.Controllers
             {
                 return NotFound(new { message = ActionResultMessage.OperationFailed });
             }
-            
         }
 
         [HttpGet("tray-hour")]
@@ -225,9 +224,17 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("communion-hour")]
-        public async Task AddCommunionOffice(IEnumerable<CommunionOfficeAdded> listOfCommunion)
+        public async Task<ActionResult> AddCommunionOffice(IEnumerable<CommunionOfficeAdded> listOfCommunion)
         {
-            await _trayCommunionHour.AddCommunionHour(listOfCommunion);
+            try
+            {
+                await _trayCommunionHour.AddCommunionHour(listOfCommunion);
+                return Ok(new { message = ActionResultMessage.OfficeAdded });
+            }
+            catch
+            {
+                return NotFound(new { message = ActionResultMessage.OperationFailed });
+            }
         }
 
         [HttpGet("communion-hour")]
