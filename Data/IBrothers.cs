@@ -13,6 +13,7 @@ namespace VirtualDean.Data
         Task<IEnumerable<BaseModel>> GetBaseBrothersModel();
         Task<IEnumerable<CantorResponse>> GetSingingBrothers();
         Task<IEnumerable<BaseModel>> GetBrothersForTray();
+        Task<IEnumerable<BaseModel>> GetBrothersForCommunion();
         Task<IEnumerable<BaseBrotherForLiturgistOffice>> GetBrotherForLiturgistOffice();
         Task<Boolean> IsBrotherInDb(Brother brother);
         Task SaveBrother(Brother brother);

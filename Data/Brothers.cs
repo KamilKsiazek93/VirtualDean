@@ -69,6 +69,11 @@ namespace VirtualDean.Data
             return await _brotherContext.Brothers.ToListAsync();
         }
 
+        public async Task<IEnumerable<BaseModel>> GetBrothersForCommunion()
+        {
+            return await _brotherContext.Brothers.Where(bro => bro.isAcolit || bro.isDiacon).ToListAsync();
+        }
+
         public async Task<IEnumerable<BaseModel>> GetBrothersForTray()
         {
             return await _brotherContext.Brothers.Where(bro => !bro.isAcolit && !bro.isDiacon).ToListAsync();
