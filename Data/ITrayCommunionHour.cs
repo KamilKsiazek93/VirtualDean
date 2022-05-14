@@ -12,9 +12,11 @@ namespace VirtualDean.Data
         Task<IEnumerable<TrayOfficeAdded>> GetTrayHours();
         Task<IEnumerable<TrayOfficeAdded>> GetTrayHours(int weekId);
         Task<IEnumerable<LastTrayOfficeList>> GetLastTrayHour();
+        Task<IEnumerable<string>> GetLastTrayHour(int idBrother);
 
         Task AddCommunionHour(IEnumerable<CommunionOfficeAdded> offices);
         Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHours();
         Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHours(int weekId);
+        Task<IEnumerable<string>> GetLastCommunionHour(int idBrother);
     }
 }
