@@ -167,9 +167,20 @@ namespace VirtualDean.Controllers
         }
 
         [HttpGet("office-last/{brotherId}")]
-        public async Task<Office> GetLastOfficeForBrother(int brotherId)
+        public async Task<OfficeBrother> GetLastOfficeForBrother(int brotherId)
         {
-            return await _officesManager.GetLastOfficeForBrother(brotherId);
+            var trays = await _trayCommunionHour.GetLastTrayHour(brotherId);
+            var communions = await _trayCommunionHour.GetLastCommunionHour(brotherId);
+            var otherOffices = await _officesManager.GetLastOfficeForBrother(brotherId);
+            return new OfficeBrother
+            {
+                BrotherId = brotherId,
+                CantorOffice = otherOffices.CantorOffice,
+                Tray = trays,
+                Communion = communions,
+                LiturgistOffice = otherOffices.LiturgistOffice,
+                DeanOffice = otherOffices.DeanOffice
+            };
         }
 
         [HttpGet("office-last")]
@@ -229,6 +240,12 @@ namespace VirtualDean.Controllers
             return await _trayCommunionHour.GetLastTrayHour();
         }
 
+        [HttpGet("tray-hour-last/{brotherId}")]
+        public async Task<IEnumerable<string>> GetLastTrayForBrother(int brotherId)
+        {
+            return await _trayCommunionHour.GetLastTrayHour(brotherId);
+        }
+
         [HttpPost("communion-hour")]
         public async Task<ActionResult> AddCommunionOffice(IEnumerable<CommunionOfficeAdded> listOfCommunion)
         {
@@ -253,6 +270,12 @@ namespace VirtualDean.Controllers
         public async Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHour(int weekId)
         {
             return await _trayCommunionHour.GetCommunionHours(weekId);
+        }
+
+        [HttpGet("communion-hour-last/{brotherId}")]
+        public async Task<IEnumerable<string>> GetLastCommunionForBrother(int brotherId)
+        {
+            return await _trayCommunionHour.GetLastCommunionHour(brotherId);
         }
 
         [HttpPost("obstacles")]
