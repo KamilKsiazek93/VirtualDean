@@ -11,7 +11,7 @@ namespace VirtualDean.Models
         public string CantorOffice { get; set; }
         public string LiturgistOffice { get; set; }
         public string DeanOffice { get; set; }
-        public List<string> Tray { get; set; }
-        public List<string> Communion { get; set; }
+        public IEnumerable<string> Tray { get; set; }
+        public IEnumerable<string> Communion { get; set; }
     }
 }

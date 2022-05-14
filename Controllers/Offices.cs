@@ -167,9 +167,20 @@ namespace VirtualDean.Controllers
         }
 
         [HttpGet("office-last/{brotherId}")]
-        public async Task<Office> GetLastOfficeForBrother(int brotherId)
+        public async Task<OfficeBrother> GetLastOfficeForBrother(int brotherId)
         {
-            return await _officesManager.GetLastOfficeForBrother(brotherId);
+            var trays = await _trayCommunionHour.GetLastTrayHour(brotherId);
+            var communions = await _trayCommunionHour.GetLastCommunionHour(brotherId);
+            var otherOffices = await _officesManager.GetLastOfficeForBrother(brotherId);
+            return new OfficeBrother
+            {
+                BrotherId = brotherId,
+                CantorOffice = otherOffices.CantorOffice,
+                Tray = trays,
+                Communion = communions,
+                LiturgistOffice = otherOffices.LiturgistOffice,
+                DeanOffice = otherOffices.DeanOffice
+            };
         }
 
         [HttpGet("office-last")]

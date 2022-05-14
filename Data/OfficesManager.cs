@@ -75,7 +75,13 @@ namespace VirtualDean.Data
         public async Task<Office> GetLastOfficeForBrother(int brotherId)
         {
             int weekOfOffice = await _week.GetLastWeek();
-            return await _officeDbContext.Offices.Where(item => item.BrotherId == brotherId && item.WeekOfOffices == weekOfOffice).FirstOrDefaultAsync();
+            var offices = await _officeDbContext.Offices.Where(item => item.BrotherId == brotherId && item.WeekOfOffices == weekOfOffice).ToListAsync();
+            return new Office
+            {
+                CantorOffice = offices.Where(item => item.CantorOffice != null).Select(item => item.CantorOffice).FirstOrDefault(),
+                LiturgistOffice = offices.Where(item => item.LiturgistOffice != null).Select(item => item.LiturgistOffice).FirstOrDefault(),
+                DeanOffice = offices.Where(item => item.DeanOffice != null).Select(item => item.DeanOffice).FirstOrDefault()
+            };
         }
 
         public async Task AddLiturgistOffice(IEnumerable<Office> offices)
