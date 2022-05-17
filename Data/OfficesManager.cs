@@ -72,10 +72,9 @@ namespace VirtualDean.Data
             return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekOfOffice).ToListAsync();
         }
 
-        public async Task<Office> GetLastOfficeForBrother(int brotherId)
+        public async Task<Office> GetOfficeForBrother(int weekNumber, int brotherId)
         {
-            int weekOfOffice = await _week.GetLastWeek();
-            var offices = await _officeDbContext.Offices.Where(item => item.BrotherId == brotherId && item.WeekOfOffices == weekOfOffice).ToListAsync();
+            var offices = await _officeDbContext.Offices.Where(item => item.BrotherId == brotherId && item.WeekOfOffices == weekNumber).ToListAsync();
             return new Office
             {
                 CantorOffice = offices.Where(item => item.CantorOffice != null).Select(item => item.CantorOffice).FirstOrDefault(),

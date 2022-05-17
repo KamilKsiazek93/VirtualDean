@@ -20,6 +20,6 @@ namespace VirtualDean.Data
         Task AddDeanOffice(IEnumerable<Office> offices);
         Task<IEnumerable<string>> GetOfficesName();
         Task<IEnumerable<Office>> GetLastOffice();
-        Task<Office> GetLastOfficeForBrother(int brotherId);
+        Task<Office> GetOfficeForBrother(int weekNumber, int brotherId);
     }
 }

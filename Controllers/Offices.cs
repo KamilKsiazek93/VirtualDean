@@ -170,9 +170,28 @@ namespace VirtualDean.Controllers
         [HttpGet("office-last/{brotherId}")]
         public async Task<OfficeBrother> GetLastOfficeForBrother(int brotherId)
         {
-            var trays = await _trayCommunionHour.GetLastTrayHour(brotherId);
-            var communions = await _trayCommunionHour.GetLastCommunionHour(brotherId);
-            var otherOffices = await _officesManager.GetLastOfficeForBrother(brotherId);
+            int weekNumber = await _week.GetLastWeek();
+            var trays = await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
+            var communions = await _trayCommunionHour.GetCommunionHour(weekNumber, brotherId);
+            var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brotherId);
+            return new OfficeBrother
+            {
+                BrotherId = brotherId,
+                CantorOffice = otherOffices.CantorOffice,
+                Tray = trays,
+                Communion = communions,
+                LiturgistOffice = otherOffices.LiturgistOffice,
+                DeanOffice = otherOffices.DeanOffice
+            };
+        }
+
+        [HttpGet("office-previous/{brotherId}")]
+        public async Task<OfficeBrother> GetPreviousOfficeForBrother(int brotherId)
+        {
+            int weekNumber = await _week.GetLastWeek() - 1;
+            var trays = await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
+            var communions = await _trayCommunionHour.GetCommunionHour(weekNumber, brotherId);
+            var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brotherId);
             return new OfficeBrother
             {
                 BrotherId = brotherId,
@@ -244,7 +263,8 @@ namespace VirtualDean.Controllers
         [HttpGet("tray-hour-last/{brotherId}")]
         public async Task<IEnumerable<string>> GetLastTrayForBrother(int brotherId)
         {
-            return await _trayCommunionHour.GetLastTrayHour(brotherId);
+            int weekNumber = await _week.GetLastWeek();
+            return await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
         }
 
         [HttpPost("communion-hour")]
@@ -276,7 +296,8 @@ namespace VirtualDean.Controllers
         [HttpGet("communion-hour-last/{brotherId}")]
         public async Task<IEnumerable<string>> GetLastCommunionForBrother(int brotherId)
         {
-            return await _trayCommunionHour.GetLastCommunionHour(brotherId);
+            int weekNumber = await _week.GetLastWeek();
+            return await _trayCommunionHour.GetCommunionHour(weekNumber, brotherId);
         }
 
         [HttpPost("obstacles")]
