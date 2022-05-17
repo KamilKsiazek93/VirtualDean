@@ -438,13 +438,15 @@ namespace VirtualDean.Controllers
         [HttpGet("pipeline-dean")]
         public async Task<Boolean> IsDeanOfficeAvailableToSet()
         {
-            return await _officesManager.IsLiturgistOfficeAlreadySet() && !await _officesManager.IsDeanOfficeAlreadySet(); ;
+            int weekNumber = await _week.GetLastWeek();
+            return await _officesManager.IsLiturgistOfficeAlreadySet() && !await _officesManager.IsDeanOfficeAlreadySet(weekNumber); ;
         }
 
         [HttpGet("pipeline-kitchen")]
         public async Task<Boolean> IsKitchenOfficeAvailableToSet()
         {
-            return await _officesManager.IsDeanOfficeAlreadySet() && !await _officesManager.IsKitchenOfficeAlreadySet();
+            int weekNumber = await _week.GetLastWeek() - 1;
+            return await _officesManager.IsDeanOfficeAlreadySet(weekNumber) && !await _officesManager.IsKitchenOfficeAlreadySet();
         }
     }
 }

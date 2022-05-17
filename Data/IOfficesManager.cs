@@ -15,7 +15,7 @@ namespace VirtualDean.Data
         Task<Boolean> IsScholaAlreadySet();
         Task<Boolean> IsKitchenOfficeAlreadySet();
         Task<Boolean> IsLiturgistOfficeAlreadySet();
-        Task<Boolean> IsDeanOfficeAlreadySet();
+        Task<Boolean> IsDeanOfficeAlreadySet(int weekNumber);
         Task AddLiturgistOffice(IEnumerable<Office> offices);
         Task AddDeanOffice(IEnumerable<Office> offices);
         Task<IEnumerable<string>> GetOfficesName();

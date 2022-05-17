@@ -128,9 +128,8 @@ namespace VirtualDean.Data
                 .Select(item => item.LiturgistOffice).AnyAsync();
         }
 
-        public async Task<bool> IsDeanOfficeAlreadySet()
+        public async Task<bool> IsDeanOfficeAlreadySet(int weekNumber)
         {
-            int weekNumber = await _week.GetLastWeek();
             return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber)
                 .Select(item => item.DeanOffice).AnyAsync();
         }
