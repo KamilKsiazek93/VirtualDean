@@ -7,7 +7,7 @@ namespace VirtualDean.Data
 {
     public interface IWeek
     {
-        Task IncrementWeek(int weekActual);
+        Task IncrementWeek();
         Task<int> GetLastWeek();
     }
 }

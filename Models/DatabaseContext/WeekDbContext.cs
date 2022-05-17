@@ -8,7 +8,7 @@ namespace VirtualDean.Models.DatabaseContext
 {
     public class WeekDbContext : DbContext
     {
-        public DbSet<Week> Weeks { get; set; }
+        public DbSet<WeekModel> WeeksNumber { get; set; }
         public WeekDbContext(DbContextOptions<WeekDbContext> options) : base(options)
         {
 
