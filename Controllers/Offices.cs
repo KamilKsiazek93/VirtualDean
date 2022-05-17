@@ -419,13 +419,19 @@ namespace VirtualDean.Controllers
         [HttpGet("pipeline-cantor")]
         public async Task<Boolean> IsCantorOfficeAvailableToSet()
         {
-            return await _officesManager.ISKitchenOfficeAlreadySet() && !await _officesManager.IsScholaAlreadySet();
+            return await _officesManager.IsKitchenOfficeAlreadySet() && !await _officesManager.IsScholaAlreadySet();
         }
 
         [HttpGet("pipeline-tray")]
         public async Task<Boolean> IsTrayAvailableToSet()
         {
             return await _officesManager.IsScholaAlreadySet() && !await _trayCommunionHour.IsTrayAlreadySet(); ;
+        }
+
+        [HttpGet("pipeline-liturgist")]
+        public async Task<Boolean> IsLiturgistOfficeAvailableToSet()
+        {
+            return await _trayCommunionHour.IsTrayAlreadySet() && !await _officesManager.IsLiturgistOfficeAlreadySet(); ;
         }
     }
 }
