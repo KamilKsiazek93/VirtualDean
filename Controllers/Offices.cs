@@ -439,5 +439,11 @@ namespace VirtualDean.Controllers
         {
             return await _officesManager.IsLiturgistOfficeAlreadySet() && !await _officesManager.IsDeanOfficeAlreadySet(); ;
         }
+
+        [HttpGet("pipeline-kitchen")]
+        public async Task<Boolean> IsKitchenOfficeAvailableToSet()
+        {
+            return await _officesManager.IsDeanOfficeAlreadySet() && !await _officesManager.IsKitchenOfficeAlreadySet();
+        }
     }
 }
