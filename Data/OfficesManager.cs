@@ -107,5 +107,32 @@ namespace VirtualDean.Data
             }
             await _officeDbContext.SaveChangesAsync();
         }
+
+        public async Task<bool> IsScholaAlreadySet()
+        {
+            int weekNumber = await _week.GetLastWeek();
+            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber)
+                .Select(item => item.CantorOffice).AnyAsync();
+        }
+
+        public async Task<bool> IsKitchenOfficeAlreadySet()
+        {
+            int weekNumber = await _week.GetLastWeek();
+            return await _kitchenContext.KitchenOffice.Where(item => item.WeekOfOffices == weekNumber).AnyAsync();
+        }
+
+        public async Task<bool> IsLiturgistOfficeAlreadySet()
+        {
+            int weekNumber = await _week.GetLastWeek();
+            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber)
+                .Select(item => item.LiturgistOffice).AnyAsync();
+        }
+
+        public async Task<bool> IsDeanOfficeAlreadySet()
+        {
+            int weekNumber = await _week.GetLastWeek();
+            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber)
+                .Select(item => item.DeanOffice).AnyAsync();
+        }
     }
 }

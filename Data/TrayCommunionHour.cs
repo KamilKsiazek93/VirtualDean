@@ -95,5 +95,11 @@ namespace VirtualDean.Data
             return await _communionContext.CommunionHourOffice.Where(item => item.BrotherId == idBrother && item.WeekOfOffices == weekNumber)
                 .Select(item => item.CommunionHour).ToListAsync();
         }
+
+        public async Task<bool> IsTrayAlreadySet()
+        {
+            int weekNumber = await _week.GetLastWeek();
+            return await _trayContext.TrayHourOffice.Where(item => item.WeekOfOffices == weekNumber).AnyAsync();
+        }
     }
 }

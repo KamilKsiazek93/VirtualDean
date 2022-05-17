@@ -415,5 +415,35 @@ namespace VirtualDean.Controllers
             await _obstacle.DeleteObstacleBetweenOffices(obstacle);
             return Ok(new { message = ActionResultMessage.ObstacleDeleted });
         }
+
+        [HttpGet("pipeline-cantor")]
+        public async Task<Boolean> IsCantorOfficeAvailableToSet()
+        {
+            return await _officesManager.IsKitchenOfficeAlreadySet() && !await _officesManager.IsScholaAlreadySet();
+        }
+
+        [HttpGet("pipeline-tray")]
+        public async Task<Boolean> IsTrayAvailableToSet()
+        {
+            return await _officesManager.IsScholaAlreadySet() && !await _trayCommunionHour.IsTrayAlreadySet(); ;
+        }
+
+        [HttpGet("pipeline-liturgist")]
+        public async Task<Boolean> IsLiturgistOfficeAvailableToSet()
+        {
+            return await _trayCommunionHour.IsTrayAlreadySet() && !await _officesManager.IsLiturgistOfficeAlreadySet(); ;
+        }
+
+        [HttpGet("pipeline-dean")]
+        public async Task<Boolean> IsDeanOfficeAvailableToSet()
+        {
+            return await _officesManager.IsLiturgistOfficeAlreadySet() && !await _officesManager.IsDeanOfficeAlreadySet(); ;
+        }
+
+        [HttpGet("pipeline-kitchen")]
+        public async Task<Boolean> IsKitchenOfficeAvailableToSet()
+        {
+            return await _officesManager.IsDeanOfficeAlreadySet() && !await _officesManager.IsKitchenOfficeAlreadySet();
+        }
     }
 }
