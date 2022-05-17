@@ -1,31 +1,32 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Data.SqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using VirtualDean.Models.DatabaseContext;
+using Microsoft.EntityFrameworkCore;
+using VirtualDean.Models;
 
 namespace VirtualDean.Data
 {
     public class Week : IWeek
     {
-        private readonly string _connectionString;
-        public Week(IConfiguration configuration)
+        private readonly WeekDbContext _weekDbContext;
+        public Week(WeekDbContext weekDbContext)
         {
-            _connectionString = configuration["ConnectionStrings:DefaultConnection"];
+            _weekDbContext = weekDbContext;
         }
         public async Task<int> GetLastWeek()
         {
-            using var connection = new SqlConnection(_connectionString);
-            var sql = "SELECT TOP 1 weekNumber FROM weeksNumber ORDER BY weekNumber DESC";
-            await connection.OpenAsync();
-            return await connection.QueryFirstAsync<int>(sql);
+            return await _weekDbContext.WeeksNumber.Select(item => item.WeekNumber)
+                .OrderByDescending(item => item).FirstOrDefaultAsync();
         }
 
-        public Task IncrementWeek(int weekActual)
+        public async Task IncrementWeek()
         {
-            throw new NotImplementedException();
+            int weekNumber = await this.GetLastWeek() + 1;
+            await _weekDbContext.AddAsync(new WeekModel{ WeekNumber = weekNumber });
+            await _weekDbContext.SaveChangesAsync();
         }
     }
 }

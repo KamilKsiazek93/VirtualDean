@@ -158,6 +158,7 @@ namespace VirtualDean.Controllers
             try
             {
                 await _officesManager.AddDeanOffice(offices);
+                await _week.IncrementWeek();
                 return Ok(new { message = ActionResultMessage.OfficeAdded });
             }
             catch
