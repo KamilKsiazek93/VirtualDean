@@ -421,5 +421,11 @@ namespace VirtualDean.Controllers
         {
             return await _officesManager.ISKitchenOfficeAlreadySet() && !await _officesManager.IsScholaAlreadySet();
         }
+
+        [HttpGet("pipeline-tray")]
+        public async Task<Boolean> IsTrayAvailableToSet()
+        {
+            return await _officesManager.IsScholaAlreadySet() && !await _trayCommunionHour.IsTrayAlreadySet(); ;
+        }
     }
 }
