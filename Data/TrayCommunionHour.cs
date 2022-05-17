@@ -82,16 +82,14 @@ namespace VirtualDean.Data
             return lastTrays;
         }
 
-        public async Task<IEnumerable<string>> GetLastTrayHour(int idBrother)
+        public async Task<IEnumerable<string>> GetTrayHour(int weekNumber, int idBrother)
         {
-            int weekNumber = await _week.GetLastWeek();
             return await _trayContext.TrayHourOffice.Where(tray => tray.BrotherId == idBrother && tray.WeekOfOffices == weekNumber)
                 .Select(tray => tray.TrayHour).ToListAsync();
         }
 
-        public async Task<IEnumerable<string>> GetLastCommunionHour(int idBrother)
+        public async Task<IEnumerable<string>> GetCommunionHour(int weekNumber, int idBrother)
         {
-            int weekNumber = await _week.GetLastWeek();
             return await _communionContext.CommunionHourOffice.Where(item => item.BrotherId == idBrother && item.WeekOfOffices == weekNumber)
                 .Select(item => item.CommunionHour).ToListAsync();
         }
