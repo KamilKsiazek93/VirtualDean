@@ -415,5 +415,11 @@ namespace VirtualDean.Controllers
             await _obstacle.DeleteObstacleBetweenOffices(obstacle);
             return Ok(new { message = ActionResultMessage.ObstacleDeleted });
         }
+
+        [HttpGet("pipeline-cantor")]
+        public async Task<Boolean> IsCantorOfficeAvailableToSet()
+        {
+            return await _officesManager.ISKitchenOfficeAlreadySet() && !await _officesManager.IsScholaAlreadySet();
+        }
     }
 }

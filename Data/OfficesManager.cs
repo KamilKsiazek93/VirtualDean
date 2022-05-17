@@ -107,5 +107,17 @@ namespace VirtualDean.Data
             }
             await _officeDbContext.SaveChangesAsync();
         }
+
+        public async Task<bool> IsScholaAlreadySet()
+        {
+            int weekNumber = await _week.GetLastWeek();
+            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber).AnyAsync();
+        }
+
+        public async Task<bool> ISKitchenOfficeAlreadySet()
+        {
+            int weekNumber = await _week.GetLastWeek();
+            return await _kitchenContext.KitchenOffice.Where(item => item.WeekOfOffices == weekNumber).AnyAsync();
+        }
     }
 }
