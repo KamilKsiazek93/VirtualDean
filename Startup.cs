@@ -1,4 +1,3 @@
-using DbUp;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -31,21 +30,6 @@ namespace VirtualDean
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
-
-            EnsureDatabase.For.SqlDatabase(connectionString);
-
-            var upgrader = DeployChanges.To
-                .SqlDatabase(connectionString, null)
-                .WithScriptsEmbeddedInAssembly(
-                System.Reflection.Assembly.GetExecutingAssembly()
-                )
-                .WithTransaction()
-                .Build();
-
-            if(upgrader.IsUpgradeRequired())
-            {
-                upgrader.PerformUpgrade();
-            }
 
             services.AddDbContext<BrotherDbContext>(options => options.UseSqlServer(connectionString));
             services.AddDbContext<ObstaclesDbContext>(options => options.UseSqlServer(connectionString));

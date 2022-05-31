@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using VirtualDean.Data;
 using VirtualDean.Models;
 using VirtualDean.Enties;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VirtualDean.Controllers
 {
