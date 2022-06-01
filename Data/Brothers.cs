@@ -45,6 +45,12 @@ namespace VirtualDean.Data
             return null;
         }
 
+        public BaseModel GetAuthenticatedBrother(BaseModel brother)
+        {
+            brother.JwtToken = _auth.GenerateToken(brother);
+            return brother;
+        }
+
         public async Task<IEnumerable<BaseModel>> GetBaseBrothersModel()
         {
             return await _brotherContext.Brothers.Where(bro => bro.StatusBrother == "BRAT").Select(bro => new BaseModel() 

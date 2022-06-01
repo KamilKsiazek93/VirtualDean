@@ -17,17 +17,15 @@ namespace VirtualDean.Controllers
     {
         private readonly IBrothers _brothers;
         private readonly IOfficesManager _officesManager;
-        private readonly IAuth _auth;
         private readonly ITrayCommunionHour _trayCommunionHour;
         private readonly IObstacle _obstacle;
         private readonly IWeek _week;
         
-        public Offices(IBrothers brothers, IOfficesManager officesManager, IAuth auth,
+        public Offices(IBrothers brothers, IOfficesManager officesManager,
             ITrayCommunionHour trayCommunionHour, IObstacle obstacle, IWeek week)
         {
             _brothers = brothers;
             _officesManager = officesManager;
-            _auth = auth;
             _trayCommunionHour = trayCommunionHour;
             _obstacle = obstacle;
             _week = week;
@@ -41,15 +39,15 @@ namespace VirtualDean.Controllers
 
         [AllowAnonymous]
         [HttpGet("brother-login")]
-        public async Task<ActionResult<string>> LoginAction([FromQuery]LoginModel loginData)
+        public async Task<BaseModel> LoginAction([FromQuery]LoginModel loginData)
         {
             var findingBrother =  await _brothers.FindLoginBrother(loginData);
             if(findingBrother != null)
             {
 
-                return _auth.GenerateToken(findingBrother);
+                return _brothers.GetAuthenticatedBrother(findingBrother);
             }
-            return "";
+            return null;
         }
 
         [HttpGet("brothers-base")]
