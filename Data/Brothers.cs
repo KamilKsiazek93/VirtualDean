@@ -8,6 +8,7 @@ using VirtualDean.Models;
 using Dapper;
 using VirtualDean.Models.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
+using VirtualDean.Enties;
 
 namespace VirtualDean.Data
 {
@@ -53,7 +54,7 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<BaseModel>> GetBaseBrothersModel()
         {
-            return await _brotherContext.Brothers.Where(bro => bro.StatusBrother == "BRAT").Select(bro => new BaseModel() 
+            return await _brotherContext.Brothers.Where(bro => bro.StatusBrother == BrotherStatus.BRAT).Select(bro => new BaseModel() 
             { Id = bro.Id, Name = bro.Name, Surname = bro.Surname }).ToListAsync();
         }
 
@@ -102,7 +103,7 @@ namespace VirtualDean.Data
         {
             try
             {
-                brother.StatusBrother = "BRAT";
+                brother.StatusBrother = BrotherStatus.BRAT;
                 brother.PasswordHash = _auth.GetHashedPassword(brother.Name + "123");
                 await _brotherContext.Brothers.AddAsync(brother);
                 await _brotherContext.SaveChangesAsync();
