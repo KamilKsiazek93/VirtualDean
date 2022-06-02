@@ -8,6 +8,7 @@ using VirtualDean.Data;
 using VirtualDean.Models;
 using VirtualDean.Enties;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace VirtualDean.Controllers
 {
@@ -310,8 +311,13 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                await _obstacle.AddObstacle(obstacles);
-                return Ok(new { message = ActionResultMessage.OfficeAdded });
+                var user = GetCurrentUser();
+                if (user.Id == obstacles.FirstOrDefault().BrotherId)
+                {
+                    await _obstacle.AddObstacle(obstacles);
+                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                }
+                return NotFound(new { message = ActionResultMessage.OperationFailed });
             }
             catch
             {
@@ -473,6 +479,24 @@ namespace VirtualDean.Controllers
         {
             int weekNumber = await _week.GetLastWeek() - 1;
             return await _officesManager.IsDeanOfficeAlreadySet(weekNumber) && !await _officesManager.IsKitchenOfficeAlreadySet();
+        }
+
+        private BaseModel GetCurrentUser()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+            if(identity != null)
+            {
+                var userClaims = identity.Claims;
+                return new BaseModel
+                {
+                    Id = Int32.Parse(userClaims.FirstOrDefault(o => o.Type == ClaimTypes.NameIdentifier)?.Value ?? "0"),
+                    Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.GivenName)?.Value,
+                    Surname = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Surname)?.Value,
+                    StatusBrother = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role)?.Value
+                };
+            }
+            return null;
         }
     }
 }
