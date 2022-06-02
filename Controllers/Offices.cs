@@ -498,5 +498,20 @@ namespace VirtualDean.Controllers
             }
             return null;
         }
+
+        private Boolean IsCurrentUserDean()
+        {
+            return GetCurrentUser().StatusBrother == BrotherStatus.DEAN;
+        }
+
+        private Boolean IsCurrentUserCantor()
+        {
+            return GetCurrentUser().StatusBrother == BrotherStatus.CANTOR;
+        }
+
+        private Boolean IsCurrenUserLiturgist()
+        {
+            return GetCurrentUser().StatusBrother == BrotherStatus.LITURGIST;
+        }
     }
 }
