@@ -149,8 +149,12 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                await _officesManager.AddLiturgistOffice(offices);
-                return Ok(new { message = ActionResultMessage.OfficeAdded });
+                if(IsCurrenUserLiturgist())
+                {
+                    await _officesManager.AddLiturgistOffice(offices);
+                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                }
+                return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
             }
             catch
             {
@@ -239,8 +243,12 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                await _trayCommunionHour.AddTrayHour(listOfTray);
-                return Ok(new { message = ActionResultMessage.OfficeAdded });
+                if(IsCurrenUserLiturgist())
+                {
+                    await _trayCommunionHour.AddTrayHour(listOfTray);
+                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                }
+                return Unauthorized( new { message = ActionResultMessage.UnauthorizedUser });
             }
             catch
             {
