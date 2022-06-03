@@ -317,7 +317,7 @@ namespace VirtualDean.Controllers
                     await _obstacle.AddObstacle(obstacles);
                     return Ok(new { message = ActionResultMessage.OfficeAdded });
                 }
-                return NotFound(new { message = ActionResultMessage.OperationFailed });
+                return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
             }
             catch
             {

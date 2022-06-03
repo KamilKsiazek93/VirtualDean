@@ -7,6 +7,8 @@ namespace VirtualDean.Enties
 {
     public static class ActionResultMessage
     {
+        public const string UnauthorizedUser = "Nie masz uprawnień do przeprowadzenia tej operacji";
+
         /**
          * Brothers messages
          */
