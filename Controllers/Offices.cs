@@ -129,8 +129,12 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                await _officesManager.AddBrothersForSchola(offices);
-                return Ok(new { message = ActionResultMessage.OfficeAdded });
+                if(IsCurrentUserCantor())
+                {
+                    await _officesManager.AddBrothersForSchola(offices);
+                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                }
+                return Unauthorized( new { message = ActionResultMessage.UnauthorizedUser });
             }
             catch
             {
