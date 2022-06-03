@@ -171,9 +171,13 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                await _officesManager.AddDeanOffice(offices);
-                await _week.IncrementWeek();
-                return Ok(new { message = ActionResultMessage.OfficeAdded });
+                if(IsCurrentUserDean())
+                {
+                    await _officesManager.AddDeanOffice(offices);
+                    await _week.IncrementWeek();
+                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                }
+                return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
             }
             catch
             {
@@ -224,10 +228,21 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("kitchen-offices")]
-        public async Task<ActionResult<KitchenOffices>> AddKitchenOffices(IEnumerable<KitchenOffices> offices)
+        public async Task<ActionResult> AddKitchenOffices(IEnumerable<KitchenOffices> offices)
         {
-            await _officesManager.AddKitchenOffices(offices);
-            return CreatedAtAction(nameof(GetKitchenOffices), offices);
+            try
+            {
+                if(IsCurrentUserDean())
+                {
+                    await _officesManager.AddKitchenOffices(offices);
+                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                }
+                return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
+            }
+            catch
+            {
+                return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
+            }
         }
 
         [HttpGet("kitchen-offices")]
