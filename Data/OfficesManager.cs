@@ -110,7 +110,7 @@ namespace VirtualDean.Data
         public async Task<bool> IsScholaAlreadySet()
         {
             int weekNumber = await _week.GetLastWeek();
-            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber)
+            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber && item.CantorOffice != null)
                 .Select(item => item.CantorOffice).AnyAsync();
         }
 
@@ -123,13 +123,13 @@ namespace VirtualDean.Data
         public async Task<bool> IsLiturgistOfficeAlreadySet()
         {
             int weekNumber = await _week.GetLastWeek();
-            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber)
+            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber && item.LiturgistOffice != null)
                 .Select(item => item.LiturgistOffice).AnyAsync();
         }
 
         public async Task<bool> IsDeanOfficeAlreadySet(int weekNumber)
         {
-            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber)
+            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber && item.DeanOffice != null)
                 .Select(item => item.DeanOffice).AnyAsync();
         }
     }
