@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using VirtualDean.Data;
 using VirtualDean.Models;
 using VirtualDean.Enties;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace VirtualDean.Controllers
 {
@@ -19,7 +21,9 @@ namespace VirtualDean.Controllers
         private readonly ITrayCommunionHour _trayCommunionHour;
         private readonly IObstacle _obstacle;
         private readonly IWeek _week;
-        public Offices(IBrothers brothers, IOfficesManager officesManager, ITrayCommunionHour trayCommunionHour, IObstacle obstacle, IWeek week)
+        
+        public Offices(IBrothers brothers, IOfficesManager officesManager,
+            ITrayCommunionHour trayCommunionHour, IObstacle obstacle, IWeek week)
         {
             _brothers = brothers;
             _officesManager = officesManager;
@@ -34,15 +38,17 @@ namespace VirtualDean.Controllers
             return await _brothers.GetBrothers();
         }
 
+        [AllowAnonymous]
         [HttpGet("brother-login")]
         public async Task<BaseModel> LoginAction([FromQuery]LoginModel loginData)
         {
             var findingBrother =  await _brothers.FindLoginBrother(loginData);
             if(findingBrother != null)
             {
-                return findingBrother;
+
+                return _brothers.GetAuthenticatedBrother(findingBrother);
             }
-            return new BaseModel { };
+            return null;
         }
 
         [HttpGet("brothers-base")]
@@ -123,8 +129,12 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                await _officesManager.AddBrothersForSchola(offices);
-                return Ok(new { message = ActionResultMessage.OfficeAdded });
+                if(IsCurrentUserCantor())
+                {
+                    await _officesManager.AddBrothersForSchola(offices);
+                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                }
+                return Unauthorized( new { message = ActionResultMessage.UnauthorizedUser });
             }
             catch
             {
@@ -143,8 +153,12 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                await _officesManager.AddLiturgistOffice(offices);
-                return Ok(new { message = ActionResultMessage.OfficeAdded });
+                if(IsCurrenUserLiturgist())
+                {
+                    await _officesManager.AddLiturgistOffice(offices);
+                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                }
+                return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
             }
             catch
             {
@@ -157,9 +171,13 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                await _officesManager.AddDeanOffice(offices);
-                await _week.IncrementWeek();
-                return Ok(new { message = ActionResultMessage.OfficeAdded });
+                if(IsCurrentUserDean())
+                {
+                    await _officesManager.AddDeanOffice(offices);
+                    await _week.IncrementWeek();
+                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                }
+                return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
             }
             catch
             {
@@ -210,10 +228,21 @@ namespace VirtualDean.Controllers
         }
 
         [HttpPost("kitchen-offices")]
-        public async Task<ActionResult<KitchenOffices>> AddKitchenOffices(IEnumerable<KitchenOffices> offices)
+        public async Task<ActionResult> AddKitchenOffices(IEnumerable<KitchenOffices> offices)
         {
-            await _officesManager.AddKitchenOffices(offices);
-            return CreatedAtAction(nameof(GetKitchenOffices), offices);
+            try
+            {
+                if(IsCurrentUserDean())
+                {
+                    await _officesManager.AddKitchenOffices(offices);
+                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                }
+                return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
+            }
+            catch
+            {
+                return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
+            }
         }
 
         [HttpGet("kitchen-offices")]
@@ -233,8 +262,12 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                await _trayCommunionHour.AddTrayHour(listOfTray);
-                return Ok(new { message = ActionResultMessage.OfficeAdded });
+                if(IsCurrenUserLiturgist())
+                {
+                    await _trayCommunionHour.AddTrayHour(listOfTray);
+                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                }
+                return Unauthorized( new { message = ActionResultMessage.UnauthorizedUser });
             }
             catch
             {
@@ -305,8 +338,13 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                await _obstacle.AddObstacle(obstacles);
-                return Ok(new { message = ActionResultMessage.OfficeAdded });
+                var user = GetCurrentUser();
+                if (user.Id == obstacles.FirstOrDefault().BrotherId)
+                {
+                    await _obstacle.AddObstacle(obstacles);
+                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                }
+                return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
             }
             catch
             {
@@ -468,6 +506,39 @@ namespace VirtualDean.Controllers
         {
             int weekNumber = await _week.GetLastWeek() - 1;
             return await _officesManager.IsDeanOfficeAlreadySet(weekNumber) && !await _officesManager.IsKitchenOfficeAlreadySet();
+        }
+
+        private BaseModel GetCurrentUser()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+            if(identity != null)
+            {
+                var userClaims = identity.Claims;
+                return new BaseModel
+                {
+                    Id = Int32.Parse(userClaims.FirstOrDefault(o => o.Type == ClaimTypes.NameIdentifier)?.Value ?? "0"),
+                    Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.GivenName)?.Value,
+                    Surname = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Surname)?.Value,
+                    StatusBrother = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role)?.Value
+                };
+            }
+            return null;
+        }
+
+        private Boolean IsCurrentUserDean()
+        {
+            return GetCurrentUser().StatusBrother == BrotherStatus.DEAN;
+        }
+
+        private Boolean IsCurrentUserCantor()
+        {
+            return GetCurrentUser().StatusBrother == BrotherStatus.CANTOR;
+        }
+
+        private Boolean IsCurrenUserLiturgist()
+        {
+            return GetCurrentUser().StatusBrother == BrotherStatus.LITURGIST;
         }
     }
 }

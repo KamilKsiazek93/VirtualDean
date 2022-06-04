@@ -1,4 +1,3 @@
-using DbUp;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -15,6 +14,9 @@ using System.Threading.Tasks;
 using VirtualDean.Data;
 using Microsoft.EntityFrameworkCore;
 using VirtualDean.Models.DatabaseContext;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace VirtualDean
 {
@@ -31,21 +33,6 @@ namespace VirtualDean
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
-
-            EnsureDatabase.For.SqlDatabase(connectionString);
-
-            var upgrader = DeployChanges.To
-                .SqlDatabase(connectionString, null)
-                .WithScriptsEmbeddedInAssembly(
-                System.Reflection.Assembly.GetExecutingAssembly()
-                )
-                .WithTransaction()
-                .Build();
-
-            if(upgrader.IsUpgradeRequired())
-            {
-                upgrader.PerformUpgrade();
-            }
 
             services.AddDbContext<BrotherDbContext>(options => options.UseSqlServer(connectionString));
             services.AddDbContext<ObstaclesDbContext>(options => options.UseSqlServer(connectionString));
@@ -76,6 +63,20 @@ namespace VirtualDean
                    .AllowAnyMethod()
                    .AllowAnyHeader()
                    .WithOrigins(Configuration["Frontend"])));
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidIssuer = Configuration["Jwt:Issuer"],
+                        ValidAudience = Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                    };
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -93,6 +94,7 @@ namespace VirtualDean
             app.UseRouting();
             app.UseCors("CorsPolicy");
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

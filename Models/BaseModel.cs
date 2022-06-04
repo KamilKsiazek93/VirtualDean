@@ -11,5 +11,7 @@ namespace VirtualDean.Models
         public string Name { get; set; }
         public string Surname { get; set; }
         public string StatusBrother { get; set; }
+
+        public string? JwtToken { get; set; }
     }
 }
