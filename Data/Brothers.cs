@@ -65,9 +65,9 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<BaseBrotherForLiturgistOffice>> GetBrotherForLiturgistOffice()
         {
-            return await _brotherContext.Brothers.Where(bro => !bro.isDiacon).
+            return await _brotherContext.Brothers.Where(bro => !bro.IsDiacon).
                 Select(bro => new BaseBrotherForLiturgistOffice { Id = bro.Id, Name = bro.Name, Surname = bro.Surname,
-                StatusBrother = bro.StatusBrother, IsAcolit = bro.isAcolit })
+                StatusBrother = bro.StatusBrother, IsAcolit = bro.IsAcolit })
                 .ToListAsync();
         }
 
@@ -78,20 +78,20 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<BaseModel>> GetBrothersForCommunion()
         {
-            return await _brotherContext.Brothers.Where(bro => (bro.isAcolit || bro.isDiacon) && bro.StatusBrother == "BRAT").ToListAsync();
+            return await _brotherContext.Brothers.Where(bro => (bro.IsAcolit || bro.IsDiacon) && bro.StatusBrother == "BRAT").ToListAsync();
         }
 
         public async Task<IEnumerable<BaseModel>> GetBrothersForTray()
         {
-            return await _brotherContext.Brothers.Where(bro => !bro.isAcolit && !bro.isDiacon).ToListAsync();
+            return await _brotherContext.Brothers.Where(bro => !bro.IsAcolit && !bro.IsDiacon).ToListAsync();
         }
 
         public async Task<IEnumerable<CantorResponse>> GetSingingBrothers()
         {
             return await _brotherContext.Brothers.
-                Where(bro => bro.isSinging).
+                Where(bro => bro.IsSinging).
                 Select(bro => new CantorResponse()
-            { Id = bro.Id, Name = bro.Name, Surname = bro.Surname, IsSinging = bro.isSinging}).ToListAsync();
+            { Id = bro.Id, Name = bro.Name, Surname = bro.Surname, IsSinging = bro.IsSinging}).ToListAsync();
         }
 
         public async Task<Boolean> IsBrotherInDb(Brother brother)
