@@ -7,11 +7,11 @@ namespace VirtualDean.Models
 {
     public class Brother : BaseModel
     {
-        public DateTime precedency { get; set; }
-        public Boolean isSinging { get; set; }
-        public Boolean isLector { get; set; }
-        public Boolean isAcolit { get; set; }
-        public Boolean isDiacon { get; set; }
+        public DateTime Precedency { get; set; }
+        public Boolean IsSinging { get; set; }
+        public Boolean IsLector { get; set; }
+        public Boolean IsAcolit { get; set; }
+        public Boolean IsDiacon { get; set; }
         public string PasswordHash { get; set; }
         public string Email { get; set; }
     }
