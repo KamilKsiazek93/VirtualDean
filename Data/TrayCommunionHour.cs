@@ -8,6 +8,7 @@ using VirtualDean.Models;
 using VirtualDean.Models.DatabaseContext;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
+using VirtualDean.Enties;
 
 namespace VirtualDean.Data
 {
@@ -16,6 +17,8 @@ namespace VirtualDean.Data
         private readonly CommunionHourDbContext _communionContext;
         private readonly TrayHourDbContext _trayContext;
         private readonly IWeek _week;
+        private IEnumerable<string> _communionHours = new Hours().CommunionHours;
+        private IEnumerable<string> _trayHours = new Hours().TrayHours;
         public TrayCommunionHour(CommunionHourDbContext communionContext, TrayHourDbContext trayHourDbContext, IWeek week)
         {
             _communionContext = communionContext;
@@ -29,6 +32,7 @@ namespace VirtualDean.Data
             foreach (var office in offices)
             {
                 office.WeekOfOffices = weekNumber;
+                ValidateHours(office.CommunionHour, _communionHours);
             }
 
             await _communionContext.AddRangeAsync(offices);
@@ -41,10 +45,19 @@ namespace VirtualDean.Data
             foreach (var office in offices)
             {
                 office.WeekOfOffices = weekNumber;
+                ValidateHours(office.TrayHour, _trayHours);
             }
 
             await _trayContext.AddRangeAsync(offices);
             await _trayContext.SaveChangesAsync();
+        }
+
+        private void ValidateHours(string office, IEnumerable<string> _listOfHours)
+        {
+            if (!_listOfHours.Contains(office))
+            {
+                throw new Exception();
+            }
         }
 
         public async Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHours()
