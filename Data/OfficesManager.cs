@@ -140,5 +140,13 @@ namespace VirtualDean.Data
         {
             return await _pipelineContext.PipelineStatus.Where(item => item.Name == name).Select(item => item.PipelineValue).FirstOrDefaultAsync();
         }
+
+        public async Task UpdatePipelineStatus(string jobName, Boolean jobValue)
+        {
+            var finishedJob = await _pipelineContext.PipelineStatus.Where(item => item.Name == jobName).FirstOrDefaultAsync();
+            finishedJob.PipelineValue = jobValue;
+            _pipelineContext.Entry(finishedJob).State = EntityState.Modified;
+            await _pipelineContext.SaveChangesAsync();
+        }
     }
 }
