@@ -483,34 +483,10 @@ namespace VirtualDean.Controllers
             return Ok(new { message = ActionResultMessage.ObstacleDeleted });
         }
 
-        [HttpGet("pipeline-cantor")]
-        public async Task<Boolean> IsCantorOfficeAvailableToSet()
+        [HttpGet("pipeline-status/{name}")]
+        public async Task<Boolean> IsOfficeAvailableToSet(string name)
         {
-            return await _officesManager.GetPipelineStatus(PipelineConstName.CANTOR);
-        }
-
-        [HttpGet("pipeline-tray")]
-        public async Task<Boolean> IsTrayAvailableToSet()
-        {
-            return await _officesManager.GetPipelineStatus(PipelineConstName.TRAY);
-        }
-
-        [HttpGet("pipeline-liturgist")]
-        public async Task<Boolean> IsLiturgistOfficeAvailableToSet()
-        {
-            return await _officesManager.GetPipelineStatus(PipelineConstName.LITURGIST);
-        }
-
-        [HttpGet("pipeline-dean")]
-        public async Task<Boolean> IsDeanOfficeAvailableToSet()
-        {
-           return await _officesManager.GetPipelineStatus(PipelineConstName.DEAN);
-        }
-
-        [HttpGet("pipeline-kitchen")]
-        public async Task<Boolean> IsKitchenOfficeAvailableToSet()
-        {
-            return await _officesManager.GetPipelineStatus(PipelineConstName.KITCHEN);
+            return await _officesManager.GetPipelineStatus(name);
         }
 
         private BaseModel GetCurrentUser()
