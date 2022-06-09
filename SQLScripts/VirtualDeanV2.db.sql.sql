@@ -5,7 +5,6 @@ CREATE TABLE [brothers] (
   [Name] nvarchar(255),
   [Surname] nvarchar(255),
   [Precedency] datetime,
-  [Status] nvarchar(255),
   [IsSinging] bit,
   [IsLector] bit,
   [IsAcolit] bit,
