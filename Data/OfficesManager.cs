@@ -17,14 +17,17 @@ namespace VirtualDean.Data
         private readonly OfficeNameDbContext _officeNameContext;
         private readonly OfficeDbContext _officeDbContext;
         private readonly KitchenOfficeDbContext _kitchenContext;
+        private readonly PipelineStatusDbContext _pipelineContext;
         private readonly IWeek _week;
+
         public OfficesManager(IWeek week, OfficeNameDbContext officeNameDbContext,
-            OfficeDbContext officeDbContext, KitchenOfficeDbContext kitchenContext)
+            OfficeDbContext officeDbContext, KitchenOfficeDbContext kitchenContext, PipelineStatusDbContext pipelineContext)
         {
             _officeNameContext = officeNameDbContext;
             _week = week;
             _officeDbContext = officeDbContext;
             _kitchenContext = kitchenContext;
+            _pipelineContext = pipelineContext;
         }
 
         public async Task AddKitchenOffices(IEnumerable<KitchenOffices> kitchenOffices)
@@ -131,6 +134,19 @@ namespace VirtualDean.Data
         {
             return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber && item.DeanOffice != null)
                 .Select(item => item.DeanOffice).AnyAsync();
+        }
+
+        public async Task<bool> GetPipelineStatus(string name)
+        {
+            return await _pipelineContext.PipelineStatus.Where(item => item.Name == name).Select(item => item.PipelineValue).FirstOrDefaultAsync();
+        }
+
+        public async Task UpdatePipelineStatus(string jobName, Boolean jobValue)
+        {
+            var finishedJob = await _pipelineContext.PipelineStatus.Where(item => item.Name == jobName).FirstOrDefaultAsync();
+            finishedJob.PipelineValue = jobValue;
+            _pipelineContext.Entry(finishedJob).State = EntityState.Modified;
+            await _pipelineContext.SaveChangesAsync();
         }
     }
 }

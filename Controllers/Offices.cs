@@ -139,6 +139,8 @@ namespace VirtualDean.Controllers
                 if(IsCurrentUserCantor())
                 {
                     await _officesManager.AddBrothersForSchola(offices);
+                    await _officesManager.UpdatePipelineStatus(PipelineConstName.CANTOR, false);
+                    await _officesManager.UpdatePipelineStatus(PipelineConstName.TRAY, true);
                     return Ok(new { message = ActionResultMessage.OfficeAdded });
                 }
                 return Unauthorized( new { message = ActionResultMessage.UnauthorizedUser });
@@ -163,6 +165,8 @@ namespace VirtualDean.Controllers
                 if(IsCurrenUserLiturgist())
                 {
                     await _officesManager.AddLiturgistOffice(offices);
+                    await _officesManager.UpdatePipelineStatus(PipelineConstName.LITURGIST, false);
+                    await _officesManager.UpdatePipelineStatus(PipelineConstName.DEAN, true);
                     return Ok(new { message = ActionResultMessage.OfficeAdded });
                 }
                 return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
@@ -182,6 +186,8 @@ namespace VirtualDean.Controllers
                 {
                     await _officesManager.AddDeanOffice(offices);
                     await _week.IncrementWeek();
+                    await _officesManager.UpdatePipelineStatus(PipelineConstName.DEAN, false);
+                    await _officesManager.UpdatePipelineStatus(PipelineConstName.KITCHEN, true);
                     return Ok(new { message = ActionResultMessage.OfficeAdded });
                 }
                 return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
@@ -242,6 +248,8 @@ namespace VirtualDean.Controllers
                 if(IsCurrentUserDean())
                 {
                     await _officesManager.AddKitchenOffices(offices);
+                    await _officesManager.UpdatePipelineStatus(PipelineConstName.KITCHEN, false);
+                    await _officesManager.UpdatePipelineStatus(PipelineConstName.CANTOR, true);
                     return Ok(new { message = ActionResultMessage.OfficeAdded });
                 }
                 return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
@@ -272,6 +280,8 @@ namespace VirtualDean.Controllers
                 if(IsCurrenUserLiturgist())
                 {
                     await _trayCommunionHour.AddTrayHour(listOfTray);
+                    await _officesManager.UpdatePipelineStatus(PipelineConstName.TRAY, false);
+                    await _officesManager.UpdatePipelineStatus(PipelineConstName.LITURGIST, true);
                     return Ok(new { message = ActionResultMessage.OfficeAdded });
                 }
                 return Unauthorized( new { message = ActionResultMessage.UnauthorizedUser });
@@ -483,36 +493,10 @@ namespace VirtualDean.Controllers
             return Ok(new { message = ActionResultMessage.ObstacleDeleted });
         }
 
-        [HttpGet("pipeline-cantor")]
-        public async Task<Boolean> IsCantorOfficeAvailableToSet()
+        [HttpGet("pipeline-status/{name}")]
+        public async Task<Boolean> IsOfficeAvailableToSet(string name)
         {
-            return await _officesManager.IsKitchenOfficeAlreadySet() && !await _officesManager.IsScholaAlreadySet();
-        }
-
-        [HttpGet("pipeline-tray")]
-        public async Task<Boolean> IsTrayAvailableToSet()
-        {
-            return await _officesManager.IsScholaAlreadySet() && !await _trayCommunionHour.IsTrayAlreadySet(); ;
-        }
-
-        [HttpGet("pipeline-liturgist")]
-        public async Task<Boolean> IsLiturgistOfficeAvailableToSet()
-        {
-            return await _trayCommunionHour.IsTrayAlreadySet() && !await _officesManager.IsLiturgistOfficeAlreadySet(); ;
-        }
-
-        [HttpGet("pipeline-dean")]
-        public async Task<Boolean> IsDeanOfficeAvailableToSet()
-        {
-            int weekNumber = await _week.GetLastWeek();
-            return await _officesManager.IsLiturgistOfficeAlreadySet() && !await _officesManager.IsDeanOfficeAlreadySet(weekNumber); ;
-        }
-
-        [HttpGet("pipeline-kitchen")]
-        public async Task<Boolean> IsKitchenOfficeAvailableToSet()
-        {
-            int weekNumber = await _week.GetLastWeek() - 1;
-            return await _officesManager.IsDeanOfficeAlreadySet(weekNumber) && !await _officesManager.IsKitchenOfficeAlreadySet();
+            return await _officesManager.GetPipelineStatus(name);
         }
 
         private BaseModel GetCurrentUser()
