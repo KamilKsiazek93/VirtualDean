@@ -44,6 +44,7 @@ namespace VirtualDean
             services.AddDbContext<TrayHourDbContext>(options => options.UseSqlServer(connectionString));
             services.AddDbContext<CommunionHourDbContext>(options => options.UseSqlServer(connectionString));
             services.AddDbContext<WeekDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddDbContext<PipelineStatusDbContext>(options => options.UseSqlServer(connectionString));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
