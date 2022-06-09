@@ -486,33 +486,31 @@ namespace VirtualDean.Controllers
         [HttpGet("pipeline-cantor")]
         public async Task<Boolean> IsCantorOfficeAvailableToSet()
         {
-            return await _officesManager.IsKitchenOfficeAlreadySet() && !await _officesManager.IsScholaAlreadySet();
+            return await _officesManager.GetPipelineStatus(PipelineConstName.CANTOR);
         }
 
         [HttpGet("pipeline-tray")]
         public async Task<Boolean> IsTrayAvailableToSet()
         {
-            return await _officesManager.IsScholaAlreadySet() && !await _trayCommunionHour.IsTrayAlreadySet(); ;
+            return await _officesManager.GetPipelineStatus(PipelineConstName.TRAY);
         }
 
         [HttpGet("pipeline-liturgist")]
         public async Task<Boolean> IsLiturgistOfficeAvailableToSet()
         {
-            return await _trayCommunionHour.IsTrayAlreadySet() && !await _officesManager.IsLiturgistOfficeAlreadySet(); ;
+            return await _officesManager.GetPipelineStatus(PipelineConstName.LITURGIST);
         }
 
         [HttpGet("pipeline-dean")]
         public async Task<Boolean> IsDeanOfficeAvailableToSet()
         {
-            int weekNumber = await _week.GetLastWeek();
-            return await _officesManager.IsLiturgistOfficeAlreadySet() && !await _officesManager.IsDeanOfficeAlreadySet(weekNumber); ;
+           return await _officesManager.GetPipelineStatus(PipelineConstName.DEAN);
         }
 
         [HttpGet("pipeline-kitchen")]
         public async Task<Boolean> IsKitchenOfficeAvailableToSet()
         {
-            int weekNumber = await _week.GetLastWeek() - 1;
-            return await _officesManager.IsDeanOfficeAlreadySet(weekNumber) && !await _officesManager.IsKitchenOfficeAlreadySet();
+            return await _officesManager.GetPipelineStatus(PipelineConstName.KITCHEN);
         }
 
         private BaseModel GetCurrentUser()
