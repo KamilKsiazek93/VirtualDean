@@ -113,5 +113,79 @@ namespace VirtualDean.Data
                 throw;
             }
         }
+
+        public async Task SetupBrothersTable()
+        {
+            if(! await _brotherContext.Brothers.AnyAsync())
+            {
+                await SetupAdminAccounts();
+            }    
+        }
+
+        private async Task SetupAdminAccounts()
+        {
+            var cantor = new Brother
+            {
+                Name = "Kantor",
+                Surname = "Studentatu",
+                Email = "kantor.studentatu@gmail.com",
+                StatusBrother = BrotherStatus.CANTOR,
+                Precedency = DateTime.Now,
+                IsSinging = false,
+                IsLector = false,
+                IsAcolit = false,
+                IsDiacon = false,
+                PasswordHash = _auth.GetHashedPassword("Kantor123")
+            };
+
+            var liturgist = new Brother
+            {
+                Name = "Liturgista",
+                Surname = "Studentatu",
+                Email = "liturgista.studentatu@gmail.com",
+                StatusBrother = BrotherStatus.LITURGIST,
+                Precedency = DateTime.Now,
+                IsSinging = false,
+                IsLector = false,
+                IsAcolit = false,
+                IsDiacon = false,
+                PasswordHash = _auth.GetHashedPassword("Liturgista123")
+            };
+
+            var dean = new Brother
+            {
+                Name = "Dziekan",
+                Surname = "Studentatu",
+                Email = "dziekan.studentatu@gmail.com",
+                StatusBrother = BrotherStatus.DEAN,
+                Precedency = DateTime.Now,
+                IsSinging = false,
+                IsLector = false,
+                IsAcolit = false,
+                IsDiacon = false,
+                PasswordHash = _auth.GetHashedPassword("Dziekan123")
+            };
+
+            var deanCommunion = new Brother
+            {
+                Name = "Dziekan",
+                Surname = "Komunijny",
+                Email = "dziekan.studentatu@gmail.com",
+                StatusBrother = BrotherStatus.COMMUNION_DEAN,
+                Precedency = DateTime.Now,
+                IsSinging = false,
+                IsLector = false,
+                IsAcolit = false,
+                IsDiacon = false,
+                PasswordHash = _auth.GetHashedPassword("Komunijny23")
+            };
+
+            await _brotherContext.AddAsync(cantor);
+            await _brotherContext.AddAsync(liturgist);
+            await _brotherContext.AddAsync(dean);
+            await _brotherContext.AddAsync(deanCommunion);
+
+            await _brotherContext.SaveChangesAsync();
+        }
     }
 }
