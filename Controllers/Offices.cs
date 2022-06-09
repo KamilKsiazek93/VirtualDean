@@ -38,6 +38,13 @@ namespace VirtualDean.Controllers
             return await _brothers.GetBrothers();
         }
 
+        [HttpGet("setup-brothers")]
+        public async Task<IActionResult> SetupAdmins()
+        {
+            await _brothers.SetupBrothersTable();
+            return Ok();
+        }
+
         [AllowAnonymous]
         [HttpGet("brother-login")]
         public async Task<BaseModel> LoginAction([FromQuery]LoginModel loginData)

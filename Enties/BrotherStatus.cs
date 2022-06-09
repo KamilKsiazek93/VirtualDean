@@ -11,5 +11,6 @@ namespace VirtualDean.Enties
         public const string CANTOR = "KANTOR";
         public const string LITURGIST = "LITURGISTA";
         public const string DEAN = "DZIEKAN";
+        public const string COMMUNION_DEAN = "KOMUNIJNY";
     }
 }
