@@ -23,5 +23,6 @@ namespace VirtualDean.Data
         Task<Office> GetOfficeForBrother(int weekNumber, int brotherId);
         Task<Boolean> GetPipelineStatus(string name);
         Task UpdatePipelineStatus(string jobName, Boolean jobValue);
+        Task<IEnumerable<OfficeNames>> GetOfficeNames(string adminName);
     }
 }

@@ -18,16 +18,18 @@ namespace VirtualDean.Data
         private readonly OfficeDbContext _officeDbContext;
         private readonly KitchenOfficeDbContext _kitchenContext;
         private readonly PipelineStatusDbContext _pipelineContext;
+        private readonly OfficeNameDbContext _officeNamesContext;
         private readonly IWeek _week;
 
-        public OfficesManager(IWeek week, OfficeNameDbContext officeNameDbContext,
-            OfficeDbContext officeDbContext, KitchenOfficeDbContext kitchenContext, PipelineStatusDbContext pipelineContext)
+        public OfficesManager(IWeek week, OfficeNameDbContext officeNameDbContext, OfficeDbContext officeDbContext,
+            KitchenOfficeDbContext kitchenContext, PipelineStatusDbContext pipelineContext, OfficeNameDbContext officeNamesContext)
         {
             _officeNameContext = officeNameDbContext;
             _week = week;
             _officeDbContext = officeDbContext;
             _kitchenContext = kitchenContext;
             _pipelineContext = pipelineContext;
+            _officeNamesContext = officeNamesContext;
         }
 
         public async Task AddKitchenOffices(IEnumerable<KitchenOffices> kitchenOffices)
@@ -147,6 +149,11 @@ namespace VirtualDean.Data
             finishedJob.PipelineValue = jobValue;
             _pipelineContext.Entry(finishedJob).State = EntityState.Modified;
             await _pipelineContext.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<OfficeNames>> GetOfficeNames(string adminName)
+        {
+            return await _officeNameContext.OfficeNames.Where(item => item.OfficeAdmin == adminName).ToListAsync();
         }
     }
 }
