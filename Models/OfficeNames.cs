@@ -9,5 +9,6 @@ namespace VirtualDean.Models
     {
         public int Id { get; set; }
         public string OfficeName { get; set; }
+        public string OfficeAdmin { get; set; }
     }
 }

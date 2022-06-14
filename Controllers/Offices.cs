@@ -157,6 +157,12 @@ namespace VirtualDean.Controllers
             return await _week.GetLastWeek();
         }
 
+        [HttpGet("office-name/{name}")]
+        public async Task<IEnumerable<OfficeNames>> GetOfficeNames(string name)
+        {
+            return await _officesManager.GetOfficeNames(name);
+        }
+
         [HttpPost("office-liturgist")]
         public async Task<ActionResult> AddLiturgistOffice(IEnumerable<Office> offices)
         {

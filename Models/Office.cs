@@ -14,7 +14,5 @@ namespace VirtualDean.Models
         public string CantorOffice { get; set; }
         public string LiturgistOffice { get; set; }
         public string DeanOffice { get; set; }
-        public string Tray { get; set; }
-        public string Communion { get; set; }
     }
 }
