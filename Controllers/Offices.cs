@@ -55,7 +55,7 @@ namespace VirtualDean.Controllers
 
                 return _brothers.GetAuthenticatedBrother(findingBrother);
             }
-            return null;
+            return new BaseModel();
         }
 
         [HttpGet("brothers-base")]

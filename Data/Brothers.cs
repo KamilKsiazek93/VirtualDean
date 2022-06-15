@@ -30,6 +30,8 @@ namespace VirtualDean.Data
 
         public async Task EditBrother(Brother brother)
         {
+            var actualBrother = await GetBrother(brother.Id);
+            brother.PasswordHash = brother.PasswordHash;
             _brotherContext.Entry(brother).State = EntityState.Modified;
             await _brotherContext.SaveChangesAsync();
         }
