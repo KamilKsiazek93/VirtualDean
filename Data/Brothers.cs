@@ -65,7 +65,7 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<BaseBrotherForLiturgistOffice>> GetBrotherForLiturgistOffice()
         {
-            return await _brotherContext.Brothers.Where(bro => !bro.IsDiacon).
+            return await _brotherContext.Brothers.Where(bro => !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).
                 Select(bro => new BaseBrotherForLiturgistOffice { Id = bro.Id, Name = bro.Name, Surname = bro.Surname,
                 StatusBrother = bro.StatusBrother, IsAcolit = bro.IsAcolit })
                 .ToListAsync();
@@ -73,23 +73,23 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<Brother>> GetBrothers()
         {
-            return await _brotherContext.Brothers.ToListAsync();
+            return await _brotherContext.Brothers.Where(bro => bro.StatusBrother == BrotherStatus.BRAT).ToListAsync();
         }
 
         public async Task<IEnumerable<BaseModel>> GetBrothersForCommunion()
         {
-            return await _brotherContext.Brothers.Where(bro => (bro.IsAcolit || bro.IsDiacon) && bro.StatusBrother == "BRAT").ToListAsync();
+            return await _brotherContext.Brothers.Where(bro => (bro.IsAcolit || bro.IsDiacon) && bro.StatusBrother == BrotherStatus.BRAT).ToListAsync();
         }
 
         public async Task<IEnumerable<BaseModel>> GetBrothersForTray()
         {
-            return await _brotherContext.Brothers.Where(bro => !bro.IsAcolit && !bro.IsDiacon).ToListAsync();
+            return await _brotherContext.Brothers.Where(bro => !bro.IsAcolit && !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).ToListAsync();
         }
 
         public async Task<IEnumerable<CantorResponse>> GetSingingBrothers()
         {
             return await _brotherContext.Brothers.
-                Where(bro => bro.IsSinging).
+                Where(bro => bro.IsSinging && bro.StatusBrother == BrotherStatus.BRAT).
                 Select(bro => new CantorResponse()
             { Id = bro.Id, Name = bro.Name, Surname = bro.Surname, IsSinging = bro.IsSinging}).ToListAsync();
         }
