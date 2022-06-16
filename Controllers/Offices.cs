@@ -136,6 +136,10 @@ namespace VirtualDean.Controllers
         {
             try
             {
+                if(!await IsOfficeAvailableToSet(PipelineConstName.CANTOR))
+                {
+                    return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
+                }
                 if(IsCurrentUserCantor())
                 {
                     await _officesManager.AddBrothersForSchola(offices);
@@ -168,7 +172,11 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                if(IsCurrenUserLiturgist())
+                if (!await IsOfficeAvailableToSet(PipelineConstName.LITURGIST))
+                {
+                    return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
+                }
+                if (IsCurrenUserLiturgist())
                 {
                     await _officesManager.AddLiturgistOffice(offices);
                     await _officesManager.UpdatePipelineStatus(PipelineConstName.LITURGIST, false);
@@ -188,7 +196,11 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                if(IsCurrentUserDean())
+                if (!await IsOfficeAvailableToSet(PipelineConstName.DEAN))
+                {
+                    return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
+                }
+                if (IsCurrentUserDean())
                 {
                     await _officesManager.AddDeanOffice(offices);
                     await _week.IncrementWeek();
@@ -251,7 +263,11 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                if(IsCurrentUserDean())
+                if (!await IsOfficeAvailableToSet(PipelineConstName.KITCHEN))
+                {
+                    return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
+                }
+                if (IsCurrentUserDean())
                 {
                     await _officesManager.AddKitchenOffices(offices);
                     await _officesManager.UpdatePipelineStatus(PipelineConstName.KITCHEN, false);
@@ -283,7 +299,11 @@ namespace VirtualDean.Controllers
         {
             try
             {
-                if(IsCurrenUserLiturgist())
+                if (!await IsOfficeAvailableToSet(PipelineConstName.TRAY))
+                {
+                    return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
+                }
+                if (IsCurrenUserLiturgist())
                 {
                     await _trayCommunionHour.AddTrayHour(listOfTray);
                     await _officesManager.UpdatePipelineStatus(PipelineConstName.TRAY, false);
