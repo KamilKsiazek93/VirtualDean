@@ -385,7 +385,7 @@ namespace VirtualDean.Controllers
                 if (user.Id == obstacles.FirstOrDefault().BrotherId)
                 {
                     await _obstacle.AddObstacle(obstacles);
-                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                    return Ok(new { message = ActionResultMessage.ObstacleAdded });
                 }
                 return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
             }

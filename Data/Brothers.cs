@@ -94,7 +94,7 @@ namespace VirtualDean.Data
         {
             return await _brotherContext.Brothers
                 .OrderBy(bro => bro.Precedency)
-                .Where(bro => bro.IsSinging && bro.StatusBrother == BrotherStatus.BRAT).
+                .Where(bro => bro.IsSinging && !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).
                 Select(bro => new CantorResponse()
             { Id = bro.Id, Name = bro.Name, Surname = bro.Surname, IsSinging = bro.IsSinging}).ToListAsync();
         }
