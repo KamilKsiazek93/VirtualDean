@@ -525,6 +525,18 @@ namespace VirtualDean.Controllers
             return await _officesManager.GetPipelineStatus(name);
         }
 
+        [HttpGet("hours-tray")]
+        public IEnumerable<string> GetHoursForTray()
+        {
+            return _trayCommunionHour.GetHoursForTray();
+        }
+
+        [HttpGet("hours-communion")]
+        public IEnumerable<string> GetHoursForCommunion()
+        {
+            return _trayCommunionHour.GetHoursForCommunion();
+        }
+
         private BaseModel GetCurrentUser()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
