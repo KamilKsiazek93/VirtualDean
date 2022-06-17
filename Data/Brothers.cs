@@ -175,14 +175,14 @@ namespace VirtualDean.Data
             {
                 Name = "Dziekan",
                 Surname = "Komunijny",
-                Email = "dziekan.studentatu@gmail.com",
+                Email = "dziekan.komunijny@gmail.com",
                 StatusBrother = BrotherStatus.COMMUNION_DEAN,
                 Precedency = DateTime.Now,
                 IsSinging = false,
                 IsLector = false,
                 IsAcolit = false,
                 IsDiacon = false,
-                PasswordHash = _auth.GetHashedPassword("Komunijny23")
+                PasswordHash = _auth.GetHashedPassword("Komunijny123")
             };
 
             await _brotherContext.AddAsync(cantor);
