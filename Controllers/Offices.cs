@@ -219,7 +219,7 @@ namespace VirtualDean.Controllers
         [HttpGet("office-last/{brotherId}")]
         public async Task<OfficeBrother> GetLastOfficeForBrother(int brotherId)
         {
-            int weekNumber = await _week.GetLastWeek();
+            int weekNumber = await _week.GetLastWeek() - 1;
             var trays = await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
             var communions = await _trayCommunionHour.GetCommunionHour(weekNumber, brotherId);
             var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brotherId);
@@ -237,7 +237,7 @@ namespace VirtualDean.Controllers
         [HttpGet("office-previous/{brotherId}")]
         public async Task<OfficeBrother> GetPreviousOfficeForBrother(int brotherId)
         {
-            int weekNumber = await _week.GetLastWeek() - 1;
+            int weekNumber = await _week.GetLastWeek() - 2;
             var trays = await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
             var communions = await _trayCommunionHour.GetCommunionHour(weekNumber, brotherId);
             var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brotherId);
