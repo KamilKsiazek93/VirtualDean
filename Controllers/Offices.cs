@@ -272,6 +272,7 @@ namespace VirtualDean.Controllers
                     await _officesManager.AddKitchenOffices(offices);
                     await _officesManager.UpdatePipelineStatus(PipelineConstName.KITCHEN, false);
                     await _officesManager.UpdatePipelineStatus(PipelineConstName.CANTOR, true);
+                    await _officesManager.UpdatePipelineStatus(PipelineConstName.COMMUNION, true);
                     return Ok(new { message = ActionResultMessage.OfficeAdded });
                 }
                 return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
@@ -346,9 +347,14 @@ namespace VirtualDean.Controllers
         [HttpPost("communion-hour")]
         public async Task<ActionResult> AddCommunionOffice(IEnumerable<CommunionOfficeAdded> listOfCommunion)
         {
+            if (!await IsOfficeAvailableToSet(PipelineConstName.COMMUNION))
+            {
+                return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
+            }
             try
             {
                 await _trayCommunionHour.AddCommunionHour(listOfCommunion);
+                await _officesManager.UpdatePipelineStatus(PipelineConstName.COMMUNION, false);
                 return Ok(new { message = ActionResultMessage.OfficeAdded });
             }
             catch
