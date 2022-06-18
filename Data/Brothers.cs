@@ -69,7 +69,7 @@ namespace VirtualDean.Data
         {
             return await _brotherContext.Brothers.OrderBy(bro => bro.Precedency).Where(bro => !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).
                 Select(bro => new BaseBrotherForLiturgistOffice { Id = bro.Id, Name = bro.Name, Surname = bro.Surname,
-                StatusBrother = bro.StatusBrother, IsAcolit = bro.IsAcolit })
+                StatusBrother = bro.StatusBrother, IsAcolit = bro.IsAcolit, IsLector = bro.IsLector })
                 .ToListAsync();
         }
 
