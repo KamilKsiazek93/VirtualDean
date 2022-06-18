@@ -112,5 +112,15 @@ namespace VirtualDean.Data
             int weekNumber = await _week.GetLastWeek();
             return await _trayContext.TrayHourOffice.Where(item => item.WeekOfOffices == weekNumber).AnyAsync();
         }
+
+        public IEnumerable<string> GetHoursForTray()
+        {
+            return _trayHours;
+        }
+
+        public IEnumerable<string> GetHoursForCommunion()
+        {
+            return _communionHours;
+        }
     }
 }

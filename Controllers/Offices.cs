@@ -219,43 +219,38 @@ namespace VirtualDean.Controllers
         [HttpGet("office-last/{brotherId}")]
         public async Task<OfficeBrother> GetLastOfficeForBrother(int brotherId)
         {
-            int weekNumber = await _week.GetLastWeek();
+            int weekNumber = await _week.GetLastWeek() - 1;
             var trays = await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
             var communions = await _trayCommunionHour.GetCommunionHour(weekNumber, brotherId);
             var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brotherId);
-            return new OfficeBrother
-            {
-                BrotherId = brotherId,
-                CantorOffice = otherOffices.CantorOffice,
-                Tray = trays,
-                Communion = communions,
-                LiturgistOffice = otherOffices.LiturgistOffice,
-                DeanOffice = otherOffices.DeanOffice
-            };
+            return _officesManager.GetOfficeForSingleBrother(trays, communions, otherOffices);
         }
 
         [HttpGet("office-previous/{brotherId}")]
         public async Task<OfficeBrother> GetPreviousOfficeForBrother(int brotherId)
         {
-            int weekNumber = await _week.GetLastWeek() - 1;
+            int weekNumber = await _week.GetLastWeek() - 2;
             var trays = await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
             var communions = await _trayCommunionHour.GetCommunionHour(weekNumber, brotherId);
             var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brotherId);
-            return new OfficeBrother
-            {
-                BrotherId = brotherId,
-                CantorOffice = otherOffices.CantorOffice,
-                Tray = trays,
-                Communion = communions,
-                LiturgistOffice = otherOffices.LiturgistOffice,
-                DeanOffice = otherOffices.DeanOffice
-            };
+            return _officesManager.GetOfficeForSingleBrother(trays, communions, otherOffices);
         }
 
         [HttpGet("office-last")]
-        public async Task<IEnumerable<Office>> GetLastOffice()
+        public async Task<IEnumerable<OfficePrint>> GetLastOffice()
         {
-            return await _officesManager.GetLastOffice();
+            int weekNumber = await _week.GetLastWeek() - 1;
+            var brothers = await GetBrothers();
+            var officesWithBrotherData = new List<OfficePrint>();
+            brothers.OrderBy(bro => bro.Precedency);
+            foreach(var brother in brothers)
+            {
+                var trays = await _trayCommunionHour.GetTrayHour(weekNumber, brother.Id);
+                var communions = await _trayCommunionHour.GetCommunionHour(weekNumber, brother.Id);
+                var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brother.Id);
+                officesWithBrotherData.Add(_officesManager.GetOfficeForSingleBrotherPrint(trays, communions, otherOffices, brother));
+            }
+            return officesWithBrotherData;
         }
 
         [HttpPost("kitchen-offices")]
@@ -272,6 +267,7 @@ namespace VirtualDean.Controllers
                     await _officesManager.AddKitchenOffices(offices);
                     await _officesManager.UpdatePipelineStatus(PipelineConstName.KITCHEN, false);
                     await _officesManager.UpdatePipelineStatus(PipelineConstName.CANTOR, true);
+                    await _officesManager.UpdatePipelineStatus(PipelineConstName.COMMUNION, true);
                     return Ok(new { message = ActionResultMessage.OfficeAdded });
                 }
                 return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
@@ -346,9 +342,14 @@ namespace VirtualDean.Controllers
         [HttpPost("communion-hour")]
         public async Task<ActionResult> AddCommunionOffice(IEnumerable<CommunionOfficeAdded> listOfCommunion)
         {
+            if (!await IsOfficeAvailableToSet(PipelineConstName.COMMUNION))
+            {
+                return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
+            }
             try
             {
                 await _trayCommunionHour.AddCommunionHour(listOfCommunion);
+                await _officesManager.UpdatePipelineStatus(PipelineConstName.COMMUNION, false);
                 return Ok(new { message = ActionResultMessage.OfficeAdded });
             }
             catch
@@ -385,7 +386,7 @@ namespace VirtualDean.Controllers
                 if (user.Id == obstacles.FirstOrDefault().BrotherId)
                 {
                     await _obstacle.AddObstacle(obstacles);
-                    return Ok(new { message = ActionResultMessage.OfficeAdded });
+                    return Ok(new { message = ActionResultMessage.ObstacleAdded });
                 }
                 return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
             }
@@ -523,6 +524,18 @@ namespace VirtualDean.Controllers
         public async Task<Boolean> IsOfficeAvailableToSet(string name)
         {
             return await _officesManager.GetPipelineStatus(name);
+        }
+
+        [HttpGet("hours-tray")]
+        public IEnumerable<string> GetHoursForTray()
+        {
+            return _trayCommunionHour.GetHoursForTray();
+        }
+
+        [HttpGet("hours-communion")]
+        public IEnumerable<string> GetHoursForCommunion()
+        {
+            return _trayCommunionHour.GetHoursForCommunion();
         }
 
         private BaseModel GetCurrentUser()

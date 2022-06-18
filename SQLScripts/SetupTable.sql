@@ -26,6 +26,7 @@ INSERT INTO dbo.hours (Hour) VALUES ('21.30')
 INSERT INTO dbo.pipelineStatus (Name, PipelineValue) VALUES ('KITCHEN', 1)
 INSERT INTO dbo.pipelineStatus (Name, PipelineValue) VALUES ('CANTOR', 0)
 INSERT INTO dbo.pipelineStatus (Name, PipelineValue) VALUES ('TRAY', 0)
+INSERT INTO dbo.pipelineStatus (Name, PipelineValue) VALUES ('COMMUNION', 0)
 INSERT INTO dbo.pipelineStatus (Name, PipelineValue) VALUES ('LITURGIST', 0)
 INSERT INTO dbo.pipelineStatus (Name, PipelineValue) VALUES ('DEAN', 0)
 

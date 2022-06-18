@@ -94,7 +94,7 @@ namespace VirtualDean.Data
         {
             return await _brotherContext.Brothers
                 .OrderBy(bro => bro.Precedency)
-                .Where(bro => bro.IsSinging && bro.StatusBrother == BrotherStatus.BRAT).
+                .Where(bro => bro.IsSinging && !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).
                 Select(bro => new CantorResponse()
             { Id = bro.Id, Name = bro.Name, Surname = bro.Surname, IsSinging = bro.IsSinging}).ToListAsync();
         }
@@ -175,14 +175,14 @@ namespace VirtualDean.Data
             {
                 Name = "Dziekan",
                 Surname = "Komunijny",
-                Email = "dziekan.studentatu@gmail.com",
+                Email = "dziekan.komunijny@gmail.com",
                 StatusBrother = BrotherStatus.COMMUNION_DEAN,
                 Precedency = DateTime.Now,
                 IsSinging = false,
                 IsLector = false,
                 IsAcolit = false,
                 IsDiacon = false,
-                PasswordHash = _auth.GetHashedPassword("Komunijny23")
+                PasswordHash = _auth.GetHashedPassword("Komunijny123")
             };
 
             await _brotherContext.AddAsync(cantor);
