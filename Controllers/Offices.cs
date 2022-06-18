@@ -223,15 +223,7 @@ namespace VirtualDean.Controllers
             var trays = await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
             var communions = await _trayCommunionHour.GetCommunionHour(weekNumber, brotherId);
             var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brotherId);
-            return new OfficeBrother
-            {
-                BrotherId = brotherId,
-                CantorOffice = otherOffices.CantorOffice,
-                Tray = trays,
-                Communion = communions,
-                LiturgistOffice = otherOffices.LiturgistOffice,
-                DeanOffice = otherOffices.DeanOffice
-            };
+            return _officesManager.GetOfficeForSingleBrother(trays, communions, otherOffices);
         }
 
         [HttpGet("office-previous/{brotherId}")]
@@ -241,21 +233,24 @@ namespace VirtualDean.Controllers
             var trays = await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
             var communions = await _trayCommunionHour.GetCommunionHour(weekNumber, brotherId);
             var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brotherId);
-            return new OfficeBrother
-            {
-                BrotherId = brotherId,
-                CantorOffice = otherOffices.CantorOffice,
-                Tray = trays,
-                Communion = communions,
-                LiturgistOffice = otherOffices.LiturgistOffice,
-                DeanOffice = otherOffices.DeanOffice
-            };
+            return _officesManager.GetOfficeForSingleBrother(trays, communions, otherOffices);
         }
 
         [HttpGet("office-last")]
-        public async Task<IEnumerable<Office>> GetLastOffice()
+        public async Task<IEnumerable<OfficePrint>> GetLastOffice()
         {
-            return await _officesManager.GetLastOffice();
+            int weekNumber = await _week.GetLastWeek() - 1;
+            var brothers = await GetBrothers();
+            var officesWithBrotherData = new List<OfficePrint>();
+            brothers.OrderBy(bro => bro.Precedency);
+            foreach(var brother in brothers)
+            {
+                var trays = await _trayCommunionHour.GetTrayHour(weekNumber, brother.Id);
+                var communions = await _trayCommunionHour.GetCommunionHour(weekNumber, brother.Id);
+                var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brother.Id);
+                officesWithBrotherData.Add(_officesManager.GetOfficeForSingleBrotherPrint(trays, communions, otherOffices, brother));
+            }
+            return officesWithBrotherData;
         }
 
         [HttpPost("kitchen-offices")]

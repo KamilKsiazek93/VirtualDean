@@ -82,7 +82,8 @@ namespace VirtualDean.Data
             {
                 CantorOffice = offices.Where(item => item.CantorOffice != null).Select(item => item.CantorOffice).FirstOrDefault(),
                 LiturgistOffice = offices.Where(item => item.LiturgistOffice != null).Select(item => item.LiturgistOffice).FirstOrDefault(),
-                DeanOffice = offices.Where(item => item.DeanOffice != null).Select(item => item.DeanOffice).FirstOrDefault()
+                DeanOffice = offices.Where(item => item.DeanOffice != null).Select(item => item.DeanOffice).FirstOrDefault(),
+                BrotherId = brotherId
             };
         }
 
@@ -152,6 +153,34 @@ namespace VirtualDean.Data
         public async Task<IEnumerable<OfficeNames>> GetOfficeNames(string adminName)
         {
             return await _officeNameContext.OfficeNames.Where(item => item.OfficeAdmin == adminName).ToListAsync();
+        }
+
+        public OfficeBrother GetOfficeForSingleBrother(IEnumerable<string> trays, IEnumerable<string> communions, Office otherOffices)
+        {
+            return new OfficeBrother
+            {
+                BrotherId = otherOffices.BrotherId,
+                CantorOffice = otherOffices.CantorOffice,
+                Tray = trays,
+                Communion = communions,
+                LiturgistOffice = otherOffices.LiturgistOffice,
+                DeanOffice = otherOffices.DeanOffice
+            };
+        }
+
+        public OfficePrint GetOfficeForSingleBrotherPrint(IEnumerable<string> trays, IEnumerable<string> communions, Office otherOffices, BaseModel brother)
+        {
+            return new OfficePrint
+            {
+                BrotherId = brother.Id,
+                Name = brother.Name,
+                Surname = brother.Surname,
+                CantorOffice = otherOffices.CantorOffice,
+                Tray = trays,
+                Communion = communions,
+                LiturgistOffice = otherOffices.LiturgistOffice,
+                DeanOffice = otherOffices.DeanOffice
+            };
         }
     }
 }
