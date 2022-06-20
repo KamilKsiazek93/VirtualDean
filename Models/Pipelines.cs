@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace VirtualDean.Models
 {
-    public class OfficeNames
+    public class Pipelines
     {
         public int Id { get; set; }
-        public string OfficeName { get; set; }
-        public string OfficeAdmin { get; set; }
+        public string Name { get; set; }
+        public Boolean PipelineValue { get; set; }
     }
 }

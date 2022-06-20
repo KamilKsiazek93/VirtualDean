@@ -17,14 +17,17 @@ namespace VirtualDean.Data
         private readonly OfficeNameDbContext _officeNameContext;
         private readonly OfficeDbContext _officeDbContext;
         private readonly KitchenOfficeDbContext _kitchenContext;
+        private readonly PipelineStatusDbContext _pipelineContext;
         private readonly IWeek _week;
-        public OfficesManager(IWeek week, OfficeNameDbContext officeNameDbContext,
-            OfficeDbContext officeDbContext, KitchenOfficeDbContext kitchenContext)
+
+        public OfficesManager(IWeek week, OfficeNameDbContext officeNameDbContext, OfficeDbContext officeDbContext,
+            KitchenOfficeDbContext kitchenContext, PipelineStatusDbContext pipelineContext)
         {
             _officeNameContext = officeNameDbContext;
             _week = week;
             _officeDbContext = officeDbContext;
             _kitchenContext = kitchenContext;
+            _pipelineContext = pipelineContext;
         }
 
         public async Task AddKitchenOffices(IEnumerable<KitchenOffices> kitchenOffices)
@@ -79,7 +82,8 @@ namespace VirtualDean.Data
             {
                 CantorOffice = offices.Where(item => item.CantorOffice != null).Select(item => item.CantorOffice).FirstOrDefault(),
                 LiturgistOffice = offices.Where(item => item.LiturgistOffice != null).Select(item => item.LiturgistOffice).FirstOrDefault(),
-                DeanOffice = offices.Where(item => item.DeanOffice != null).Select(item => item.DeanOffice).FirstOrDefault()
+                DeanOffice = offices.Where(item => item.DeanOffice != null).Select(item => item.DeanOffice).FirstOrDefault(),
+                BrotherId = brotherId
             };
         }
 
@@ -131,6 +135,52 @@ namespace VirtualDean.Data
         {
             return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber && item.DeanOffice != null)
                 .Select(item => item.DeanOffice).AnyAsync();
+        }
+
+        public async Task<bool> GetPipelineStatus(string name)
+        {
+            return await _pipelineContext.PipelineStatus.Where(item => item.Name == name).Select(item => item.PipelineValue).FirstOrDefaultAsync();
+        }
+
+        public async Task UpdatePipelineStatus(string jobName, Boolean jobValue)
+        {
+            var finishedJob = await _pipelineContext.PipelineStatus.Where(item => item.Name == jobName).FirstOrDefaultAsync();
+            finishedJob.PipelineValue = jobValue;
+            _pipelineContext.Entry(finishedJob).State = EntityState.Modified;
+            await _pipelineContext.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<OfficeNames>> GetOfficeNames(string adminName)
+        {
+            return await _officeNameContext.OfficeNames.Where(item => item.OfficeAdmin == adminName).ToListAsync();
+        }
+
+        public OfficeBrother GetOfficeForSingleBrother(IEnumerable<string> trays, IEnumerable<string> communions, Office otherOffices)
+        {
+            return new OfficeBrother
+            {
+                BrotherId = otherOffices.BrotherId,
+                CantorOffice = otherOffices.CantorOffice,
+                Tray = trays,
+                Communion = communions,
+                LiturgistOffice = otherOffices.LiturgistOffice,
+                DeanOffice = otherOffices.DeanOffice
+            };
+        }
+
+        public OfficePrint GetOfficeForSingleBrotherPrint(IEnumerable<string> trays, IEnumerable<string> communions, Office otherOffices, BaseModel brother)
+        {
+            return new OfficePrint
+            {
+                BrotherId = brother.Id,
+                Name = brother.Name,
+                Surname = brother.Surname,
+                CantorOffice = otherOffices.CantorOffice,
+                Tray = trays,
+                Communion = communions,
+                LiturgistOffice = otherOffices.LiturgistOffice,
+                DeanOffice = otherOffices.DeanOffice
+            };
         }
     }
 }

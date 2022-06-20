@@ -54,8 +54,10 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<BaseModel>> GetBaseBrothersModel()
         {
-            return await _brotherContext.Brothers.Where(bro => bro.StatusBrother == BrotherStatus.BRAT).Select(bro => new BaseModel() 
-            { Id = bro.Id, Name = bro.Name, Surname = bro.Surname }).ToListAsync();
+            return await _brotherContext.Brothers
+                .OrderBy(bro => bro.Precedency)
+                .Where(bro => bro.StatusBrother == BrotherStatus.BRAT).Select(bro => new BaseModel() 
+                { Id = bro.Id, Name = bro.Name, Surname = bro.Surname }).ToListAsync();
         }
 
         public async Task<Brother> GetBrother(int brotherId)
@@ -65,31 +67,34 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<BaseBrotherForLiturgistOffice>> GetBrotherForLiturgistOffice()
         {
-            return await _brotherContext.Brothers.Where(bro => !bro.IsDiacon).
+            return await _brotherContext.Brothers.OrderBy(bro => bro.Precedency).Where(bro => !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).
                 Select(bro => new BaseBrotherForLiturgistOffice { Id = bro.Id, Name = bro.Name, Surname = bro.Surname,
-                StatusBrother = bro.StatusBrother, IsAcolit = bro.IsAcolit })
+                StatusBrother = bro.StatusBrother, IsAcolit = bro.IsAcolit, IsLector = bro.IsLector })
                 .ToListAsync();
         }
 
         public async Task<IEnumerable<Brother>> GetBrothers()
         {
-            return await _brotherContext.Brothers.ToListAsync();
+            return await _brotherContext.Brothers.OrderBy(bro => bro.Precedency).Where(bro => bro.StatusBrother == BrotherStatus.BRAT).ToListAsync();
         }
 
         public async Task<IEnumerable<BaseModel>> GetBrothersForCommunion()
         {
-            return await _brotherContext.Brothers.Where(bro => (bro.IsAcolit || bro.IsDiacon) && bro.StatusBrother == "BRAT").ToListAsync();
+            return await _brotherContext.Brothers
+                .OrderBy(bro => bro.Precedency)
+                .Where(bro => (bro.IsAcolit || bro.IsDiacon) && bro.StatusBrother == BrotherStatus.BRAT).ToListAsync();
         }
 
         public async Task<IEnumerable<BaseModel>> GetBrothersForTray()
         {
-            return await _brotherContext.Brothers.Where(bro => !bro.IsAcolit && !bro.IsDiacon).ToListAsync();
+            return await _brotherContext.Brothers.Where(bro => !bro.IsAcolit && !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).ToListAsync();
         }
 
         public async Task<IEnumerable<CantorResponse>> GetSingingBrothers()
         {
-            return await _brotherContext.Brothers.
-                Where(bro => bro.IsSinging).
+            return await _brotherContext.Brothers
+                .OrderBy(bro => bro.Precedency)
+                .Where(bro => bro.IsSinging && !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).
                 Select(bro => new CantorResponse()
             { Id = bro.Id, Name = bro.Name, Surname = bro.Surname, IsSinging = bro.IsSinging}).ToListAsync();
         }
@@ -112,6 +117,80 @@ namespace VirtualDean.Data
             {
                 throw;
             }
+        }
+
+        public async Task SetupBrothersTable()
+        {
+            if(! await _brotherContext.Brothers.AnyAsync())
+            {
+                await SetupAdminAccounts();
+            }    
+        }
+
+        private async Task SetupAdminAccounts()
+        {
+            var cantor = new Brother
+            {
+                Name = "Kantor",
+                Surname = "Studentatu",
+                Email = "kantor.studentatu@gmail.com",
+                StatusBrother = BrotherStatus.CANTOR,
+                Precedency = DateTime.Now,
+                IsSinging = false,
+                IsLector = false,
+                IsAcolit = false,
+                IsDiacon = false,
+                PasswordHash = _auth.GetHashedPassword("Kantor123")
+            };
+
+            var liturgist = new Brother
+            {
+                Name = "Liturgista",
+                Surname = "Studentatu",
+                Email = "liturgista.studentatu@gmail.com",
+                StatusBrother = BrotherStatus.LITURGIST,
+                Precedency = DateTime.Now,
+                IsSinging = false,
+                IsLector = false,
+                IsAcolit = false,
+                IsDiacon = false,
+                PasswordHash = _auth.GetHashedPassword("Liturgista123")
+            };
+
+            var dean = new Brother
+            {
+                Name = "Dziekan",
+                Surname = "Studentatu",
+                Email = "dziekan.studentatu@gmail.com",
+                StatusBrother = BrotherStatus.DEAN,
+                Precedency = DateTime.Now,
+                IsSinging = false,
+                IsLector = false,
+                IsAcolit = false,
+                IsDiacon = false,
+                PasswordHash = _auth.GetHashedPassword("Dziekan123")
+            };
+
+            var deanCommunion = new Brother
+            {
+                Name = "Dziekan",
+                Surname = "Komunijny",
+                Email = "dziekan.komunijny@gmail.com",
+                StatusBrother = BrotherStatus.COMMUNION_DEAN,
+                Precedency = DateTime.Now,
+                IsSinging = false,
+                IsLector = false,
+                IsAcolit = false,
+                IsDiacon = false,
+                PasswordHash = _auth.GetHashedPassword("Komunijny123")
+            };
+
+            await _brotherContext.AddAsync(cantor);
+            await _brotherContext.AddAsync(liturgist);
+            await _brotherContext.AddAsync(dean);
+            await _brotherContext.AddAsync(deanCommunion);
+
+            await _brotherContext.SaveChangesAsync();
         }
     }
 }
