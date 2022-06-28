@@ -164,13 +164,15 @@ namespace VirtualDean.Controllers
         [HttpGet("office-name/{name}")]
         public async Task<IEnumerable<OfficeNames>> GetOfficeNames(string name)
         {
-            return await _officesManager.GetOfficeNames(name);
+             return await _officesManager.GetOfficeNames(name);
         }
 
         [HttpGet("office-name/obstacle")]
         public async Task<IEnumerable<OfficeNames>> GetOfficeNameForObstacle()
         {
-            return await _officesManager.GetOfficeNamesForObstacle();
+            var officeName = await _officesManager.GetOfficeNamesForObstacle();
+            var officeHour = await _trayCommunionHour.GetHoursAsOfficeNames();
+            return officeName.Union(officeHour);
         }
 
         [HttpPost("office-liturgist")]

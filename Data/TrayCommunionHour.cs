@@ -124,5 +124,17 @@ namespace VirtualDean.Data
         {
             return await _hourContext.Hours.Where(item => item.Hour != "10.30").Select(item => item.Hour).ToListAsync();
         }
+
+        public async Task<IEnumerable<OfficeNames>> GetHoursAsOfficeNames()
+        {
+            var officeNames = new List<OfficeNames>();
+            var hours = await _hourContext.Hours.ToListAsync();
+            foreach(var hour in hours)
+            {
+                officeNames.Add(new OfficeNames { Id = hour.Id, OfficeName = hour.Hour, OfficeAdmin = "HOUR" });
+            }
+
+            return officeNames;
+        }
     }
 }
