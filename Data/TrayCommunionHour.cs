@@ -18,8 +18,6 @@ namespace VirtualDean.Data
         private readonly TrayHourDbContext _trayContext;
         private readonly HoursDbContext _hourContext;
         private readonly IWeek _week;
-        private IEnumerable<string> _communionHours = new Hours().CommunionHours;
-        private IEnumerable<string> _trayHours = new Hours().TrayHours;
         public TrayCommunionHour(CommunionHourDbContext communionContext, TrayHourDbContext trayHourDbContext, IWeek week, HoursDbContext hoursDbContext)
         {
             _communionContext = communionContext;
@@ -31,10 +29,11 @@ namespace VirtualDean.Data
         public async Task AddCommunionHour(IEnumerable<CommunionOfficeAdded> offices)
         {
             int weekNumber = await _week.GetLastWeek();
+            var communionHours = await GetHoursForCommunion();
             foreach (var office in offices)
             {
                 office.WeekOfOffices = weekNumber;
-                ValidateHours(office.CommunionHour, _communionHours);
+                ValidateHours(office.CommunionHour, communionHours);
             }
 
             await _communionContext.AddRangeAsync(offices);
@@ -44,10 +43,11 @@ namespace VirtualDean.Data
         public async Task AddTrayHour(IEnumerable<TrayOfficeAdded> offices)
         {
             int weekNumber = await _week.GetLastWeek();
+            var trayHours = await GetHoursForTray();
             foreach (var office in offices)
             {
                 office.WeekOfOffices = weekNumber;
-                ValidateHours(office.TrayHour, _trayHours);
+                ValidateHours(office.TrayHour, trayHours);
             }
 
             await _trayContext.AddRangeAsync(offices);
@@ -115,14 +115,14 @@ namespace VirtualDean.Data
             return await _trayContext.TrayHourOffice.Where(item => item.WeekOfOffices == weekNumber).AnyAsync();
         }
 
-        public IEnumerable<string> GetHoursForTray()
+        public async Task<IEnumerable<string>> GetHoursForTray()
         {
-            return _trayHours;
+            return await _hourContext.Hours.Select(item => item.Hour).ToListAsync();
         }
 
-        public IEnumerable<string> GetHoursForCommunion()
+        public async Task<IEnumerable<string>>GetHoursForCommunion()
         {
-            return _communionHours;
+            return await _hourContext.Hours.Where(item => item.Hour != "10.30").Select(item => item.Hour).ToListAsync();
         }
     }
 }

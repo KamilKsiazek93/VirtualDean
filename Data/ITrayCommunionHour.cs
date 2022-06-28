@@ -19,7 +19,7 @@ namespace VirtualDean.Data
         Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHours();
         Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHours(int weekId);
         Task<IEnumerable<string>> GetCommunionHour(int weekNumber, int idBrother);
-        IEnumerable<string> GetHoursForTray();
-        IEnumerable<string> GetHoursForCommunion();
+        Task<IEnumerable<string>> GetHoursForTray();
+        Task<IEnumerable<string>> GetHoursForCommunion();
     }
 }

@@ -533,13 +533,13 @@ namespace VirtualDean.Controllers
         }
 
         [HttpGet("hours-tray")]
-        public IEnumerable<string> GetHoursForTray()
+        public Task<IEnumerable<string>> GetHoursForTray()
         {
             return _trayCommunionHour.GetHoursForTray();
         }
 
         [HttpGet("hours-communion")]
-        public IEnumerable<string> GetHoursForCommunion()
+        public Task<IEnumerable<string>> GetHoursForCommunion()
         {
             return _trayCommunionHour.GetHoursForCommunion();
         }
