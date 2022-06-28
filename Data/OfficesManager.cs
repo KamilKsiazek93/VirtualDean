@@ -182,5 +182,10 @@ namespace VirtualDean.Data
                 DeanOffice = otherOffices.DeanOffice
             };
         }
+
+        public async Task<IEnumerable<OfficeNames>> GetOfficeNamesForObstacle()
+        {
+            return await _officeNameContext.OfficeNames.Where(item => item.OfficeAdmin != PipelineConstName.KITCHEN).ToListAsync();
+        }
     }
 }

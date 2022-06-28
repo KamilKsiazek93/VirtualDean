@@ -24,6 +24,7 @@ namespace VirtualDean.Data
         Task<Boolean> GetPipelineStatus(string name);
         Task UpdatePipelineStatus(string jobName, Boolean jobValue);
         Task<IEnumerable<OfficeNames>> GetOfficeNames(string adminName);
+        Task<IEnumerable<OfficeNames>> GetOfficeNamesForObstacle();
         OfficeBrother GetOfficeForSingleBrother(IEnumerable<string> trays, IEnumerable<string> communions, Office otherOffices);
         OfficePrint GetOfficeForSingleBrotherPrint(IEnumerable<string> trays, IEnumerable<string> communions, Office otherOffices, BaseModel brother);
     }
