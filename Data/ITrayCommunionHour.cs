@@ -21,6 +21,5 @@ namespace VirtualDean.Data
         Task<IEnumerable<string>> GetCommunionHour(int weekNumber, int idBrother);
         Task<IEnumerable<string>> GetHoursForTray();
         Task<IEnumerable<string>> GetHoursForCommunion();
-        Task<IEnumerable<OfficeNames>> GetHoursAsOfficeNames();
     }
 }

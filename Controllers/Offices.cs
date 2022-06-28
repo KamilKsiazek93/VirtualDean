@@ -168,10 +168,10 @@ namespace VirtualDean.Controllers
         }
 
         [HttpGet("office-name/obstacle")]
-        public async Task<IEnumerable<OfficeNames>> GetOfficeNameForObstacle()
+        public async Task<IEnumerable<string>> GetOfficeNameForObstacle()
         {
             var officeName = await _officesManager.GetOfficeNamesForObstacle();
-            var officeHour = await _trayCommunionHour.GetHoursAsOfficeNames();
+            var officeHour = await _trayCommunionHour.GetHoursForTray();
             return officeName.Union(officeHour);
         }
 
