@@ -16,13 +16,15 @@ namespace VirtualDean.Data
     {
         private readonly CommunionHourDbContext _communionContext;
         private readonly TrayHourDbContext _trayContext;
+        private readonly HoursDbContext _hourContext;
         private readonly IWeek _week;
         private IEnumerable<string> _communionHours = new Hours().CommunionHours;
         private IEnumerable<string> _trayHours = new Hours().TrayHours;
-        public TrayCommunionHour(CommunionHourDbContext communionContext, TrayHourDbContext trayHourDbContext, IWeek week)
+        public TrayCommunionHour(CommunionHourDbContext communionContext, TrayHourDbContext trayHourDbContext, IWeek week, HoursDbContext hoursDbContext)
         {
             _communionContext = communionContext;
             _trayContext = trayHourDbContext;
+            _hourContext = hoursDbContext;
             _week = week;
         }
 

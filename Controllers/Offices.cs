@@ -167,6 +167,12 @@ namespace VirtualDean.Controllers
             return await _officesManager.GetOfficeNames(name);
         }
 
+        [HttpGet("office-name/obstacle")]
+        public async Task<IEnumerable<OfficeNames>> GetOfficeNameForObstacle()
+        {
+            return await _officesManager.GetOfficeNamesForObstacle();
+        }
+
         [HttpPost("office-liturgist")]
         public async Task<ActionResult> AddLiturgistOffice(IEnumerable<Office> offices)
         {
