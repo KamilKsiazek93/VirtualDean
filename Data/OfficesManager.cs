@@ -80,6 +80,30 @@ namespace VirtualDean.Data
             return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekId).ToListAsync();
         }
 
+        public async Task<IEnumerable<FlatOffice>> GetFlatOffice(int weekId)
+        {
+            var offices = await GetOffice(weekId);
+            var flatOffices = new List<FlatOffice>();
+            foreach(var office in offices)
+            {
+                flatOffices.Add(new FlatOffice { BrotherId = office.BrotherId, OfficeName = GetNotNullPropertyFromOffice(office) });
+            }
+            return flatOffices;
+        }
+
+        private string GetNotNullPropertyFromOffice(Office office)
+        {
+            if(office.CantorOffice != null)
+            {
+                return office.CantorOffice;
+            }
+            else if(office.LiturgistOffice != null)
+            {
+                return office.LiturgistOffice;
+            }
+            return office.DeanOffice;
+        }
+
         public async Task<Office> GetOfficeForBrother(int weekNumber, int brotherId)
         {
             var offices = await _officeDbContext.Offices.Where(item => item.BrotherId == brotherId && item.WeekOfOffices == weekNumber).ToListAsync();

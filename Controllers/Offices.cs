@@ -167,6 +167,18 @@ namespace VirtualDean.Controllers
              return await _officesManager.GetOfficeNames(name);
         }
 
+        [HttpGet("office/{weekId}")]
+        public async Task<IEnumerable<Office>> GetOffices(int weekId)
+        {
+            return await _officesManager.GetOffice(weekId);
+        }
+
+        [HttpGet("office-flat/{weekId}")]
+        public async Task<IEnumerable<FlatOffice>> GetFlatOffice(int weekId)
+        {
+            return await _officesManager.GetFlatOffice(weekId);
+        }
+
         [HttpGet("office-name/obstacle")]
         public async Task<IEnumerable<string>> GetOfficeNameForObstacle()
         {
