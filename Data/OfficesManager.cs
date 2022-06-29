@@ -75,6 +75,11 @@ namespace VirtualDean.Data
             return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekOfOffice).ToListAsync();
         }
 
+        public async Task<IEnumerable<Office>> GetOffice(int weekId)
+        {
+            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekId).ToListAsync();
+        }
+
         public async Task<Office> GetOfficeForBrother(int weekNumber, int brotherId)
         {
             var offices = await _officeDbContext.Offices.Where(item => item.BrotherId == brotherId && item.WeekOfOffices == weekNumber).ToListAsync();
@@ -187,6 +192,28 @@ namespace VirtualDean.Data
         {
             return await _officeNameContext.OfficeNames.Where(item => item.OfficeAdmin != PipelineConstName.KITCHEN)
                 .Select(item => item.OfficeName).ToListAsync();
+        }
+
+        public IEnumerable<OfficePrint> GetOfficeForAllBrothers(IEnumerable<Brother> brothers, IEnumerable<TrayOfficeAdded> trays, IEnumerable<CommunionOfficeAdded> communions, IEnumerable<Office> otherOffices)
+        {
+            var offices = new List<OfficePrint>();
+
+            foreach(var brother in brothers)
+            {
+                offices.Add(new OfficePrint
+                {
+                    BrotherId = brother.Id,
+                    Name = brother.Name,
+                    Surname = brother.Surname,
+                    Tray = trays.Where(item => item.BrotherId == brother.Id).Select(item => item.TrayHour).ToList(),
+                    Communion = communions.Where(item => item.BrotherId == brother.Id).Select(item => item.CommunionHour).ToList(),
+                    CantorOffice = otherOffices.Where(item => item.CantorOffice != null && item.BrotherId == brother.Id).Select(item => item.CantorOffice).FirstOrDefault(),
+                    LiturgistOffice = otherOffices.Where(item => item.LiturgistOffice != null && item.BrotherId == brother.Id).Select(item => item.LiturgistOffice).FirstOrDefault(),
+                    DeanOffice = otherOffices.Where(item => item.DeanOffice != null  && item.BrotherId == brother.Id).Select(item => item.DeanOffice).FirstOrDefault(),
+                });
+            }
+
+            return offices;
         }
     }
 }

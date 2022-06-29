@@ -20,6 +20,7 @@ namespace VirtualDean.Data
         Task AddDeanOffice(IEnumerable<Office> offices);
         Task<IEnumerable<string>> GetOfficesName();
         Task<IEnumerable<Office>> GetLastOffice();
+        Task<IEnumerable<Office>> GetOffice(int weekId);
         Task<Office> GetOfficeForBrother(int weekNumber, int brotherId);
         Task<Boolean> GetPipelineStatus(string name);
         Task UpdatePipelineStatus(string jobName, Boolean jobValue);
@@ -27,5 +28,6 @@ namespace VirtualDean.Data
         Task<IEnumerable<string>> GetOfficeNamesForObstacle();
         OfficeBrother GetOfficeForSingleBrother(IEnumerable<string> trays, IEnumerable<string> communions, Office otherOffices);
         OfficePrint GetOfficeForSingleBrotherPrint(IEnumerable<string> trays, IEnumerable<string> communions, Office otherOffices, BaseModel brother);
+        IEnumerable<OfficePrint> GetOfficeForAllBrothers(IEnumerable<Brother> brothers, IEnumerable<TrayOfficeAdded> trays, IEnumerable<CommunionOfficeAdded> communions, IEnumerable<Office> otherOffices);
     }
 }

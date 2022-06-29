@@ -224,6 +224,7 @@ namespace VirtualDean.Controllers
             }
         }
 
+
         [HttpGet("office-last/{brotherId}")]
         public async Task<OfficeBrother> GetLastOfficeForBrother(int brotherId)
         {
@@ -248,17 +249,11 @@ namespace VirtualDean.Controllers
         public async Task<IEnumerable<OfficePrint>> GetLastOffice()
         {
             int weekNumber = await _week.GetLastWeek() - 1;
-            var brothers = await GetBrothers();
-            var officesWithBrotherData = new List<OfficePrint>();
-            brothers.OrderBy(bro => bro.Precedency);
-            foreach(var brother in brothers)
-            {
-                var trays = await _trayCommunionHour.GetTrayHour(weekNumber, brother.Id);
-                var communions = await _trayCommunionHour.GetCommunionHour(weekNumber, brother.Id);
-                var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brother.Id);
-                officesWithBrotherData.Add(_officesManager.GetOfficeForSingleBrotherPrint(trays, communions, otherOffices, brother));
-            }
-            return officesWithBrotherData;
+            var brothers = (await GetBrothers()).OrderBy(bro => bro.Precedency);
+            var trays = await _trayCommunionHour.GetTrayHours(weekNumber);
+            var communions = await _trayCommunionHour.GetCommunionHours(weekNumber);
+            var otherOffices = await _officesManager.GetOffice(weekNumber);
+            return _officesManager.GetOfficeForAllBrothers(brothers, trays, communions, otherOffices);
         }
 
         [HttpPost("kitchen-offices")]
