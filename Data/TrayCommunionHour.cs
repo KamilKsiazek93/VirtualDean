@@ -1,14 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Data.SqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VirtualDean.Models;
 using VirtualDean.Models.DatabaseContext;
-using Dapper;
 using Microsoft.EntityFrameworkCore;
-using VirtualDean.Enties;
 
 namespace VirtualDean.Data
 {
