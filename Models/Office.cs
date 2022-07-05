@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VirtualDean.Enties;
-
-namespace VirtualDean.Models
+﻿namespace VirtualDean.Models
 {
     public class Office
     {
