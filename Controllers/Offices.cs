@@ -38,6 +38,19 @@ namespace VirtualDean.Controllers
             return await _brothers.GetBrothers();
         }
 
+        [HttpPost("password-update")]
+        public async Task<IActionResult> ChangePassword(PasswordUpdate passwordUpdate)
+        {
+            var brother = await GetBrothers(passwordUpdate.BrotherId);
+            string oldPasswordHashed = _brothers.GetHashedPassword(passwordUpdate.CurrentPassword);
+            if(brother != null && brother.PasswordHash == oldPasswordHashed)
+            {
+                await _brothers.UpdatePassword(passwordUpdate, brother);
+                return Ok();
+            }
+            return NotFound();
+        }
+
         [HttpGet("setup-brothers")]
         public async Task<IActionResult> SetupAdmins()
         {

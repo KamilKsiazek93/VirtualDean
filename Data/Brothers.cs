@@ -87,6 +87,11 @@ namespace VirtualDean.Data
             return await _brotherContext.Brothers.Where(bro => !bro.IsAcolit && !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).ToListAsync();
         }
 
+        public string GetHashedPassword(string currentPassword)
+        {
+            return _auth.GetHashedPassword(currentPassword);
+        }
+
         public async Task<IEnumerable<CantorResponse>> GetSingingBrothers()
         {
             return await _brotherContext.Brothers
@@ -122,6 +127,13 @@ namespace VirtualDean.Data
             {
                 await SetupAdminAccounts();
             }    
+        }
+
+        public async Task UpdatePassword(PasswordUpdate passwordUpdate, Brother brother)
+        {
+            brother.PasswordHash = _auth.GetHashedPassword(passwordUpdate.NewPassword);
+            _brotherContext.Entry(brother).State = EntityState.Modified;
+            await _brotherContext.SaveChangesAsync();
         }
 
         private async Task SetupAdminAccounts()

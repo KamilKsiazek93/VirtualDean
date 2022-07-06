@@ -21,5 +21,7 @@ namespace VirtualDean.Data
         Task EditBrother(Brother brother);
         Task<BaseModel> FindLoginBrother(LoginModel loginData);
         BaseModel GetAuthenticatedBrother(BaseModel brother);
+        Task UpdatePassword(PasswordUpdate passwordUpdate, Brother brother);
+        string GetHashedPassword(string currentPassword);
     }
 }
