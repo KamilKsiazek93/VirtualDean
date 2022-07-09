@@ -11,20 +11,13 @@ namespace VirtualDean.Data
 {
     public class OfficesManager : IOfficesManager
     {
-        private readonly OfficeNameDbContext _officeNameContext;
-        private readonly OfficeDbContext _officeDbContext;
-        private readonly KitchenOfficeDbContext _kitchenContext;
-        private readonly PipelineStatusDbContext _pipelineContext;
+        private readonly VirtualDeanDbContext _virtualDeanDbContext;
         private readonly IWeek _week;
 
-        public OfficesManager(IWeek week, OfficeNameDbContext officeNameDbContext, OfficeDbContext officeDbContext,
-            KitchenOfficeDbContext kitchenContext, PipelineStatusDbContext pipelineContext)
+        public OfficesManager(IWeek week, VirtualDeanDbContext virtualDeanDbContext)
         {
-            _officeNameContext = officeNameDbContext;
+            _virtualDeanDbContext = virtualDeanDbContext;
             _week = week;
-            _officeDbContext = officeDbContext;
-            _kitchenContext = kitchenContext;
-            _pipelineContext = pipelineContext;
         }
 
         public async Task AddKitchenOffices(IEnumerable<KitchenOffices> kitchenOffices)
@@ -35,18 +28,18 @@ namespace VirtualDean.Data
                 office.WeekOfOffices = weekOfOffice;
             }
 
-            await _kitchenContext.AddRangeAsync(kitchenOffices);
-            await _kitchenContext.SaveChangesAsync();
+            await _virtualDeanDbContext.AddRangeAsync(kitchenOffices);
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices()
         {
-            return await _kitchenContext.KitchenOffice.ToListAsync();
+            return await _virtualDeanDbContext.KitchenOffice.ToListAsync();
         }
 
         public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices(int weekId)
         {
-            return await _kitchenContext.KitchenOffice.Where(office => office.WeekOfOffices == weekId).ToListAsync();
+            return await _virtualDeanDbContext.KitchenOffice.Where(office => office.WeekOfOffices == weekId).ToListAsync();
         }
 
         public async Task AddBrothersForSchola(IEnumerable<Office> offices)
@@ -56,25 +49,25 @@ namespace VirtualDean.Data
             {
                 office.WeekOfOffices = weekNumber;
                 
-                await _officeDbContext.AddAsync(office);
+                await _virtualDeanDbContext.AddAsync(office);
             }
-            await _officeDbContext.SaveChangesAsync();
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<string>> GetOfficesName()
         {
-            return await _officeNameContext.OfficeNames.Select(i => i.OfficeName).ToListAsync();
+            return await _virtualDeanDbContext.OfficeNames.Select(i => i.OfficeName).ToListAsync();
         }
 
         public async Task<IEnumerable<Office>> GetLastOffice()
         {
             int weekOfOffice = await _week.GetLastWeek();
-            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekOfOffice).ToListAsync();
+            return await _virtualDeanDbContext.Offices.Where(item => item.WeekOfOffices == weekOfOffice).ToListAsync();
         }
 
         public async Task<IEnumerable<Office>> GetOffice(int weekId)
         {
-            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekId).ToListAsync();
+            return await _virtualDeanDbContext.Offices.Where(item => item.WeekOfOffices == weekId).ToListAsync();
         }
 
         public async Task<IEnumerable<FlatOffice>> GetFlatOffice(int weekId)
@@ -103,7 +96,7 @@ namespace VirtualDean.Data
 
         public async Task<Office> GetOfficeForBrother(int weekNumber, int brotherId)
         {
-            var offices = await _officeDbContext.Offices.Where(item => item.BrotherId == brotherId && item.WeekOfOffices == weekNumber).ToListAsync();
+            var offices = await _virtualDeanDbContext.Offices.Where(item => item.BrotherId == brotherId && item.WeekOfOffices == weekNumber).ToListAsync();
             return new Office
             {
                 CantorOffice = offices.Where(item => item.CantorOffice != null).Select(item => item.CantorOffice).FirstOrDefault(),
@@ -120,9 +113,9 @@ namespace VirtualDean.Data
             {
                 office.WeekOfOffices = weekNumber;
 
-                await _officeDbContext.AddAsync(office);
+                await _virtualDeanDbContext.AddAsync(office);
             }
-            await _officeDbContext.SaveChangesAsync();
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         public async Task AddDeanOffice(IEnumerable<Office> offices)
@@ -132,53 +125,53 @@ namespace VirtualDean.Data
             {
                 office.WeekOfOffices = weekNumber;
 
-                await _officeDbContext.AddAsync(office);
+                await _virtualDeanDbContext.AddAsync(office);
             }
-            await _officeDbContext.SaveChangesAsync();
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         public async Task<bool> IsScholaAlreadySet()
         {
             int weekNumber = await _week.GetLastWeek();
-            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber && item.CantorOffice != null)
+            return await _virtualDeanDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber && item.CantorOffice != null)
                 .Select(item => item.CantorOffice).AnyAsync();
         }
 
         public async Task<bool> IsKitchenOfficeAlreadySet()
         {
             int weekNumber = await _week.GetLastWeek();
-            return await _kitchenContext.KitchenOffice.Where(item => item.WeekOfOffices == weekNumber).AnyAsync();
+            return await _virtualDeanDbContext.KitchenOffice.Where(item => item.WeekOfOffices == weekNumber).AnyAsync();
         }
 
         public async Task<bool> IsLiturgistOfficeAlreadySet()
         {
             int weekNumber = await _week.GetLastWeek();
-            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber && item.LiturgistOffice != null)
+            return await _virtualDeanDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber && item.LiturgistOffice != null)
                 .Select(item => item.LiturgistOffice).AnyAsync();
         }
 
         public async Task<bool> IsDeanOfficeAlreadySet(int weekNumber)
         {
-            return await _officeDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber && item.DeanOffice != null)
+            return await _virtualDeanDbContext.Offices.Where(item => item.WeekOfOffices == weekNumber && item.DeanOffice != null)
                 .Select(item => item.DeanOffice).AnyAsync();
         }
 
         public async Task<bool> GetPipelineStatus(string name)
         {
-            return await _pipelineContext.PipelineStatus.Where(item => item.Name == name).Select(item => item.PipelineValue).FirstOrDefaultAsync();
+            return await _virtualDeanDbContext.PipelineStatus.Where(item => item.Name == name).Select(item => item.PipelineValue).FirstOrDefaultAsync();
         }
 
         public async Task UpdatePipelineStatus(string jobName, Boolean jobValue)
         {
-            var finishedJob = await _pipelineContext.PipelineStatus.Where(item => item.Name == jobName).FirstOrDefaultAsync();
+            var finishedJob = await _virtualDeanDbContext.PipelineStatus.Where(item => item.Name == jobName).FirstOrDefaultAsync();
             finishedJob.PipelineValue = jobValue;
-            _pipelineContext.Entry(finishedJob).State = EntityState.Modified;
-            await _pipelineContext.SaveChangesAsync();
+            _virtualDeanDbContext.Entry(finishedJob).State = EntityState.Modified;
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<OfficeNames>> GetOfficeNames(string adminName)
         {
-            return await _officeNameContext.OfficeNames.Where(item => item.OfficeAdmin == adminName).ToListAsync();
+            return await _virtualDeanDbContext.OfficeNames.Where(item => item.OfficeAdmin == adminName).ToListAsync();
         }
 
         public OfficeBrother GetOfficeForSingleBrother(IEnumerable<string> trays, IEnumerable<string> communions, Office otherOffices)
@@ -211,7 +204,7 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<string>> GetOfficeNamesForObstacle()
         {
-            return await _officeNameContext.OfficeNames.Where(item => item.OfficeAdmin != PipelineConstName.KITCHEN)
+            return await _virtualDeanDbContext.OfficeNames.Where(item => item.OfficeAdmin != PipelineConstName.KITCHEN)
                 .Select(item => item.OfficeName).ToListAsync();
         }
 

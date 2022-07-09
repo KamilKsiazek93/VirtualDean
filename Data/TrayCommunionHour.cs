@@ -10,15 +10,11 @@ namespace VirtualDean.Data
 {
     public class TrayCommunionHour : ITrayCommunionHour
     {
-        private readonly CommunionHourDbContext _communionContext;
-        private readonly TrayHourDbContext _trayContext;
-        private readonly HoursDbContext _hourContext;
+        private readonly VirtualDeanDbContext _virtualDeanDbContext;
         private readonly IWeek _week;
-        public TrayCommunionHour(CommunionHourDbContext communionContext, TrayHourDbContext trayHourDbContext, IWeek week, HoursDbContext hoursDbContext)
+        public TrayCommunionHour(VirtualDeanDbContext virtualDeanDbContext, IWeek week)
         {
-            _communionContext = communionContext;
-            _trayContext = trayHourDbContext;
-            _hourContext = hoursDbContext;
+            _virtualDeanDbContext = virtualDeanDbContext;
             _week = week;
         }
 
@@ -32,8 +28,8 @@ namespace VirtualDean.Data
                 ValidateHours(office.CommunionHour, communionHours);
             }
 
-            await _communionContext.AddRangeAsync(offices);
-            await _communionContext.SaveChangesAsync();
+            await _virtualDeanDbContext.AddRangeAsync(offices);
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         public async Task AddTrayHour(IEnumerable<TrayOfficeAdded> offices)
@@ -46,8 +42,8 @@ namespace VirtualDean.Data
                 ValidateHours(office.TrayHour, trayHours);
             }
 
-            await _trayContext.AddRangeAsync(offices);
-            await _trayContext.SaveChangesAsync();
+            await _virtualDeanDbContext.AddRangeAsync(offices);
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         private void ValidateHours(string office, IEnumerable<string> _listOfHours)
@@ -60,33 +56,33 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHours()
         {
-            return await _communionContext.CommunionHourOffice.ToListAsync();
+            return await _virtualDeanDbContext.CommunionHourOffice.ToListAsync();
         }
 
         public async Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHours(int weekId)
         {
-            return await _communionContext.CommunionHourOffice.Where(communion => communion.WeekOfOffices == weekId).ToListAsync();
+            return await _virtualDeanDbContext.CommunionHourOffice.Where(communion => communion.WeekOfOffices == weekId).ToListAsync();
         }
         public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHours()
         {
-            return await _trayContext.TrayHourOffice.ToListAsync();
+            return await _virtualDeanDbContext.TrayHourOffice.ToListAsync();
         }
 
         public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHours(int weekId)
         {
-            return await _trayContext.TrayHourOffice.Where(tray => tray.WeekOfOffices == weekId).ToListAsync();
+            return await _virtualDeanDbContext.TrayHourOffice.Where(tray => tray.WeekOfOffices == weekId).ToListAsync();
         }
 
         public async Task<IEnumerable<LastTrayOfficeList>> GetLastTrayHour()
         {
             int weekNumber = await _week.GetLastWeek();
-            var ids = await _trayContext.TrayHourOffice.Where(tray => tray.WeekOfOffices == weekNumber)
+            var ids = await _virtualDeanDbContext.TrayHourOffice.Where(tray => tray.WeekOfOffices == weekNumber)
                 .Select(tray => tray.BrotherId).Distinct().ToListAsync();
             var lastTrays = new List<LastTrayOfficeList>();
             
             foreach(var id in ids)
             {
-                var trays = await _trayContext.TrayHourOffice.Where(item => item.WeekOfOffices == weekNumber && item.BrotherId == id)
+                var trays = await _virtualDeanDbContext.TrayHourOffice.Where(item => item.WeekOfOffices == weekNumber && item.BrotherId == id)
                     .Select(tray => tray.TrayHour).ToListAsync();
                 lastTrays.Add(new LastTrayOfficeList { IdBrother = id, BrothersTrays = trays });
             }
@@ -95,30 +91,30 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<string>> GetTrayHour(int weekNumber, int idBrother)
         {
-            return await _trayContext.TrayHourOffice.Where(tray => tray.BrotherId == idBrother && tray.WeekOfOffices == weekNumber)
+            return await _virtualDeanDbContext.TrayHourOffice.Where(tray => tray.BrotherId == idBrother && tray.WeekOfOffices == weekNumber)
                 .Select(tray => tray.TrayHour).ToListAsync();
         }
 
         public async Task<IEnumerable<string>> GetCommunionHour(int weekNumber, int idBrother)
         {
-            return await _communionContext.CommunionHourOffice.Where(item => item.BrotherId == idBrother && item.WeekOfOffices == weekNumber)
+            return await _virtualDeanDbContext.CommunionHourOffice.Where(item => item.BrotherId == idBrother && item.WeekOfOffices == weekNumber)
                 .Select(item => item.CommunionHour).ToListAsync();
         }
 
         public async Task<bool> IsTrayAlreadySet()
         {
             int weekNumber = await _week.GetLastWeek();
-            return await _trayContext.TrayHourOffice.Where(item => item.WeekOfOffices == weekNumber).AnyAsync();
+            return await _virtualDeanDbContext.TrayHourOffice.Where(item => item.WeekOfOffices == weekNumber).AnyAsync();
         }
 
         public async Task<IEnumerable<string>> GetHoursForTray()
         {
-            return await _hourContext.Hours.Select(item => item.Hour).ToListAsync();
+            return await _virtualDeanDbContext.Hours.Select(item => item.Hour).ToListAsync();
         }
 
         public async Task<IEnumerable<string>>GetHoursForCommunion()
         {
-            return await _hourContext.Hours.Where(item => item.Hour != "10.30").Select(item => item.Hour).ToListAsync();
+            return await _virtualDeanDbContext.Hours.Where(item => item.Hour != "10.30").Select(item => item.Hour).ToListAsync();
         }
     }
 }
