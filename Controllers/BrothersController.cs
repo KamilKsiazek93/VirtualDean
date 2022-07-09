@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using VirtualDean.Data;
 using VirtualDean.Enties;
@@ -13,10 +10,10 @@ namespace VirtualDean.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class Brothers : ControllerBase
+    public class BrothersController : ControllerBase
     {
         private readonly IBrothers _brothers;
-        public Brothers(IBrothers brothers)
+        public BrothersController(IBrothers brothers)
         {
             _brothers = brothers;
         }

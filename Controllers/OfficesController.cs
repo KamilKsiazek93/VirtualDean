@@ -14,7 +14,7 @@ namespace VirtualDean.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class Offices : ControllerBase
+    public class OfficesController : ControllerBase
     {
         private readonly IBrothers _brothers;
         private readonly IOfficesManager _officesManager;
@@ -22,7 +22,7 @@ namespace VirtualDean.Controllers
         private readonly IObstacle _obstacle;
         private readonly IWeek _week;
         
-        public Offices(IBrothers brothers, IOfficesManager officesManager,
+        public OfficesController(IBrothers brothers, IOfficesManager officesManager,
             ITrayCommunionHour trayCommunionHour, IObstacle obstacle, IWeek week)
         {
             _brothers = brothers;
