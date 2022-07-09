@@ -11,30 +11,30 @@ namespace VirtualDean.Data
 {
     public class Brothers : IBrothers
     {
-        private readonly BrotherDbContext _brotherContext;
+        private readonly VirtualDeanDbContext _virtualDeanDbContext;
         private readonly IAuth _auth;
-        public Brothers(BrotherDbContext brotherContext, IAuth auth)
+        public Brothers(VirtualDeanDbContext virtualDeanDbContext, IAuth auth)
         {
-            _brotherContext = brotherContext;
+            _virtualDeanDbContext = virtualDeanDbContext;
             _auth = auth;
         }
 
         public async Task DeleteBrother(Brother brother)
         {
-             _brotherContext.Remove(brother);
-            await _brotherContext.SaveChangesAsync();
+            _virtualDeanDbContext.Remove(brother);
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         public async Task EditBrother(Brother brother)
         {
-            _brotherContext.Entry(brother).State = EntityState.Modified;
-            await _brotherContext.SaveChangesAsync();
+            _virtualDeanDbContext.Entry(brother).State = EntityState.Modified;
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         public async Task<BaseModel> FindLoginBrother(LoginModel loginData)
         {
             var hashedPassword = _auth.GetHashedPassword(loginData.Password);
-            var brother = await _brotherContext.Brothers.Where(b => b.Email == loginData.Email 
+            var brother = await _virtualDeanDbContext.Brothers.Where(b => b.Email == loginData.Email 
             && b.PasswordHash == hashedPassword).FirstOrDefaultAsync();
             if(brother != null)
             {
@@ -51,7 +51,7 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<BaseModel>> GetBaseBrothersModel()
         {
-            return await _brotherContext.Brothers
+            return await _virtualDeanDbContext.Brothers
                 .OrderBy(bro => bro.Precedency)
                 .Where(bro => bro.StatusBrother == BrotherStatus.BRAT).Select(bro => new BaseModel() 
                 { Id = bro.Id, Name = bro.Name, Surname = bro.Surname }).ToListAsync();
@@ -59,12 +59,12 @@ namespace VirtualDean.Data
 
         public async Task<Brother> GetBrother(int brotherId)
         {
-            return await _brotherContext.Brothers.FindAsync(brotherId);
+            return await _virtualDeanDbContext.Brothers.FindAsync(brotherId);
         }
 
         public async Task<IEnumerable<BaseBrotherForLiturgistOffice>> GetBrotherForLiturgistOffice()
         {
-            return await _brotherContext.Brothers.OrderBy(bro => bro.Precedency).Where(bro => !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).
+            return await _virtualDeanDbContext.Brothers.OrderBy(bro => bro.Precedency).Where(bro => !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).
                 Select(bro => new BaseBrotherForLiturgistOffice { Id = bro.Id, Name = bro.Name, Surname = bro.Surname,
                 StatusBrother = bro.StatusBrother, IsAcolit = bro.IsAcolit, IsLector = bro.IsLector })
                 .ToListAsync();
@@ -72,19 +72,19 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<Brother>> GetBrothers()
         {
-            return await _brotherContext.Brothers.OrderBy(bro => bro.Precedency).Where(bro => bro.StatusBrother == BrotherStatus.BRAT).ToListAsync();
+            return await _virtualDeanDbContext.Brothers.OrderBy(bro => bro.Precedency).Where(bro => bro.StatusBrother == BrotherStatus.BRAT).ToListAsync();
         }
 
         public async Task<IEnumerable<BaseModel>> GetBrothersForCommunion()
         {
-            return await _brotherContext.Brothers
+            return await _virtualDeanDbContext.Brothers
                 .OrderBy(bro => bro.Precedency)
                 .Where(bro => (bro.IsAcolit || bro.IsDiacon) && bro.StatusBrother == BrotherStatus.BRAT).ToListAsync();
         }
 
         public async Task<IEnumerable<BaseModel>> GetBrothersForTray()
         {
-            return await _brotherContext.Brothers.Where(bro => !bro.IsAcolit && !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).ToListAsync();
+            return await _virtualDeanDbContext.Brothers.Where(bro => !bro.IsAcolit && !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).ToListAsync();
         }
 
         public string GetHashedPassword(string currentPassword)
@@ -94,7 +94,7 @@ namespace VirtualDean.Data
 
         public async Task<IEnumerable<CantorResponse>> GetSingingBrothers()
         {
-            return await _brotherContext.Brothers
+            return await _virtualDeanDbContext.Brothers
                 .OrderBy(bro => bro.Precedency)
                 .Where(bro => bro.IsSinging && !bro.IsDiacon && bro.StatusBrother == BrotherStatus.BRAT).
                 Select(bro => new CantorResponse()
@@ -103,7 +103,7 @@ namespace VirtualDean.Data
 
         public async Task<Boolean> IsBrotherInDb(Brother brother)
         {
-            return await _brotherContext.Brothers.AnyAsync(bro => bro.Name == brother.Name && bro.Surname == brother.Surname);
+            return await _virtualDeanDbContext.Brothers.AnyAsync(bro => bro.Name == brother.Name && bro.Surname == brother.Surname);
         }
 
         public async Task SaveBrother(Brother brother)
@@ -112,8 +112,8 @@ namespace VirtualDean.Data
             {
                 brother.StatusBrother = BrotherStatus.BRAT;
                 brother.PasswordHash = _auth.GetHashedPassword(brother.Name + "123");
-                await _brotherContext.Brothers.AddAsync(brother);
-                await _brotherContext.SaveChangesAsync();
+                await _virtualDeanDbContext.Brothers.AddAsync(brother);
+                await _virtualDeanDbContext.SaveChangesAsync();
             }
             catch
             {
@@ -123,7 +123,7 @@ namespace VirtualDean.Data
 
         public async Task SetupBrothersTable()
         {
-            if(! await _brotherContext.Brothers.AnyAsync())
+            if(! await _virtualDeanDbContext.Brothers.AnyAsync())
             {
                 await SetupAdminAccounts();
             }    
@@ -132,8 +132,8 @@ namespace VirtualDean.Data
         public async Task UpdatePassword(PasswordUpdate passwordUpdate, Brother brother)
         {
             brother.PasswordHash = _auth.GetHashedPassword(passwordUpdate.NewPassword);
-            _brotherContext.Entry(brother).State = EntityState.Modified;
-            await _brotherContext.SaveChangesAsync();
+            _virtualDeanDbContext.Entry(brother).State = EntityState.Modified;
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         private async Task SetupAdminAccounts()
@@ -194,12 +194,12 @@ namespace VirtualDean.Data
                 PasswordHash = _auth.GetHashedPassword("Komunijny123")
             };
 
-            await _brotherContext.AddAsync(cantor);
-            await _brotherContext.AddAsync(liturgist);
-            await _brotherContext.AddAsync(dean);
-            await _brotherContext.AddAsync(deanCommunion);
+            await _virtualDeanDbContext.AddAsync(cantor);
+            await _virtualDeanDbContext.AddAsync(liturgist);
+            await _virtualDeanDbContext.AddAsync(dean);
+            await _virtualDeanDbContext.AddAsync(deanCommunion);
 
-            await _brotherContext.SaveChangesAsync();
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
     }
 }

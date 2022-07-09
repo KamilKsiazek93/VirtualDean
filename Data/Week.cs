@@ -8,22 +8,22 @@ namespace VirtualDean.Data
 {
     public class Week : IWeek
     {
-        private readonly WeekDbContext _weekDbContext;
-        public Week(WeekDbContext weekDbContext)
+        private readonly VirtualDeanDbContext _virtualDeanDbContext;
+        public Week(VirtualDeanDbContext virtualDeanDbContext)
         {
-            _weekDbContext = weekDbContext;
+            _virtualDeanDbContext = virtualDeanDbContext;
         }
         public async Task<int> GetLastWeek()
         {
-            return await _weekDbContext.WeeksNumber.Select(item => item.WeekNumber)
+            return await _virtualDeanDbContext.WeeksNumber.Select(item => item.WeekNumber)
                 .OrderByDescending(item => item).FirstOrDefaultAsync();
         }
 
         public async Task IncrementWeek()
         {
             int weekNumber = await this.GetLastWeek() + 1;
-            await _weekDbContext.AddAsync(new WeekModel{ WeekNumber = weekNumber });
-            await _weekDbContext.SaveChangesAsync();
+            await _virtualDeanDbContext.AddAsync(new WeekModel{ WeekNumber = weekNumber });
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
     }
 }

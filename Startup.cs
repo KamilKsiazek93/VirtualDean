@@ -27,18 +27,6 @@ namespace VirtualDean
         {
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
-            services.AddDbContext<BrotherDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<ObstaclesDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<ObstacleConstDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<OfficeNameDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<OfficeDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<ObstacleBetweenOfficesDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<KitchenOfficeDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<TrayHourDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<CommunionHourDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<WeekDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<PipelineStatusDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<HoursDbContext>(options => options.UseSqlServer(connectionString));
             services.AddDbContext<VirtualDeanDbContext>(options => options.UseSqlServer(connectionString));
 
             services.AddControllers();

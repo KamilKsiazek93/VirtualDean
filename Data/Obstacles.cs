@@ -11,24 +11,19 @@ namespace VirtualDean.Data
     public class Obstacles : IObstacle
     {
         private readonly IWeek _week;
-        private readonly ObstaclesDbContext _obstaclesDbContext;
-        private readonly ObstacleConstDbContext _obstacleConstDbContext;
-        private readonly ObstacleBetweenOfficesDbContext _obstacleBetweenOfficeDbContext;
-        public Obstacles(IWeek week, ObstaclesDbContext obstaclesDbContext, ObstacleConstDbContext obstacleConstDbContext,
-            ObstacleBetweenOfficesDbContext obstacleBetweenOfficesDbContext)
+        private readonly VirtualDeanDbContext _virtualDeanDbContext;
+        public Obstacles(IWeek week, VirtualDeanDbContext virtualDeanDbContext)
         {
             _week = week;
-            _obstaclesDbContext = obstaclesDbContext;
-            _obstacleConstDbContext = obstacleConstDbContext;
-            _obstacleBetweenOfficeDbContext = obstacleBetweenOfficesDbContext;
+            _virtualDeanDbContext = virtualDeanDbContext;
         }
 
         public async Task AddConstObstacle(ConstObstacleAdded obstacles)
         {
             try
             {
-                await _obstacleConstDbContext.AddAsync(obstacles);
-                await _obstacleConstDbContext.SaveChangesAsync();
+                await _virtualDeanDbContext.AddAsync(obstacles);
+                await _virtualDeanDbContext.SaveChangesAsync();
             }
             catch
             {
@@ -46,10 +41,10 @@ namespace VirtualDean.Data
                     obstacle.WeekOfOffices = weekNumber;
                     if (!await IsOBstacleInDb(obstacle))
                     {
-                        await _obstaclesDbContext.AddAsync(obstacle);
+                        await _virtualDeanDbContext.AddAsync(obstacle);
                     }
                 }
-                await _obstaclesDbContext.SaveChangesAsync();
+                await _virtualDeanDbContext.SaveChangesAsync();
             }
             catch
             {
@@ -59,34 +54,34 @@ namespace VirtualDean.Data
 
         private async Task<Boolean> IsOBstacleInDb(ObstaclesAdded obstacle)
         {
-            return await _obstaclesDbContext.Obstacles.AnyAsync(item => item.Obstacle == obstacle.Obstacle && item.WeekOfOffices == obstacle.WeekOfOffices);
+            return await _virtualDeanDbContext.Obstacles.AnyAsync(item => item.Obstacle == obstacle.Obstacle && item.WeekOfOffices == obstacle.WeekOfOffices);
         }
 
         public async Task DeleteConstObstacle(ConstObstacleAdded obstacle)
         {
-            _obstacleConstDbContext.Remove(obstacle);
-            await _obstacleConstDbContext.SaveChangesAsync();
+            _virtualDeanDbContext.Remove(obstacle);
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<ConstObstacleAdded>> GetAllConstObstacles()
         {
-            return await _obstacleConstDbContext.ObstacleConst.ToListAsync();
+            return await _virtualDeanDbContext.ObstacleConst.ToListAsync();
         }
 
         public async Task<IEnumerable<string>> GetConstObstacleForBrother(int brotherId)
         {
-            return await _obstacleConstDbContext.ObstacleConst.Where(obstacle => obstacle.BrotherId == brotherId).Select(obstacle => obstacle.ObstacleName).ToListAsync();
+            return await _virtualDeanDbContext.ObstacleConst.Where(obstacle => obstacle.BrotherId == brotherId).Select(obstacle => obstacle.ObstacleName).ToListAsync();
         }
 
         public async Task<ConstObstacleAdded> GetConstObstacle(int id)
         {
-            return await _obstacleConstDbContext.ObstacleConst.FindAsync(id);
+            return await _virtualDeanDbContext.ObstacleConst.FindAsync(id);
         }
 
         public async Task<IEnumerable<ObstaclesList>> GetObstacles(int weekId)
         {
             List<ObstaclesList> obstaclesFromDB = new List<ObstaclesList>();
-            var obstacles =  await _obstaclesDbContext.Obstacles.Where(o => o.WeekOfOffices == weekId).ToListAsync();
+            var obstacles =  await _virtualDeanDbContext.Obstacles.Where(o => o.WeekOfOffices == weekId).ToListAsync();
             var ids = obstacles.Select(o => o.BrotherId).Distinct();
             foreach(var id in ids)
             {
@@ -115,36 +110,36 @@ namespace VirtualDean.Data
 
         public async Task EditConstObstacle(ConstObstacleAdded obstacle)
         {
-            _obstacleConstDbContext.Entry(obstacle).State = EntityState.Modified;
-            await _obstacleConstDbContext.SaveChangesAsync();
+            _virtualDeanDbContext.Entry(obstacle).State = EntityState.Modified;
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<ObstacleBetweenOffice>> GetObstacleBetweenOffices()
         {
-            return await _obstacleBetweenOfficeDbContext.ObstacleBetweenOffices.ToListAsync();
+            return await _virtualDeanDbContext.ObstacleBetweenOffices.ToListAsync();
         }
 
         public async Task AddObstacleBetweenOffices(ObstacleBetweenOffice obstacle)
         {
-            await _obstacleBetweenOfficeDbContext.AddAsync(obstacle);
-            await _obstacleBetweenOfficeDbContext.SaveChangesAsync();
+            await _virtualDeanDbContext.AddAsync(obstacle);
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         public async Task EditObstacleBetweenOffices(ObstacleBetweenOffice obstacle)
         {
-            _obstacleBetweenOfficeDbContext.Entry(obstacle).State = EntityState.Modified;
-            await _obstacleBetweenOfficeDbContext.SaveChangesAsync();
+            _virtualDeanDbContext.Entry(obstacle).State = EntityState.Modified;
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         public async Task DeleteObstacleBetweenOffices(ObstacleBetweenOffice obstacle)
         {
-            _obstacleBetweenOfficeDbContext.Remove(obstacle);
-            await _obstacleBetweenOfficeDbContext.SaveChangesAsync();
+            _virtualDeanDbContext.Remove(obstacle);
+            await _virtualDeanDbContext.SaveChangesAsync();
         }
 
         public async Task<ObstacleBetweenOffice> GetObstacleBetweenOffice(int id)
         {
-            return await _obstacleBetweenOfficeDbContext.ObstacleBetweenOffices.FindAsync(id);
+            return await _virtualDeanDbContext.ObstacleBetweenOffices.FindAsync(id);
         }
     }
 }
