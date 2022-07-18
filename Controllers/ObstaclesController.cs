@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using VirtualDean.Data;
@@ -16,11 +19,11 @@ namespace VirtualDean.Controllers
     public class ObstaclesController : ControllerBase
     {
         private readonly IObstacle _obstacle;
-        private readonly IBrothers _brothers;
-        public ObstaclesController(IObstacle obstacle, IBrothers brothers)
+        private readonly IHttpClientFactory _clientFactory;
+        public ObstaclesController(IObstacle obstacle, IHttpClientFactory clientFactory)
         {
             _obstacle = obstacle;
-            _brothers = brothers;
+            _clientFactory = clientFactory;
         }
 
         [HttpPost]
@@ -83,7 +86,8 @@ namespace VirtualDean.Controllers
         [HttpGet("const/brothers-data")]
         public async Task<IEnumerable<ConstObstacleWithBrotherData>> GetObstacleWithBrotherData()
         {
-            var baseBrothers = await _brothers.GetBaseBrothersModel();
+            var client = _clientFactory.CreateClient("Brothers");
+            var baseBrothers = await client.GetFromJsonAsync<IEnumerable<BaseModel>>("base");
             return await _obstacle.GetObstacleWithBrotherData(baseBrothers);
         }
 

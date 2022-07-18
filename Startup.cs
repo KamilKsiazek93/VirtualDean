@@ -10,6 +10,7 @@ using VirtualDean.Models.DatabaseContext;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System;
 
 namespace VirtualDean
 {
@@ -26,6 +27,10 @@ namespace VirtualDean
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            services.AddHttpClient("Brothers", httpClient =>
+            {
+                httpClient.BaseAddress = new Uri(Configuration["ServiceUri:Brothers"]);
+            });
 
             services.AddDbContext<VirtualDeanDbContext>(options => options.UseSqlServer(connectionString));
 
