@@ -9,6 +9,8 @@ using VirtualDean.Models;
 using VirtualDean.Enties;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Net.Http;
+using System.Net.Http.Json;
 
 namespace VirtualDean.Controllers
 {
@@ -16,26 +18,20 @@ namespace VirtualDean.Controllers
     [ApiController]
     public class OfficesController : ControllerBase
     {
-        private readonly IBrothers _brothers;
+        private readonly IHttpClientFactory _clientFactory;
         private readonly IOfficesManager _officesManager;
         private readonly ITrayCommunionHour _trayCommunionHour;
         private readonly IObstacle _obstacle;
         private readonly IWeek _week;
         
-        public OfficesController(IBrothers brothers, IOfficesManager officesManager,
+        public OfficesController(IHttpClientFactory clientFactory, IOfficesManager officesManager,
             ITrayCommunionHour trayCommunionHour, IObstacle obstacle, IWeek week)
         {
-            _brothers = brothers;
+            _clientFactory = clientFactory;
             _officesManager = officesManager;
             _trayCommunionHour = trayCommunionHour;
             _obstacle = obstacle;
             _week = week;
-        }
-
-        [HttpGet("brothers")]
-        public async Task<IEnumerable<Brother>> GetBrothers()
-        {
-            return await _brothers.GetBrothers();
         }
 
         [HttpPost("office-singing")]
@@ -167,8 +163,9 @@ namespace VirtualDean.Controllers
         [HttpGet("office-last")]
         public async Task<IEnumerable<OfficePrint>> GetLastOffice()
         {
+            var clientBrother = _clientFactory.CreateClient("Brothers");
             int weekNumber = await _week.GetLastWeek() - 1;
-            var brothers = (await GetBrothers()).OrderBy(bro => bro.Precedency);
+            var brothers = (await clientBrother.GetFromJsonAsync<IEnumerable<Brother>>("")).OrderBy(bro => bro.Precedency);
             var trays = await _trayCommunionHour.GetTrayHours(weekNumber);
             var communions = await _trayCommunionHour.GetCommunionHours(weekNumber);
             var otherOffices = await _officesManager.GetOffice(weekNumber);
