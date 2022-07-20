@@ -20,18 +20,12 @@ namespace VirtualDean.Controllers
     {
         private readonly IHttpClientFactory _clientFactory;
         private readonly IOfficesManager _officesManager;
-        private readonly ITrayCommunionHour _trayCommunionHour;
-        private readonly IObstacle _obstacle;
-        private readonly IWeek _week;
         
         public OfficesController(IHttpClientFactory clientFactory, IOfficesManager officesManager,
             ITrayCommunionHour trayCommunionHour, IObstacle obstacle, IWeek week)
         {
             _clientFactory = clientFactory;
             _officesManager = officesManager;
-            _trayCommunionHour = trayCommunionHour;
-            _obstacle = obstacle;
-            _week = week;
         }
 
         [HttpPost("office-singing")]
@@ -58,12 +52,6 @@ namespace VirtualDean.Controllers
             }
         }
 
-        [HttpGet("week-number")]
-        public async Task<int> GetActualWeekNumber()
-        {
-            return await _week.GetLastWeek();
-        }
-
         [HttpGet("office-name/{name}")]
         public async Task<IEnumerable<OfficeNames>> GetOfficeNames(string name)
         {
@@ -86,7 +74,8 @@ namespace VirtualDean.Controllers
         public async Task<IEnumerable<string>> GetOfficeNameForObstacle()
         {
             var officeName = await _officesManager.GetOfficeNamesForObstacle();
-            var officeHour = await _trayCommunionHour.GetHoursForTray();
+            var client = _clientFactory.CreateClient("TrayCommunions");
+            var officeHour = await client.GetFromJsonAsync<IEnumerable<string>>("hours-tray");
             return officeName.Union(officeHour);
         }
 
@@ -119,6 +108,7 @@ namespace VirtualDean.Controllers
         {
             try
             {
+                var client = _clientFactory.CreateClient("Weeks");
                 if (!await IsOfficeAvailableToSet(PipelineConstName.DEAN))
                 {
                     return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
@@ -126,7 +116,7 @@ namespace VirtualDean.Controllers
                 if (IsCurrentUserDean())
                 {
                     await _officesManager.AddDeanOffice(offices);
-                    await _week.IncrementWeek();
+                    await client.GetFromJsonAsync<Task>("");
                     await _officesManager.UpdatePipelineStatus(PipelineConstName.DEAN, false);
                     await _officesManager.UpdatePipelineStatus(PipelineConstName.KITCHEN, true);
                     return Ok(new { message = ActionResultMessage.OfficeAdded });
@@ -143,9 +133,11 @@ namespace VirtualDean.Controllers
         [HttpGet("office-last/{brotherId}")]
         public async Task<OfficeBrother> GetLastOfficeForBrother(int brotherId)
         {
-            int weekNumber = await _week.GetLastWeek() - 1;
-            var trays = await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
-            var communions = await _trayCommunionHour.GetCommunionHour(weekNumber, brotherId);
+            var clientTrayCommunion = _clientFactory.CreateClient("TrayCommunions");
+            var clientWeek = _clientFactory.CreateClient("Weeks");
+            int weekNumber = await clientWeek.GetFromJsonAsync<int>("") - 1;
+            var trays = await clientTrayCommunion.GetFromJsonAsync<IEnumerable<string>>($"tray-hour-last/{brotherId}");
+            var communions = await clientTrayCommunion.GetFromJsonAsync<IEnumerable<string>>($"communion-hour-last/{brotherId}");
             var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brotherId);
             return _officesManager.GetOfficeForSingleBrother(trays, communions, otherOffices);
         }
@@ -153,9 +145,11 @@ namespace VirtualDean.Controllers
         [HttpGet("office-previous/{brotherId}")]
         public async Task<OfficeBrother> GetPreviousOfficeForBrother(int brotherId)
         {
-            int weekNumber = await _week.GetLastWeek() - 2;
-            var trays = await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
-            var communions = await _trayCommunionHour.GetCommunionHour(weekNumber, brotherId);
+            var clientTrayCommunion = _clientFactory.CreateClient("TrayCommunions");
+            var clientWeek = _clientFactory.CreateClient("Weeks");
+            int weekNumber = await clientWeek.GetFromJsonAsync<int>("") - 2;
+            var trays = await clientTrayCommunion.GetFromJsonAsync<IEnumerable<string>>($"tray-hour-last/{brotherId}");
+            var communions = await clientTrayCommunion.GetFromJsonAsync<IEnumerable<string>>($"communion-hour-last/{brotherId}");
             var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brotherId);
             return _officesManager.GetOfficeForSingleBrother(trays, communions, otherOffices);
         }
@@ -163,11 +157,13 @@ namespace VirtualDean.Controllers
         [HttpGet("office-last")]
         public async Task<IEnumerable<OfficePrint>> GetLastOffice()
         {
+            var clientWeek = _clientFactory.CreateClient("Weeks");
             var clientBrother = _clientFactory.CreateClient("Brothers");
-            int weekNumber = await _week.GetLastWeek() - 1;
+            var clientTrayCommunion = _clientFactory.CreateClient("TrayCommunions");
+            int weekNumber = await clientWeek.GetFromJsonAsync<int>("") - 1;
             var brothers = (await clientBrother.GetFromJsonAsync<IEnumerable<Brother>>("")).OrderBy(bro => bro.Precedency);
-            var trays = await _trayCommunionHour.GetTrayHours(weekNumber);
-            var communions = await _trayCommunionHour.GetCommunionHours(weekNumber);
+            var trays = await clientTrayCommunion.GetFromJsonAsync<IEnumerable<TrayOfficeAdded>>($"tray-hour/{weekNumber}");
+            var communions = await clientTrayCommunion.GetFromJsonAsync<IEnumerable<CommunionOfficeAdded>>($"communion-hour/{weekNumber}");
             var otherOffices = await _officesManager.GetOffice(weekNumber);
             return _officesManager.GetOfficeForAllBrothers(brothers, trays, communions, otherOffices);
         }
@@ -209,93 +205,6 @@ namespace VirtualDean.Controllers
             return await _officesManager.GetKitchenOffices(weekId);
         }
 
-        [HttpPost("tray-hour")]
-        public async Task<ActionResult> AddTrayOffice(IEnumerable<TrayOfficeAdded> listOfTray)
-        {
-            try
-            {
-                if (!await IsOfficeAvailableToSet(PipelineConstName.TRAY))
-                {
-                    return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
-                }
-                if (IsCurrenUserLiturgist())
-                {
-                    await _trayCommunionHour.AddTrayHour(listOfTray);
-                    await _officesManager.UpdatePipelineStatus(PipelineConstName.TRAY, false);
-                    await _officesManager.UpdatePipelineStatus(PipelineConstName.LITURGIST, true);
-                    return Ok(new { message = ActionResultMessage.OfficeAdded });
-                }
-                return Unauthorized( new { message = ActionResultMessage.UnauthorizedUser });
-            }
-            catch
-            {
-                return NotFound(new { message = ActionResultMessage.OperationFailed });
-            }
-        }
-
-        [HttpGet("tray-hour")]
-        public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHour()
-        {
-            return await _trayCommunionHour.GetTrayHours();
-        }
-
-        [HttpGet("tray-hour/{weekId}")]
-        public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHour(int weekId)
-        {
-            return await _trayCommunionHour.GetTrayHours(weekId);
-        }
-
-        [HttpGet("tray-hour-last")]
-        public async Task<IEnumerable<LastTrayOfficeList>> GetLastTray()
-        {
-            return await _trayCommunionHour.GetLastTrayHour();
-        }
-
-        [HttpGet("tray-hour-last/{brotherId}")]
-        public async Task<IEnumerable<string>> GetLastTrayForBrother(int brotherId)
-        {
-            int weekNumber = await _week.GetLastWeek();
-            return await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
-        }
-
-        [HttpPost("communion-hour")]
-        public async Task<ActionResult> AddCommunionOffice(IEnumerable<CommunionOfficeAdded> listOfCommunion)
-        {
-            if (!await IsOfficeAvailableToSet(PipelineConstName.COMMUNION))
-            {
-                return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
-            }
-            try
-            {
-                await _trayCommunionHour.AddCommunionHour(listOfCommunion);
-                await _officesManager.UpdatePipelineStatus(PipelineConstName.COMMUNION, false);
-                return Ok(new { message = ActionResultMessage.OfficeAdded });
-            }
-            catch
-            {
-                return NotFound(new { message = ActionResultMessage.OperationFailed });
-            }
-        }
-
-        [HttpGet("communion-hour")]
-        public async Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHour()
-        {
-            return await _trayCommunionHour.GetCommunionHours();
-        }
-
-        [HttpGet("communion-hour/{weekId}")]
-        public async Task<IEnumerable<CommunionOfficeAdded>> GetCommunionHour(int weekId)
-        {
-            return await _trayCommunionHour.GetCommunionHours(weekId);
-        }
-
-        [HttpGet("communion-hour-last/{brotherId}")]
-        public async Task<IEnumerable<string>> GetLastCommunionForBrother(int brotherId)
-        {
-            int weekNumber = await _week.GetLastWeek();
-            return await _trayCommunionHour.GetCommunionHour(weekNumber, brotherId);
-        }
-
         [HttpGet("offices-name")]
         public async Task<IEnumerable<string>> GetOfficesName()
         {
@@ -308,16 +217,10 @@ namespace VirtualDean.Controllers
             return await _officesManager.GetPipelineStatus(name);
         }
 
-        [HttpGet("hours-tray")]
-        public Task<IEnumerable<string>> GetHoursForTray()
+        [HttpPut("pipeline")]
+        public async Task UpdatePipelineStatus(PipelineUpdate pipelineUpdate)
         {
-            return _trayCommunionHour.GetHoursForTray();
-        }
-
-        [HttpGet("hours-communion")]
-        public Task<IEnumerable<string>> GetHoursForCommunion()
-        {
-            return _trayCommunionHour.GetHoursForCommunion();
+            await _officesManager.UpdatePipelineStatus(pipelineUpdate.JobName, pipelineUpdate.JobValue);
         }
 
         private BaseModel GetCurrentUser()

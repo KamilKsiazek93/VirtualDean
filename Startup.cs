@@ -32,6 +32,21 @@ namespace VirtualDean
                 httpClient.BaseAddress = new Uri(Configuration["ServiceUri:Brothers"]);
             });
 
+            services.AddHttpClient("Offices", httpClient =>
+            {
+                httpClient.BaseAddress = new Uri(Configuration["ServiceUri:Offices"]);
+            });
+
+            services.AddHttpClient("Weeks", httpClient =>
+            {
+                httpClient.BaseAddress = new Uri(Configuration["ServiceUri:Weeks"]);
+            });
+
+            services.AddHttpClient("TrayCommunions", httpClient =>
+            {
+                httpClient.BaseAddress = new Uri(Configuration["ServiceUri:TrayCommunions"]);
+            });
+
             services.AddDbContext<VirtualDeanDbContext>(options => options.UseSqlServer(connectionString));
 
             services.AddControllers();
