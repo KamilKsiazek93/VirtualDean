@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
+using Microsoft.AspNetCore.Authorization;
+using VirtualDean.Authorization;
 
 namespace VirtualDean
 {
@@ -62,12 +64,6 @@ namespace VirtualDean
             services.AddScoped<IWeek, Week>();
             services.AddScoped<IAuth, Auth>();
 
-            services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
-                  builder
-                   .AllowAnyMethod()
-                   .AllowAnyHeader()
-                   .WithOrigins(Configuration["Frontend"])));
-
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -81,6 +77,23 @@ namespace VirtualDean
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                     };
                 });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Dean", policy =>
+                {
+                    policy.Requirements.Add(new ShouldBeDean());
+                });
+            });
+            services.AddScoped<IAuthorizationHandler, ShouldBeDeanHandler>();
+
+            services.AddHttpContextAccessor();
+
+            services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
+                  builder
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .WithOrigins(Configuration["Frontend"])));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
