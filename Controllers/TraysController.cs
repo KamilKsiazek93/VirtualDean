@@ -15,12 +15,12 @@ namespace VirtualDean.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TrayController : ControllerBase
+    public class TraysController : ControllerBase
     {
         private readonly ITrayRepository _trayRepository;
         private readonly IHttpClientFactory _clientFactory;
 
-        public TrayController(ITrayRepository trayRepository, IHttpClientFactory clientFactory)
+        public TraysController(ITrayRepository trayRepository, IHttpClientFactory clientFactory)
         {
             _trayRepository = trayRepository;
             _clientFactory = clientFactory;

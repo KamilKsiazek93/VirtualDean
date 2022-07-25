@@ -14,12 +14,12 @@ namespace VirtualDean.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CommunionController : ControllerBase
+    public class CommunionsController : ControllerBase
     {
         private readonly ICommunionRepository _communionRepository;
         private readonly IHttpClientFactory _clientFactory;
 
-        public CommunionController(ICommunionRepository communionRepository, IHttpClientFactory clientFactory)
+        public CommunionsController(ICommunionRepository communionRepository, IHttpClientFactory clientFactory)
         {
             _communionRepository = communionRepository;
             _clientFactory = clientFactory;
