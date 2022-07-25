@@ -28,7 +28,7 @@ namespace VirtualDean.Controllers
         }
 
         [Authorize(Policy = "Cantor")]
-        [HttpPost("office-singing")]
+        [HttpPost("singing")]
         public async Task<ActionResult> AddScholaOffices(IEnumerable<Office> offices)
         {
             try
@@ -76,7 +76,7 @@ namespace VirtualDean.Controllers
         }
 
         [Authorize(Policy = "Liturgist")]
-        [HttpPost("office-liturgist")]
+        [HttpPost("liturgist")]
         public async Task<ActionResult> AddLiturgistOffice(IEnumerable<Office> offices)
         {
             try
@@ -97,7 +97,7 @@ namespace VirtualDean.Controllers
         }
 
         [Authorize(Policy = "Dean")]
-        [HttpPost("office-dean")]
+        [HttpPost("dean")]
         public async Task<ActionResult> AddDeanOffice(IEnumerable<Office> offices)
         {
             try
@@ -163,7 +163,7 @@ namespace VirtualDean.Controllers
         }
 
         [Authorize(Policy = "Dean")]
-        [HttpPost("kitchen-offices")]
+        [HttpPost("kitchen")]
         public async Task<ActionResult> AddKitchenOffices(IEnumerable<KitchenOffices> offices)
         {
             try
@@ -184,25 +184,25 @@ namespace VirtualDean.Controllers
             }
         }
 
-        [HttpGet("kitchen-offices")]
+        [HttpGet("kitchen")]
         public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices()
         {
             return await _officesManager.GetKitchenOffices();
         }
 
-        [HttpGet("kitchen-offices/{weekId}")]
+        [HttpGet("kitchen/{weekId}")]
         public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices(int weekId)
         {
             return await _officesManager.GetKitchenOffices(weekId);
         }
 
-        [HttpGet("offices-name")]
+        [HttpGet("names")]
         public async Task<IEnumerable<string>> GetOfficesName()
         {
             return await _officesManager.GetOfficesName();
         }
 
-        [HttpGet("pipeline-status/{name}")]
+        [HttpGet("pipeline/name/{name}")]
         public async Task<Boolean> IsOfficeAvailableToSet(string name)
         {
             return await _officesManager.GetPipelineStatus(name);
