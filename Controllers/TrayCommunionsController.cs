@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,7 @@ namespace VirtualDean.Controllers
             _clientFactory = clientFactory;
         }
 
+        [Authorize(Policy = "Liturgist")]
         [HttpPost("tray-hour")]
         public async Task<ActionResult> AddTrayOffice(IEnumerable<TrayOfficeAdded> listOfTray)
         {
@@ -35,14 +37,10 @@ namespace VirtualDean.Controllers
                 {
                     return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
                 }
-               // if (IsCurrenUserLiturgist())
-                //{
-                    await _trayCommunionHour.AddTrayHour(listOfTray);
-                    await client.PutAsJsonAsync("pipeline", new PipelineUpdate { JobName = PipelineConstName.TRAY, JobValue = false});
-                    await client.PutAsJsonAsync("pipeline", new PipelineUpdate { JobName = PipelineConstName.LITURGIST, JobValue = true});
-                    return Ok(new { message = ActionResultMessage.OfficeAdded });
-               // }
-               // return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
+                await _trayCommunionHour.AddTrayHour(listOfTray);
+                await client.PutAsJsonAsync("pipeline", new PipelineUpdate { JobName = PipelineConstName.TRAY, JobValue = false });
+                await client.PutAsJsonAsync("pipeline", new PipelineUpdate { JobName = PipelineConstName.LITURGIST, JobValue = true });
+                return Ok(new { message = ActionResultMessage.OfficeAdded });
             }
             catch
             {
@@ -75,7 +73,7 @@ namespace VirtualDean.Controllers
             int weekNumber = await client.GetFromJsonAsync<int>("");
             return await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
         }
-
+        
         [HttpPost("communion-hour")]
         public async Task<ActionResult> AddCommunionOffice(IEnumerable<CommunionOfficeAdded> listOfCommunion)
         {
