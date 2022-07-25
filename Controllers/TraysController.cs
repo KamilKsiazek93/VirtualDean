@@ -83,7 +83,7 @@ namespace VirtualDean.Controllers
         private Task<bool> IsOfficeAvailableToSet(string officeName)
         {
             var client = _clientFactory.CreateClient("Offices");
-            return client.GetFromJsonAsync<bool>($"pipeline-status/{officeName}");
+            return client.GetFromJsonAsync<bool>($"pipeline/name/{officeName}");
         }
     }
 }
