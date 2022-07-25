@@ -28,6 +28,7 @@ namespace VirtualDean.Controllers
             _officesManager = officesManager;
         }
 
+        [Authorize(Policy = "Cantor")]
         [HttpPost("office-singing")]
         public async Task<ActionResult> AddScholaOffices(IEnumerable<Office> offices)
         {
@@ -37,14 +38,10 @@ namespace VirtualDean.Controllers
                 {
                     return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
                 }
-                if(IsCurrentUserCantor())
-                {
-                    await _officesManager.AddBrothersForSchola(offices);
-                    await _officesManager.UpdatePipelineStatus(PipelineConstName.CANTOR, false);
-                    await _officesManager.UpdatePipelineStatus(PipelineConstName.TRAY, true);
-                    return Ok(new { message = ActionResultMessage.OfficeAdded });
-                }
-                return Unauthorized( new { message = ActionResultMessage.UnauthorizedUser });
+                await _officesManager.AddBrothersForSchola(offices);
+                await _officesManager.UpdatePipelineStatus(PipelineConstName.CANTOR, false);
+                await _officesManager.UpdatePipelineStatus(PipelineConstName.TRAY, true);
+                return Ok(new { message = ActionResultMessage.OfficeAdded });
             }
             catch
             {
@@ -79,6 +76,7 @@ namespace VirtualDean.Controllers
             return officeName.Union(officeHour);
         }
 
+        [Authorize(Policy = "Liturgist")]
         [HttpPost("office-liturgist")]
         public async Task<ActionResult> AddLiturgistOffice(IEnumerable<Office> offices)
         {
@@ -88,14 +86,10 @@ namespace VirtualDean.Controllers
                 {
                     return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
                 }
-                if (IsCurrenUserLiturgist())
-                {
-                    await _officesManager.AddLiturgistOffice(offices);
-                    await _officesManager.UpdatePipelineStatus(PipelineConstName.LITURGIST, false);
-                    await _officesManager.UpdatePipelineStatus(PipelineConstName.DEAN, true);
-                    return Ok(new { message = ActionResultMessage.OfficeAdded });
-                }
-                return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
+                await _officesManager.AddLiturgistOffice(offices);
+                await _officesManager.UpdatePipelineStatus(PipelineConstName.LITURGIST, false);
+                await _officesManager.UpdatePipelineStatus(PipelineConstName.DEAN, true);
+                return Ok(new { message = ActionResultMessage.OfficeAdded });
             }
             catch
             {
@@ -103,6 +97,7 @@ namespace VirtualDean.Controllers
             }
         }
 
+        [Authorize(Policy = "Dean")]
         [HttpPost("office-dean")]
         public async Task<ActionResult> AddDeanOffice(IEnumerable<Office> offices)
         {
@@ -113,15 +108,11 @@ namespace VirtualDean.Controllers
                 {
                     return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
                 }
-                if (IsCurrentUserDean())
-                {
-                    await _officesManager.AddDeanOffice(offices);
-                    await client.GetFromJsonAsync<Task>("");
-                    await _officesManager.UpdatePipelineStatus(PipelineConstName.DEAN, false);
-                    await _officesManager.UpdatePipelineStatus(PipelineConstName.KITCHEN, true);
-                    return Ok(new { message = ActionResultMessage.OfficeAdded });
-                }
-                return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
+                await _officesManager.AddDeanOffice(offices);
+                await client.GetFromJsonAsync<Task>("");
+                await _officesManager.UpdatePipelineStatus(PipelineConstName.DEAN, false);
+                await _officesManager.UpdatePipelineStatus(PipelineConstName.KITCHEN, true);
+                return Ok(new { message = ActionResultMessage.OfficeAdded });
             }
             catch
             {
@@ -169,6 +160,7 @@ namespace VirtualDean.Controllers
             return _officesManager.GetOfficeForAllBrothers(brothers, trays, communions, otherOffices);
         }
 
+        [Authorize(Policy = "Dean")]
         [HttpPost("kitchen-offices")]
         public async Task<ActionResult> AddKitchenOffices(IEnumerable<KitchenOffices> offices)
         {
@@ -178,15 +170,11 @@ namespace VirtualDean.Controllers
                 {
                     return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
                 }
-                if (IsCurrentUserDean())
-                {
-                    await _officesManager.AddKitchenOffices(offices);
-                    await _officesManager.UpdatePipelineStatus(PipelineConstName.KITCHEN, false);
-                    await _officesManager.UpdatePipelineStatus(PipelineConstName.CANTOR, true);
-                    await _officesManager.UpdatePipelineStatus(PipelineConstName.COMMUNION, true);
-                    return Ok(new { message = ActionResultMessage.OfficeAdded });
-                }
-                return Unauthorized(new { message = ActionResultMessage.UnauthorizedUser });
+                await _officesManager.AddKitchenOffices(offices);
+                await _officesManager.UpdatePipelineStatus(PipelineConstName.KITCHEN, false);
+                await _officesManager.UpdatePipelineStatus(PipelineConstName.CANTOR, true);
+                await _officesManager.UpdatePipelineStatus(PipelineConstName.COMMUNION, true);
+                return Ok(new { message = ActionResultMessage.OfficeAdded });
             }
             catch
             {
@@ -222,39 +210,6 @@ namespace VirtualDean.Controllers
         public async Task UpdatePipelineStatus(PipelineUpdate pipelineUpdate)
         {
             await _officesManager.UpdatePipelineStatus(pipelineUpdate.JobName, pipelineUpdate.JobValue);
-        }
-
-        private BaseModel GetCurrentUser()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-
-            if(identity != null)
-            {
-                var userClaims = identity.Claims;
-                return new BaseModel
-                {
-                    Id = Int32.Parse(userClaims.FirstOrDefault(o => o.Type == ClaimTypes.NameIdentifier)?.Value ?? "0"),
-                    Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.GivenName)?.Value,
-                    Surname = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Surname)?.Value,
-                    StatusBrother = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role)?.Value
-                };
-            }
-            return null;
-        }
-
-        private Boolean IsCurrentUserDean()
-        {
-            return GetCurrentUser().StatusBrother == BrotherStatus.DEAN;
-        }
-
-        private Boolean IsCurrentUserCantor()
-        {
-            return GetCurrentUser().StatusBrother == BrotherStatus.CANTOR;
-        }
-
-        private Boolean IsCurrenUserLiturgist()
-        {
-            return GetCurrentUser().StatusBrother == BrotherStatus.LITURGIST;
         }
     }
 }
