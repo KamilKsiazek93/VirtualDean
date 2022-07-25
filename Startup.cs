@@ -44,9 +44,14 @@ namespace VirtualDean
                 httpClient.BaseAddress = new Uri(Configuration["ServiceUri:Weeks"]);
             });
 
-            services.AddHttpClient("TrayCommunions", httpClient =>
+            services.AddHttpClient("Trays", httpClient =>
             {
-                httpClient.BaseAddress = new Uri(Configuration["ServiceUri:TrayCommunions"]);
+                httpClient.BaseAddress = new Uri(Configuration["ServiceUri:Trays"]);
+            });
+
+            services.AddHttpClient("Communions", httpClient =>
+            {
+                httpClient.BaseAddress = new Uri(Configuration["ServiceUri:Communions"]);
             });
 
             services.AddDbContext<VirtualDeanDbContext>(options => options.UseSqlServer(connectionString));
@@ -59,7 +64,8 @@ namespace VirtualDean
 
             services.AddScoped<IBrothers, Brothers>();
             services.AddScoped<IOfficesManager, OfficesManager>();
-            services.AddScoped<ITrayCommunionHour, TrayCommunionHour>();
+            services.AddScoped<ITrayRepository, TrayRepository>();
+            services.AddScoped<ICommunionRepository, CommunionRepository>();
             services.AddScoped<IObstacle, Obstacles>();
             services.AddScoped<IWeek, Week>();
             services.AddScoped<IAuth, Auth>();

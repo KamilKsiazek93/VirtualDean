@@ -21,15 +21,14 @@ namespace VirtualDean.Controllers
         private readonly IHttpClientFactory _clientFactory;
         private readonly IOfficesManager _officesManager;
         
-        public OfficesController(IHttpClientFactory clientFactory, IOfficesManager officesManager,
-            ITrayCommunionHour trayCommunionHour, IObstacle obstacle, IWeek week)
+        public OfficesController(IHttpClientFactory clientFactory, IOfficesManager officesManager)
         {
             _clientFactory = clientFactory;
             _officesManager = officesManager;
         }
 
         [Authorize(Policy = "Cantor")]
-        [HttpPost("office-singing")]
+        [HttpPost("singing")]
         public async Task<ActionResult> AddScholaOffices(IEnumerable<Office> offices)
         {
             try
@@ -71,13 +70,13 @@ namespace VirtualDean.Controllers
         public async Task<IEnumerable<string>> GetOfficeNameForObstacle()
         {
             var officeName = await _officesManager.GetOfficeNamesForObstacle();
-            var client = _clientFactory.CreateClient("TrayCommunions");
-            var officeHour = await client.GetFromJsonAsync<IEnumerable<string>>("hours-tray");
+            var client = _clientFactory.CreateClient("Trays");
+            var officeHour = await client.GetFromJsonAsync<IEnumerable<string>>("hours");
             return officeName.Union(officeHour);
         }
 
         [Authorize(Policy = "Liturgist")]
-        [HttpPost("office-liturgist")]
+        [HttpPost("liturgist")]
         public async Task<ActionResult> AddLiturgistOffice(IEnumerable<Office> offices)
         {
             try
@@ -98,7 +97,7 @@ namespace VirtualDean.Controllers
         }
 
         [Authorize(Policy = "Dean")]
-        [HttpPost("office-dean")]
+        [HttpPost("dean")]
         public async Task<ActionResult> AddDeanOffice(IEnumerable<Office> offices)
         {
             try
@@ -124,11 +123,12 @@ namespace VirtualDean.Controllers
         [HttpGet("office-last/{brotherId}")]
         public async Task<OfficeBrother> GetLastOfficeForBrother(int brotherId)
         {
-            var clientTrayCommunion = _clientFactory.CreateClient("TrayCommunions");
+            var clientTray = _clientFactory.CreateClient("Trays");
+            var clientCommunion = _clientFactory.CreateClient("Communions");
             var clientWeek = _clientFactory.CreateClient("Weeks");
             int weekNumber = await clientWeek.GetFromJsonAsync<int>("") - 1;
-            var trays = await clientTrayCommunion.GetFromJsonAsync<IEnumerable<string>>($"tray-hour-last/{brotherId}");
-            var communions = await clientTrayCommunion.GetFromJsonAsync<IEnumerable<string>>($"communion-hour-last/{brotherId}");
+            var trays = await clientTray.GetFromJsonAsync<IEnumerable<string>>($"brother/{brotherId}");
+            var communions = await clientCommunion.GetFromJsonAsync<IEnumerable<string>>($"brother/{brotherId}");
             var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brotherId);
             return _officesManager.GetOfficeForSingleBrother(trays, communions, otherOffices);
         }
@@ -136,11 +136,12 @@ namespace VirtualDean.Controllers
         [HttpGet("office-previous/{brotherId}")]
         public async Task<OfficeBrother> GetPreviousOfficeForBrother(int brotherId)
         {
-            var clientTrayCommunion = _clientFactory.CreateClient("TrayCommunions");
+            var clientTray = _clientFactory.CreateClient("Trays");
+            var clientCommunion = _clientFactory.CreateClient("Communions");
             var clientWeek = _clientFactory.CreateClient("Weeks");
             int weekNumber = await clientWeek.GetFromJsonAsync<int>("") - 2;
-            var trays = await clientTrayCommunion.GetFromJsonAsync<IEnumerable<string>>($"tray-hour-last/{brotherId}");
-            var communions = await clientTrayCommunion.GetFromJsonAsync<IEnumerable<string>>($"communion-hour-last/{brotherId}");
+            var trays = await clientTray.GetFromJsonAsync<IEnumerable<string>>($"brother/{brotherId}");
+            var communions = await clientCommunion.GetFromJsonAsync<IEnumerable<string>>($"brother/{brotherId}");
             var otherOffices = await _officesManager.GetOfficeForBrother(weekNumber, brotherId);
             return _officesManager.GetOfficeForSingleBrother(trays, communions, otherOffices);
         }
@@ -151,17 +152,18 @@ namespace VirtualDean.Controllers
         {
             var clientWeek = _clientFactory.CreateClient("Weeks");
             var clientBrother = _clientFactory.CreateClient("Brothers");
-            var clientTrayCommunion = _clientFactory.CreateClient("TrayCommunions");
+            var clientTray = _clientFactory.CreateClient("Trays");
+            var clientCommunion = _clientFactory.CreateClient("Communions");
             int weekNumber = await clientWeek.GetFromJsonAsync<int>("") - 1;
             var brothers = (await clientBrother.GetFromJsonAsync<IEnumerable<Brother>>("")).OrderBy(bro => bro.Precedency);
-            var trays = await clientTrayCommunion.GetFromJsonAsync<IEnumerable<TrayOfficeAdded>>($"tray-hour/{weekNumber}");
-            var communions = await clientTrayCommunion.GetFromJsonAsync<IEnumerable<CommunionOfficeAdded>>($"communion-hour/{weekNumber}");
+            var trays = await clientTray.GetFromJsonAsync<IEnumerable<TrayOfficeAdded>>($"week/{weekNumber}");
+            var communions = await clientCommunion.GetFromJsonAsync<IEnumerable<CommunionOfficeAdded>>($"week/{weekNumber}");
             var otherOffices = await _officesManager.GetOffice(weekNumber);
             return _officesManager.GetOfficeForAllBrothers(brothers, trays, communions, otherOffices);
         }
 
         [Authorize(Policy = "Dean")]
-        [HttpPost("kitchen-offices")]
+        [HttpPost("kitchen")]
         public async Task<ActionResult> AddKitchenOffices(IEnumerable<KitchenOffices> offices)
         {
             try
@@ -182,25 +184,25 @@ namespace VirtualDean.Controllers
             }
         }
 
-        [HttpGet("kitchen-offices")]
+        [HttpGet("kitchen")]
         public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices()
         {
             return await _officesManager.GetKitchenOffices();
         }
 
-        [HttpGet("kitchen-offices/{weekId}")]
+        [HttpGet("kitchen/{weekId}")]
         public async Task<IEnumerable<KitchenOffices>> GetKitchenOffices(int weekId)
         {
             return await _officesManager.GetKitchenOffices(weekId);
         }
 
-        [HttpGet("offices-name")]
+        [HttpGet("names")]
         public async Task<IEnumerable<string>> GetOfficesName()
         {
             return await _officesManager.GetOfficesName();
         }
 
-        [HttpGet("pipeline-status/{name}")]
+        [HttpGet("pipeline/name/{name}")]
         public async Task<Boolean> IsOfficeAvailableToSet(string name)
         {
             return await _officesManager.GetPipelineStatus(name);
