@@ -26,53 +26,7 @@ namespace VirtualDean.Controllers
             _clientFactory = clientFactory;
         }
 
-        [Authorize(Policy = "Liturgist")]
-        [HttpPost("tray-hour")]
-        public async Task<ActionResult> AddTrayOffice(IEnumerable<TrayOfficeAdded> listOfTray)
-        {
-            try
-            {
-                var client = _clientFactory.CreateClient("Offices");
-                if (!await IsOfficeAvailableToSet(PipelineConstName.TRAY))
-                {
-                    return NotFound(new { message = ActionResultMessage.OfficeNotAdded });
-                }
-                await _trayCommunionHour.AddTrayHour(listOfTray);
-                await client.PutAsJsonAsync("pipeline", new PipelineUpdate { JobName = PipelineConstName.TRAY, JobValue = false });
-                await client.PutAsJsonAsync("pipeline", new PipelineUpdate { JobName = PipelineConstName.LITURGIST, JobValue = true });
-                return Ok(new { message = ActionResultMessage.OfficeAdded });
-            }
-            catch
-            {
-                return NotFound(new { message = ActionResultMessage.OperationFailed });
-            }
-        }
-
-        [HttpGet("tray-hour")]
-        public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHour()
-        {
-            return await _trayCommunionHour.GetTrayHours();
-        }
-
-        [HttpGet("tray-hour/{weekId}")]
-        public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHour(int weekId)
-        {
-            return await _trayCommunionHour.GetTrayHours(weekId);
-        }
-
-        [HttpGet("tray-hour-last")]
-        public async Task<IEnumerable<LastTrayOfficeList>> GetLastTray()
-        {
-            return await _trayCommunionHour.GetLastTrayHour();
-        }
-
-        [HttpGet("tray-hour-last/{brotherId}")]
-        public async Task<IEnumerable<string>> GetLastTrayForBrother(int brotherId)
-        {
-            var client = _clientFactory.CreateClient("Weeks");
-            int weekNumber = await client.GetFromJsonAsync<int>("");
-            return await _trayCommunionHour.GetTrayHour(weekNumber, brotherId);
-        }
+        
         
         [HttpPost("communion-hour")]
         public async Task<ActionResult> AddCommunionOffice(IEnumerable<CommunionOfficeAdded> listOfCommunion)
@@ -118,12 +72,6 @@ namespace VirtualDean.Controllers
             var client = _clientFactory.CreateClient("Weeks");
             int weekNumber = await client.GetFromJsonAsync<int>("");
             return await _trayCommunionHour.GetCommunionHour(weekNumber, brotherId);
-        }
-
-        [HttpGet("hours-tray")]
-        public Task<IEnumerable<string>> GetHoursForTray()
-        {
-            return _trayCommunionHour.GetHoursForTray();
         }
 
         [HttpGet("hours-communion")]

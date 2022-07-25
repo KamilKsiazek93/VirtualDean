@@ -27,7 +27,7 @@ namespace VirtualDean.Controllers
         }
 
         [Authorize(Policy = "Liturgist")]
-        [HttpPost("tray-hour")]
+        [HttpPost)]
         public async Task<ActionResult> AddTrayOffice(IEnumerable<TrayOfficeAdded> listOfTray)
         {
             try
@@ -48,30 +48,36 @@ namespace VirtualDean.Controllers
             }
         }
 
-        [HttpGet("tray-hour")]
+        [HttpGet]
         public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHour()
         {
             return await _trayRepository.GetTrayHours();
         }
 
-        [HttpGet("tray-hour/{weekId}")]
+        [HttpGet("week/{weekId}")]
         public async Task<IEnumerable<TrayOfficeAdded>> GetTrayHour(int weekId)
         {
             return await _trayRepository.GetTrayHours(weekId);
         }
 
-        [HttpGet("tray-hour-last")]
+        [HttpGet("last")]
         public async Task<IEnumerable<LastTrayOfficeList>> GetLastTray()
         {
             return await _trayRepository.GetLastTrayHour();
         }
 
-        [HttpGet("tray-hour-last/{brotherId}")]
+        [HttpGet("brother/{brotherId}")]
         public async Task<IEnumerable<string>> GetLastTrayForBrother(int brotherId)
         {
             var client = _clientFactory.CreateClient("Weeks");
             int weekNumber = await client.GetFromJsonAsync<int>("");
             return await _trayRepository.GetTrayHour(weekNumber, brotherId);
+        }
+
+        [HttpGet("hours")]
+        public Task<IEnumerable<string>> GetHoursForTray()
+        {
+            return _trayRepository.GetHoursForTray();
         }
 
         private Task<bool> IsOfficeAvailableToSet(string officeName)
