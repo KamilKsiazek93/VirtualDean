@@ -6,21 +6,20 @@ using VirtualDean.Enties;
 
 namespace VirtualDean.Authorization
 {
-    internal class ShouldBeDean : IAuthorizationRequirement
+    public class ShouldBeLiturgist : IAuthorizationRequirement
     {
-        
     }
 
-    internal class ShouldBeDeanHandler : AuthorizationHandler<ShouldBeDean>
+    public class ShouldBeLiturgistHandler : AuthorizationHandler<ShouldBeLiturgist>
     {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ShouldBeDean requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ShouldBeLiturgist requirement)
         {
             if (!context.User.HasClaim(x => x.Type == ClaimTypes.Role))
                 return Task.CompletedTask;
 
             var claims = context.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role);
             var role = claims.Value;
-            if (role == BrotherStatus.DEAN)
+            if (role == BrotherStatus.LITURGIST)
                 context.Succeed(requirement);
             return Task.CompletedTask;
         }

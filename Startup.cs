@@ -84,8 +84,18 @@ namespace VirtualDean
                 {
                     policy.Requirements.Add(new ShouldBeDean());
                 });
+                options.AddPolicy("Liturgist", policy =>
+                {
+                    policy.Requirements.Add(new ShouldBeLiturgist());
+                });
+                options.AddPolicy("Cantor", policy =>
+                {
+                    policy.Requirements.Add(new ShouldBeCantor());
+                });
             });
             services.AddScoped<IAuthorizationHandler, ShouldBeDeanHandler>();
+            services.AddScoped<IAuthorizationHandler, ShouldBeLiturgistHandler>();
+            services.AddScoped<IAuthorizationHandler, ShouldBeCantorHandler>();
 
             services.AddHttpContextAccessor();
 

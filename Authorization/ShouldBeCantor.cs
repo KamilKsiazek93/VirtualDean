@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;\
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -6,21 +6,20 @@ using VirtualDean.Enties;
 
 namespace VirtualDean.Authorization
 {
-    internal class ShouldBeDean : IAuthorizationRequirement
+    public class ShouldBeCantor : IAuthorizationRequirement
     {
-        
     }
 
-    internal class ShouldBeDeanHandler : AuthorizationHandler<ShouldBeDean>
+    public class ShouldBeCantorHandler : AuthorizationHandler<ShouldBeCantor>
     {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ShouldBeDean requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ShouldBeCantor requirement)
         {
             if (!context.User.HasClaim(x => x.Type == ClaimTypes.Role))
                 return Task.CompletedTask;
 
             var claims = context.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role);
             var role = claims.Value;
-            if (role == BrotherStatus.DEAN)
+            if (role == BrotherStatus.CANTOR)
                 context.Succeed(requirement);
             return Task.CompletedTask;
         }
