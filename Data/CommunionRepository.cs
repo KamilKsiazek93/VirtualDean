@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace VirtualDean.Data
 {
-    public class CommunionRepository
+    public class CommunionRepository : ICommunionRepository
     {
     }
 }
