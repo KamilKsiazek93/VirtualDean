@@ -27,7 +27,7 @@ namespace VirtualDean.Controllers
         }
 
         [Authorize(Policy = "Liturgist")]
-        [HttpPost)]
+        [HttpPost]
         public async Task<ActionResult> AddTrayOffice(IEnumerable<TrayOfficeAdded> listOfTray)
         {
             try
