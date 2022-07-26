@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ using VirtualDean.Models;
 namespace VirtualDean.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class ObstaclesController : ControllerBase
     {
@@ -56,6 +58,7 @@ namespace VirtualDean.Controllers
             return await _obstacle.GetObstacles(weekId);
         }
 
+        [Authorize(Policy = "Dean")]
         [HttpPost("const")]
         public async Task<ActionResult> AddConstObstacle(ConstObstacleAdded obstacles)
         {
@@ -90,6 +93,7 @@ namespace VirtualDean.Controllers
             return await _obstacle.GetObstacleWithBrotherData(baseBrothers);
         }
 
+        [Authorize(Policy = "Dean")]
         [HttpDelete("const/{id}")]
         public async Task<ActionResult> DeleteConstObstacle(int id)
         {
@@ -102,6 +106,7 @@ namespace VirtualDean.Controllers
             return Ok(new { message = ActionResultMessage.ObstacleDeleted });
         }
 
+        [Authorize(Policy = "Dean")]
         [HttpPut("obstacle-const/{id}")]
         public async Task<IActionResult> EditOBstacleConst(ConstObstacleAdded obstacle)
         {
@@ -116,13 +121,13 @@ namespace VirtualDean.Controllers
             return Ok(new { message = ActionResultMessage.DataUpdated });
         }
 
-        // old: obstacle-between-offices
         [HttpGet("offices")]
         public async Task<IEnumerable<ObstacleBetweenOffice>> GetObstacleBetweenOffices()
         {
             return await _obstacle.GetObstacleBetweenOffices();
         }
 
+        [Authorize(Policy = "Dean")]
         [HttpPost("offices")]
         public async Task<ActionResult> AddObstacleBetweenOffice(ObstacleBetweenOffice obstacle)
         {
@@ -137,6 +142,7 @@ namespace VirtualDean.Controllers
             }
         }
 
+        [Authorize(Policy = "Dean")]
         [HttpPut("offices/{id}")]
         public async Task<ActionResult> EditObstacleBetweenOffice(ObstacleBetweenOffice obstacle)
         {
@@ -151,6 +157,7 @@ namespace VirtualDean.Controllers
             return Ok(new { message = ActionResultMessage.DataUpdated });
         }
 
+        [Authorize(Policy = "Dean")]
         [HttpDelete("offices/{id}")]
         public async Task<ActionResult> DeleteObstacleBetweenOffice(int id)
         {

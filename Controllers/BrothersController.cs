@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using VirtualDean.Models;
 namespace VirtualDean.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class BrothersController : ControllerBase
     {
@@ -24,6 +26,7 @@ namespace VirtualDean.Controllers
             return await _brothers.GetBrothers();
         }
 
+        [AllowAnonymous]
         [HttpGet("login")]
         public async Task<BaseModel> LoginAction([FromQuery] LoginModel loginData)
         {
@@ -48,6 +51,7 @@ namespace VirtualDean.Controllers
             return await _brothers.GetBrother(id);
         }
 
+        [Authorize(Policy = "Dean")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteBrother(int id)
         {
@@ -60,6 +64,7 @@ namespace VirtualDean.Controllers
             return Ok(new { message = ActionResultMessage.BrotherDeleted });
         }
 
+        [Authorize(Policy = "Dean")]
         [HttpPut("{id}")]
         public async Task<IActionResult> EditBrother(Brother brother)
         {
@@ -74,6 +79,7 @@ namespace VirtualDean.Controllers
             return Ok(new { message = ActionResultMessage.DataUpdated });
         }
 
+        [Authorize(Policy = "Dean")]
         [HttpPost("brothers")]
         public async Task<ActionResult<Brother>> AddBrothers(Brother brother)
         {

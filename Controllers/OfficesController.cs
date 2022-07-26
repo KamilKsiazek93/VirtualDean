@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,13 +7,13 @@ using VirtualDean.Data;
 using VirtualDean.Models;
 using VirtualDean.Enties;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 using System.Net.Http;
 using System.Net.Http.Json;
 
 namespace VirtualDean.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class OfficesController : ControllerBase
     {

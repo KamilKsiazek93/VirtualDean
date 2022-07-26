@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -14,6 +11,7 @@ using VirtualDean.Models;
 namespace VirtualDean.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class TraysController : ControllerBase
     {
