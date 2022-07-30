@@ -3,3 +3,5 @@
 /VirtualDean/obj
 /VirtualDean/VirtualDean - Backup.csproj
 /.vs
+/VirtualDeanUnitTests/bin
+/VirtualDeanUnitTets/obj
