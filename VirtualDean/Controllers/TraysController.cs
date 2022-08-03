@@ -11,7 +11,6 @@ using VirtualDean.Models;
 namespace VirtualDean.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class TraysController : ControllerBase
     {

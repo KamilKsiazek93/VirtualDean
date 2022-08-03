@@ -6,7 +6,6 @@ using VirtualDean.Data;
 namespace VirtualDean.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class WeeksController : ControllerBase
     {

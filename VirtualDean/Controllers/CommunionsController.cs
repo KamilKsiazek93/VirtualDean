@@ -11,7 +11,7 @@ using VirtualDean.Models;
 namespace VirtualDean.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class CommunionsController : ControllerBase
     {

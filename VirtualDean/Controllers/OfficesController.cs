@@ -13,7 +13,6 @@ using System.Net.Http.Json;
 namespace VirtualDean.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class OfficesController : ControllerBase
     {
@@ -145,7 +144,6 @@ namespace VirtualDean.Controllers
             return _officesManager.GetOfficeForSingleBrother(trays, communions, otherOffices);
         }
 
-        [Authorize(Policy = "Dean")]
         [HttpGet("office-last")]
         public async Task<IEnumerable<OfficePrint>> GetLastOffice()
         {
