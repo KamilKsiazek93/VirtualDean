@@ -25,6 +25,12 @@ namespace VirtualDean.Controllers
             _officesManager = officesManager;
         }
 
+        [HttpGet("cron")]
+        public IActionResult TestCronAction()
+        {
+            return Ok(new { message = "Message from called endpoint" });
+        }
+
         [Authorize(Policy = "Cantor")]
         [HttpPost("singing")]
         public async Task<ActionResult> AddScholaOffices(IEnumerable<Office> offices)
