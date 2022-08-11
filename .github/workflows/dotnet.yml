@@ -17,6 +17,8 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        buildpack: "https://github.com/jincod/dotnetcore-buildpack"
       env:
         MailSettings.Email: "${{ secrets.Email}}"
         MailSettings.SmtpServer: "${{ secrets.SmtpServer }}"
