@@ -18,17 +18,35 @@ namespace VirtualDean.Controllers
     {
         private readonly IHttpClientFactory _clientFactory;
         private readonly IOfficesManager _officesManager;
+        private readonly INotifications _notifications;
         
-        public OfficesController(IHttpClientFactory clientFactory, IOfficesManager officesManager)
+        public OfficesController(IHttpClientFactory clientFactory, IOfficesManager officesManager, INotifications notifications)
         {
             _clientFactory = clientFactory;
             _officesManager = officesManager;
+            _notifications = notifications;
         }
 
         [HttpGet("cron")]
         public IActionResult TestCronAction()
         {
             return Ok(new { message = "Message from called endpoint" });
+        }
+
+        [HttpGet("mail")]
+        public IActionResult TestMail()
+        {
+            _notifications.SendEmail();
+            return Ok(new { message = "Wiadomość została wysłana" });
+            /* try
+             {
+                 _notifications.SendEmail();
+                 return Ok(new { message = "Wiadomość została wysłana" });
+             }
+             catch(Exception ex)
+             {
+                 return BadRequest(new { message = "Coś poszło nie tak: {0}", ex });
+             }*/
         }
 
         [Authorize(Policy = "Cantor")]
