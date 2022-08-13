@@ -3,5 +3,6 @@
     public interface INotifications
     {
         void SendEmail();
+        string GetServerName();
     }
 }

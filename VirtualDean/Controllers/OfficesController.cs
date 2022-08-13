@@ -49,6 +49,12 @@ namespace VirtualDean.Controllers
              }*/
         }
 
+        [HttpGet("server")]
+        public string GetServerName()
+        {
+            return "ServerName:  " + _notifications.GetServerName();
+        }
+
         [Authorize(Policy = "Cantor")]
         [HttpPost("singing")]
         public async Task<ActionResult> AddScholaOffices(IEnumerable<Office> offices)
