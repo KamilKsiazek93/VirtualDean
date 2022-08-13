@@ -19,7 +19,7 @@ jobs:
         dotnet-version: 6.0.x
       env:
         MailSettings.Email: "${{ secrets.Email}}"
-        MailSettings.SmtpServer: "${{ secrets.SMTPSERVER }}"
+        MailSettings.SmtpServer: "serverTest"
         MailSettings.Password: "${{ secrets.EmailPassword }}"
         MailSettings.Recipient: "${{ secrets.Recipient }}"
     - name: Restore dependencies
