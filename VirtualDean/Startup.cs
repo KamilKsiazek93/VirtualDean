@@ -125,10 +125,10 @@ namespace VirtualDean
                 builder.AddUserSecrets<Program>();
             }
 
-            //builder.AddEnvironmentVariables();
+            builder.AddEnvironmentVariables();
             var config = builder.Build();
 
-            //SetEnvironmentVariable(config);
+            SetEnvironmentVariable(config);
 
             app.UseHttpsRedirection();
 
