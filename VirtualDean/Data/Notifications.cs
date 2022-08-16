@@ -19,6 +19,7 @@ namespace VirtualDean.Data
             _email = configuration["MailSettings:Email"];
             _password = configuration["MailSettings:Password"];
             _recipient = configuration["MailSettings:Recipient"];
+            Environment.SetEnvironmentVariable("MailSettings:SmtpServer", _smtpServer);
         }
 
         public string GetServerName()

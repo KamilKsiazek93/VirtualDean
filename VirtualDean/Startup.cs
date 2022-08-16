@@ -124,8 +124,11 @@ namespace VirtualDean
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "VirtualDean v1"));
                 builder.AddUserSecrets<Program>();
             }
-            builder.AddEnvironmentVariables();
-            builder.Build();
+
+            //builder.AddEnvironmentVariables();
+            var config = builder.Build();
+
+            //SetEnvironmentVariable(config);
 
             app.UseHttpsRedirection();
 
@@ -139,6 +142,14 @@ namespace VirtualDean
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void SetEnvironmentVariable(IConfigurationRoot config)
+        {
+            foreach (var child in config.GetChildren())
+            {
+                Environment.SetEnvironmentVariable("MailSettings:SmtpServer", "testEnvServer");
+            }
         }
     }
 }
