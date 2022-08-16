@@ -148,7 +148,7 @@ namespace VirtualDean
         {
             foreach (var child in config.GetChildren())
             {
-                Environment.SetEnvironmentVariable("MailSettings:SmtpServer", "testEnvServer");
+                Environment.SetEnvironmentVariable("SmtpServer", "testEnvServer");
             }
         }
     }
