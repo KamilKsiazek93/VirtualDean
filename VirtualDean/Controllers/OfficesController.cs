@@ -33,20 +33,6 @@ namespace VirtualDean.Controllers
             return Ok(new { message = "Message from called endpoint" });
         }
 
-        [HttpGet("mail")]
-        public IActionResult TestMail()
-        {
-            try
-            {
-                _notifications.SendEmail();
-                return Ok(new { message = "Wiadomość została wysłana" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = "Coś poszło nie tak: {0}", ex });
-            }
-        }
-
         [Authorize(Policy = "Cantor")]
         [HttpPost("singing")]
         public async Task<ActionResult> AddScholaOffices(IEnumerable<Office> offices)

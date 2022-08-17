@@ -2,6 +2,6 @@
 {
     public interface INotifications
     {
-        void SendEmail();
+        void SendEmail(string[] reciepients, string mailContent, string subject);
     }
 }
