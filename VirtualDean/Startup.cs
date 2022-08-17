@@ -128,8 +128,6 @@ namespace VirtualDean
             builder.AddEnvironmentVariables();
             var config = builder.Build();
 
-            SetEnvironmentVariable(config);
-
             app.UseHttpsRedirection();
 
             app.UseRouting();
@@ -142,14 +140,6 @@ namespace VirtualDean
             {
                 endpoints.MapControllers();
             });
-        }
-
-        private void SetEnvironmentVariable(IConfigurationRoot config)
-        {
-            foreach (var child in config.GetChildren())
-            {
-                Environment.SetEnvironmentVariable("SmtpServer", "testEnvServer");
-            }
         }
     }
 }

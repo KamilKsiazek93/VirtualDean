@@ -16,9 +16,9 @@ namespace VirtualDean.Data
         public Notifications(IConfiguration configuration)
         {
             _smtpServer = configuration["SmtpServer"];
-            _email = configuration["MailSettings:Email"];
-            _password = configuration["MailSettings:Password"];
-            _recipient = configuration["MailSettings:Recipient"];
+            _email = configuration["Email"];
+            _password = configuration["Password"];
+            _recipient = configuration["Recipient"];
         }
 
         public string GetServerName()
