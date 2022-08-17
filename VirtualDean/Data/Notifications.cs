@@ -21,11 +21,6 @@ namespace VirtualDean.Data
             _recipient = configuration["Recipient"];
         }
 
-        public string GetServerName()
-        {
-            return _smtpServer + " "+ _email + " " + _password + " " + _recipient;
-        }
-
         public void SendEmail()
         {
             EmailManager mailMan = new EmailManager(_smtpServer);

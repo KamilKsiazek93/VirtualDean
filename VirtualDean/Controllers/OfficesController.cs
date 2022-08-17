@@ -36,23 +36,15 @@ namespace VirtualDean.Controllers
         [HttpGet("mail")]
         public IActionResult TestMail()
         {
-            _notifications.SendEmail();
-            return Ok(new { message = "Wiadomość została wysłana" });
-            /* try
-             {
-                 _notifications.SendEmail();
-                 return Ok(new { message = "Wiadomość została wysłana" });
-             }
-             catch(Exception ex)
-             {
-                 return BadRequest(new { message = "Coś poszło nie tak: {0}", ex });
-             }*/
-        }
-
-        [HttpGet("server")]
-        public string GetServerName()
-        {
-            return "ServerName:  " + _notifications.GetServerName();
+            try
+            {
+                _notifications.SendEmail();
+                return Ok(new { message = "Wiadomość została wysłana" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Coś poszło nie tak: {0}", ex });
+            }
         }
 
         [Authorize(Policy = "Cantor")]
