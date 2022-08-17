@@ -36,7 +36,7 @@ namespace VirtualDean.Data
             myConfig.ClientCredentialPassword = _password;
             myConfig.TOs = new string[] { _recipient };
             myConfig.CCs = new string[] { };
-            myConfig.From = "virtualdeanop@outlook.com";
+            myConfig.From = _email;
             myConfig.FromDisplayName = "DziekanInfo";
             myConfig.Priority = System.Net.Mail.MailPriority.Normal;
             myConfig.Subject = "Test mail from outlook and app";
