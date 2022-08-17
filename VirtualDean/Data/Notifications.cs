@@ -23,7 +23,7 @@ namespace VirtualDean.Data
 
         public string GetServerName()
         {
-            return _smtpServer;
+            return _smtpServer + " "+ _email + " " + _password + " " + _recipient;
         }
 
         public void SendEmail()
