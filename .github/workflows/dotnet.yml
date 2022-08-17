@@ -18,10 +18,10 @@ jobs:
       with:
         dotnet-version: 6.0.x
       env:
-        MailSettings.Email: "${{ secrets.Email}}"
+        Email: "${{ secrets.Email}}"
         SmtpServer: "${{ secrets.SMTPSERVER }}"
-        MailSettings.Password: "${{ secrets.EmailPassword }}"
-        MailSettings.Recipient: "${{ secrets.Recipient }}"
+        Password: "${{ secrets.EmailPassword }}"
+        Recipient: "${{ secrets.Recipient }}"
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
