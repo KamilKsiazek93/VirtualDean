@@ -38,6 +38,21 @@ namespace VirtualDean.Controllers
             return new BaseModel();
         }
 
+        [HttpPost("password")]
+        public async Task<IActionResult> UpdatePassword(PasswordUpdate data)
+        {
+            var brother = await GetBrothers(data.BrotherId);
+            try
+            {
+                await _brothers.UpdatePassword(data, brother);
+                return Ok(new { message = ActionResultMessage.DataUpdated });
+            }
+            catch
+            {
+                return BadRequest(new { message = ActionResultMessage.OperationFailed });
+            }
+        }
+
         [HttpGet("base")]
         public async Task<IEnumerable<BaseModel>> GetBaseBrothersModel()
         {
