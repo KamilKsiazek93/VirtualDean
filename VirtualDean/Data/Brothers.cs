@@ -131,9 +131,16 @@ namespace VirtualDean.Data
 
         public async Task UpdatePassword(PasswordUpdate passwordUpdate, Brother brother)
         {
-            brother.PasswordHash = _auth.GetHashedPassword(passwordUpdate.NewPassword);
-            _virtualDeanDbContext.Entry(brother).State = EntityState.Modified;
-            await _virtualDeanDbContext.SaveChangesAsync();
+            if(brother.PasswordHash != _auth.GetHashedPassword(passwordUpdate.CurrentPassword))
+            {
+                throw new Exception("Podane hasło nie jest zgodne z obecnym hasłem");
+            }
+            else
+            {
+                brother.PasswordHash = _auth.GetHashedPassword(passwordUpdate.NewPassword);
+                _virtualDeanDbContext.Entry(brother).State = EntityState.Modified;
+                await _virtualDeanDbContext.SaveChangesAsync();
+            }
         }
 
         private async Task SetupAdminAccounts()
